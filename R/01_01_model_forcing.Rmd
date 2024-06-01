@@ -1,0 +1,669 @@
+---
+title: "Forcing functions"
+execute:
+  eval: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "C:/Users/treimer/OneDrive - University of Tasmania/Macroalgae growth & attenuation/R stuff - Growth")
+
+pacman::p_load("knitr", "tidyverse", "magrittr","forcats", "MASS", "ggplot2", "car", "gamlss", "fitdistrplus", "statmod", "stats", "tweedie", "geosphere", "stringr", "ggmap", "scales", "kableExtra", "multcomp", "insight", "ggeffects", "plotrix", "Rmisc", "BSagri", "magick", "cowplot", "broom", "lubridate", "nlstools", "dplyr", "tidyr", "devtools", "EnvStats", "nlstimedist", install = T, dependencies = T, update = T)
+
+# WARNING! THIS REQUIRES AN EARLIER VERSION OF R!
+# options(repos = c(pecanproject = 'https://pecanproject.r-universe.dev',
+#                   CRAN = 'https://cloud.r-project.org'))
+# install.packages('PEcAn.all')
+# install.packages('PEcAn.data.atmosphere')
+
+niceplot = theme_classic() + theme(legend.position = "none") + theme(text = element_text(size = 12, family = "sans", colour = "black"))
+prettybars = scale_fill_brewer(palette = "Set1")
+```
+
+Axis labels, etc.
+
+```{r globals}
+irr_lab = bquote('Irradience (' * mu * 'mol photons ' ~ m ^ -2 ~ s ^ -1 * ')')
+lab_N = bquote("Concentration ("*mu*"mol N "~L^-1*")")
+lab_N = bquote("Concentration ("*mu*"mol N "~L^-1*")")
+lab_amm.log = bquote("Log of concentration ("*mu*"mol "~NH[4]*")")
+lab_nit = bquote("Concentration ("*mu*"mol "~NO[3]*")")
+temp_lab = expression(Temperature ~ (degree * C))
+t = data.frame(as.numeric(1:(365 + 30)))
+colnames(t) = c("day_t")
+```
+
+# Light and temperature
+
+## Environmental data
+
+This loads all the environmental data from WP1 and WP2 (data.CRC), as well as data from the BOM.
+
+```{r load environmental data}
+setwd("C:/Users/treimer/OneDrive - University of Tasmania/Other people's data/CRC-P WP1 & 2 data - old")
+
+data.CRC = read.csv("all_env_data.csv", sep = ',')
+
+data.CRC = data.CRC %>%
+  mutate(site = as.factor(site)) %>%
+  mutate(depth_m = as.factor(depth_m)) %>%
+  mutate(date = as.Date(date, "%d/%m/%y"))
+levels(data.CRC$site) = c("Okehampton", "Tower Bay")
+
+solar_dov = read.csv("bom data/IDCJAC0016_094020_2021_Data.csv", sep = ',') %>%
+  mutate(site = as.factor("Dover"))
+solar_tri = read.csv("bom data/IDCJAC0016_092157_2021_Data.csv", sep = ',') %>%
+  mutate(site = as.factor("Triabunna"))
+temp.BOM.min = read.csv("bom data/IDCJAC0011_094020_2021_Data.csv", sep = ',')
+colnames(temp.BOM.min) = c("code", "site_no", "y", "m", "d", "day_t", "temp.min", "days_acc", "quality")
+temp.BOM.min = temp.BOM.min %>%
+  mutate(site = case_when(site_no == as.integer(94020) ~ as.factor("Dover"),
+                          site_no == as.integer(92157) ~ as.factor("Triabunna")))
+temp.BOM.max = read.csv("bom data/IDCJAC0010_094020_2021_Data.csv", sep = ',')
+colnames(temp.BOM.max) = c("code", "site_no", "y", "m", "d", "day_t", "temp.max", "days_acc", "quality")
+temp.BOM.max = temp.BOM.max %>%
+  mutate(site = case_when(site_no == as.integer(94020) ~ as.factor("Dover"),
+                          site_no == as.integer(92157) ~ as.factor("Triabunna")))
+```
+
+```{r combine bom data}
+solar.BOM = rbind(solar_dov, solar_tri)
+colnames(solar.BOM) = c("prod", "code", "y", "m", "d", "day_t", "I.MJ", "site")
+solar.BOM = solar.BOM %>%
+  mutate(date = make_date(y = y, m = m, d = d)) %>%
+  mutate(I.ppfd = PEcAn.data.atmosphere::solarMJ2ppfd(I.MJ)) %>%
+  dplyr::select(-c(prod, code, y, m, d))
+
+temp.BOM = merge(temp.BOM.min, temp.BOM.max, by.x = "day_t", by.y = "day_t") %>%
+  mutate(date = make_date(y = y.x, m = m.x, d = d.x)) %>%
+  dplyr::select(-c(code.x, site_no.x, y.x, m.x, d.x, days_acc.x, quality.x, code.y, site_no.y, y.y, m.y, d.y, days_acc.y, quality.y, site.y))
+colnames(temp.BOM) = c("day_t", "temp.min", "site", "temp.max", "date")
+
+data.BOM = merge(solar.BOM,temp.BOM, by.x = c("day_t", "site"), by.y = c("day_t", "site"),
+                 all.x = TRUE, all.y = TRUE) %>%
+  mutate(temp.ave = (temp.min + temp.max) / 2) %>% 
+  dplyr::select(-c(date.x))
+colnames(data.BOM) = c("day_t", "site", "I.MJ", "I.BOM.ppfd", "temp.BOM.min", "temp.BOM.max", "date", "temp.BOM.ave")
+
+rm(solar_dov,solar_tri, solar.BOM,temp.BOM,temp.BOM.max,temp.BOM.min)
+```
+
+```{r combine crcp data}
+means.CRC = data.CRC %>%
+  filter(I_lux > 0, I_ppfd < 20000) %>%  # one giant outlier
+  group_by(site, depth_m, day_t) %>%
+  reframe(I.CRCP.ave = mean(I_ppfd),
+          temp.CRCP.ave = mean(temp_C))
+```
+
+```{r combine all data}
+env.BOM = data.BOM %>%
+  mutate(source = as.factor("BOM")) %>%
+  mutate(depth_m = as.factor("surf")) %>%
+  dplyr::select(-date, -I.MJ)
+colnames(env.BOM) = c("day_t", "site", "I.ppfd", "temp.min" , "temp.max" , "temp.ave", "source", "depth_m")
+env.CRC = means.CRC %>%
+  mutate(source = as.factor("CRC")) %>%
+  mutate(temp.min = NA) %>%
+  mutate(temp.max = NA)
+colnames(env.CRC) = c("site", "depth_m", "day_t", "I.ppfd", "temp.ave", "source", "temp.min" , "temp.max")
+
+data.env = rbind(env.BOM, env.CRC)
+write.csv(data.env, "data/processed/data.env.csv")
+```
+
+## Plotting environmental data
+
+```{r initial I plot, eval=F}
+(p.init.I = ggplot(data.env) +
+  geom_point(aes(x = day_t, y = I.ppfd, 
+                 shape = site, color = depth_m, size = source)) + 
+   scale_color_manual(values = c("surf" = "grey", "2" = "orange", 
+                                 "5" = "steelblue")) +
+   scale_size_manual(values = c("BOM" = 1.5, "CRC" = 2.5)) +
+   scale_shape_manual(values = c("Dover" = 1, "Triabunna" = 1, 
+                                 "Okehampton" = 0, "Tower Bay" = 2)) +
+  theme_classic()) + theme(legend.position = "none")
+```
+
+```{r initial T plot, eval=F}
+(p.init.T = ggplot(data.env) +
+  geom_point(aes(x = day_t, y = temp.ave, 
+                 shape = site, color = depth_m, size = source)) +
+  scale_color_manual(values = c("surf" = "grey", "2" = "orange", 
+                                "5" = "steelblue")) +
+  scale_size_manual(values = c("BOM" = 1.5, "CRC" = 2.5)) +
+  scale_shape_manual(values = c("Dover" = 1, "Triabunna" = 1, "Okehampton" = 0, "Tower Bay" = 2)) +
+  theme_classic())
+```
+
+## New forcing functions
+
+### Irradience
+
+```{r nls on BOM ppfd}
+x.I = as.formula(I.ppfd ~ aI - 425 + sin((2 * pi * (day_t + bI) + pi / 2) / 365) * cI *0.675)
+
+y.I = nls(x.I, start = list(aI = 850, bI = 60, cI = 600), data = env.BOM)
+summary(y.I)
+aI = round(coef(summary(y.I))[1],2)
+bI = round(coef(summary(y.I))[2],0)
+cI = round(coef(summary(y.I))[3],2)
+
+y.I.BOM = t %>%
+  mutate(surfI = aI + sin((2 * pi * (day_t + bI) + pi / 2) / 365) * cI)
+write.csv(y.I.BOM, "data/processed/y.I.BOM.csv")
+
+p.init.I + geom_line(data = y.I.BOM, aes(x = day_t, y = surfI))
+```
+
+```{r adapting for CRC ppfd}
+x.f = as.formula(I.ppfd ~ (aI + sin((2 * pi * (day_t + bI) + pi / 2) / 365) * cI) * exp(-kW * as.numeric(depth_m)))
+y.f = nls(x.f, start = list(kW = 0.85), data = env.CRC)
+
+summary(y.f)
+kW.new = round(coef(y.f)[[1]]*0.25, 2)
+
+kW.levs.1 = t %>%
+  mutate(surf = (aI + sin((2 * pi * (day_t + bI) + pi / 2) / 365) * cI),
+         l.1 = surf * exp(-kW.new * 0.9 * 1),
+         l.2 = surf * exp(-kW.new * 1),
+         l.3 = surf * exp(-kW.new * 1.1 * 1)) %>% 
+  pivot_longer(names_to = "kW.lev", values_to = "Ippfd", cols = c(l.1,l.2,l.3)) %>% 
+  mutate(depth = 1)
+
+kW.levs.2 = t %>%
+  mutate(surf = (aI + sin((2 * pi * (day_t + bI) + pi / 2) / 365) * cI),
+         l.1 = surf * exp(-kW.new * 0.9 * 2),
+         l.2 = surf * exp(-kW.new * 2),
+         l.3 = surf * exp(-kW.new * 1.1 * 2)) %>% 
+  pivot_longer(names_to = "kW.lev", values_to = "Ippfd", cols = c(l.1,l.2,l.3)) %>% 
+  mutate(depth = 2)
+
+kW.levs.5 = t %>%
+  mutate(surf = (aI + sin((2 * pi * (day_t + bI) + pi / 2) / 365) * cI),
+         l.1 = surf * exp(-kW.new * 0.9 * 5),
+         l.2 = surf * exp(-kW.new * 5),
+         l.3 = surf * exp(-kW.new * 1.1 * 5)) %>% 
+  pivot_longer(names_to = "kW.lev", values_to = "Ippfd", 
+               cols = c(l.1, l.2, l.3)) %>% 
+  mutate(depth = 5)
+
+y.I.CRC = rbind(kW.levs.1, kW.levs.2, kW.levs.5) %>% 
+  mutate(depth = as.factor(depth))
+write.csv(y.I.CRC, "data/processed/y.I.CRC.csv")
+
+p.init.I +
+  # geom_point(data = data.env, 
+  #            aes(x = day_t, y = I.ppfd, color = depth_m)) +
+  # theme_classic() +
+  geom_line(data = filter(y.I.CRC, kW.lev == "l.2"), aes(x = day_t, y = Ippfd, 
+                                linetype = depth)) +
+  geom_line(data = y.I.BOM, aes(x = day_t, y = surfI), color = "gold", linewidth = 1.5) +
+  lims(x = c(0, 365))
+```
+
+### Temperature
+
+There is only Dover for BOM temperature.
+
+```{r nls on BOM temp}
+x.T =
+  as.formula(temp.ave ~ aT.Dov + sin((2 * pi * (day_t + bT.Dov) + pi / 2) / 365) * cT.Dov)
+
+y.T.Dov =
+  nls(
+    x.T,
+    start = list(
+      aT.Dov = 15,
+      bT.Dov = 60,
+      cT.Dov = 2
+    ),
+    data = env.BOM
+  )
+summary(y.T.Dov)
+aT.Dov = round(coef(summary(y.T.Dov))[1], 2)
+bT.Dov = round(coef(summary(y.T.Dov))[2], 0)
+cT.Dov = round(coef(summary(y.T.Dov))[3], 2)
+
+y.T.BOM = t %>%
+  mutate(Dover = aT.Dov + sin((2 * pi * (day_t + bT.Dov) + pi / 2) / 365) * cT.Dov)
+y.T.BOM = as.data.frame(y.T.BOM)
+
+p.init.T + geom_line(data = y.T.BOM,
+                     aes(x = day_t,
+                         y = Dover,
+                         linetype = "solid"))
+
+rm(y.T.Dov)
+```
+
+This time only the b value stays the same, so that the peak is in the correct place.
+
+```{r adapting for CRC temp}
+x.T.Oke =
+  as.formula(temp.ave ~ aT.Oke + sin((2 * pi * (day_t + bT.Dov) + pi / 2) / 365) * cT.Oke)
+y.T.Oke =
+  nls(
+    x.T.Oke,
+    start = list(aT.Oke = aT.Dov, cT.Oke = cT.Dov),
+    data = filter(env.CRC,site=="Okehampton")
+  )
+summary(y.T.Oke)
+aT.Oke = round(coef(summary(y.T.Oke))[1], 2)
+cT.Oke = round(coef(summary(y.T.Oke))[2], 2)
+
+x.T.Tow =
+  as.formula(temp.ave ~ aT.Tow + sin((2 * pi * (day_t + bT.Dov) + pi / 2) / 365) * cT.Tow)
+y.T.Tow =
+  nls(
+    x.T.Tow,
+    start = list(aT.Tow = aT.Dov, cT.Tow = cT.Dov),
+    data = filter(env.CRC,site=="Tower Bay")
+  )
+summary(y.T.Tow)
+aT.Tow = round(coef(summary(y.T.Tow))[1], 2)
+cT.Tow = round(coef(summary(y.T.Tow))[2], 2)
+
+y.T.CRC = t %>%
+  mutate(Tow = aT.Tow + sin((2 * pi * (day_t + bT.Dov) + pi / 2) / 365) * cT.Tow) %>%
+  mutate(Oke = aT.Oke + sin((2 * pi * (day_t + bT.Dov) + pi / 2) / 365) * cT.Oke)
+y.T.CRC = as.data.frame(y.T.CRC)
+write.csv(y.T.CRC, "data/processed/y.T.CRC.csv")
+
+p.init.T + geom_line(
+  data = y.T.CRC,
+  aes(x = day_t,
+      y = Oke),
+  linetype = "dashed"
+) +
+  geom_line(
+    data = y.T.CRC,
+    aes(x = day_t,
+        y = Tow),
+    linetype = "solid"
+  ) 
+
+rm(y.T.Oke,y.T.Tow)
+```
+
+```{r}
+write.csv(data.env
+y.I.CRC
+y.I.BOM
+y.T.CRC)
+```
+
+
+## Plots
+
+```{r final I plot}
+(p.Irr = ggplot() +
+   geom_point(data = data.env, aes(x = day_t, y = I.ppfd, shape = site, color = depth_m, size = source)) +
+   scale_color_manual(values = c("surf" = "grey","2" = "orange", "5" = "steelblue")) +
+   scale_size_manual(values = c("BOM" = 1.5, "CRC" = 2.5)) +
+   scale_shape_manual(values = c("Dover" = 1, "Triabunna" = 1, "Okehampton" = 0, "Tower Bay" = 2)) +
+   geom_line(data = filter(y.I.CRC, kW.lev == "l.2"), aes(x = day_t, y = Ippfd, linetype = depth)) +
+   geom_line(data = y.I.BOM, aes(x = day_t, y = surfI), linewidth = 1.25) +
+   lims(x = c(0, 365)) +
+   labs(x = "Day of the year", y = irr_lab) + niceplot
+)
+```
+
+```{r final T plot}
+(p.Temp = ggplot(data = data.env) +
+   geom_point(aes(x = day_t, y = temp.ave, shape = depth_m, color = site, size = source)) +
+    scale_shape_manual(values = c("2" = 0, "5" = 0, "surf" = 1)) +
+    scale_color_manual(values = c("Dover" = "grey", "Triabunna" = "grey", 
+                                  "Okehampton" = "orange", "Tower Bay" = "steelblue")) +
+    scale_size_manual(values = c("BOM" = 1.5, "CRC" = 2.5)) +
+    geom_line(data = y.T.CRC, aes(x = day_t, y = Oke), linetype = "solid") +
+    geom_line(data = y.T.CRC, aes(x = day_t, y = Tow), linetype = "dashed") +
+    labs(y = temp_lab, x = "Day of the year") + niceplot)
+```
+
+## Nutrients
+
+### Swadling data
+
+```{r load swadling data}
+nitrogen =
+  read.csv("C:/Users/treimer/OneDrive - University of Tasmania/Other people's data/Swadling 2018/ECP_GEOSERVER_NUTRIENTS.csv",
+               sep = ',')
+
+nitrogen = nitrogen %>%
+  mutate(date = as.Date(as.data.frame(str_split_fixed(nitrogen$DATE_TRIP, "T", 2))[, 1]),
+         month = month(date),
+         year = year(date),
+         trip = as.factor(TRIP_ID),
+         site = as.factor(SITE_CODE),
+         latitude = LATITUDE,
+         longitude = LONGITUDE,
+         depth = as.numeric(DEPTH),
+         ammonium = as.numeric(AMMONIUM),
+         nitrate = as.numeric(NITRATE_NITRITE),
+         nitrite = as.numeric(NITRITE),
+         nitrate = case_when(
+           is.na(nitrite) | is.na(nitrate) ~ nitrate,
+           TRUE ~ nitrate-nitrite)) %>%
+  dplyr::select(date, month, year, site, latitude, longitude, depth, ammonium, nitrate, nitrite)
+
+n.sites = nitrogen %>%
+  group_by(site) %>%
+  reframe(longitude = mean(longitude),
+         latitude = mean(latitude))
+
+# ggmap(get_stamenmap(bbox = c(min(n.sites$longitude)-0.25, # min long
+#                      min(n.sites$latitude)-0.25, # min lat
+#                      max(n.sites$longitude)+0.25, # max long
+#                      max(n.sites$latitude)+0.25  # max lat
+#                      ),
+#   zoom = 10, maptype = "terrain-background")) +
+#   theme_void() +
+#   theme(panel.border = element_rect(colour = "grey", fill = NA, size = 2)) +
+#   geom_point(data = n.sites, aes(y = latitude, x = longitude), size = 2)+
+#   ggrepel::geom_text_repel(data = n.sites, aes(y = latitude, x = longitude,label=site))
+```
+
+Sites 3 and 4 are pretty far away from the rest. Exclude?
+
+```{r initial N plot swadling}
+n.surf = nitrogen %>%
+  filter(depth <= 50,
+        # site != "SB4",
+        # site != "SB3"
+        ) %>%
+  gather("chem", "val", ammonium, nitrate, factor_key = TRUE) %>% 
+  mutate(ave.day = month * 30.345)
+
+n.surf = n.surf %>%
+  group_by(ave.day, chem) %>%
+  reframe(val.m = mean(val),
+          val.se = std.error(val))
+
+# (p.init.N=ggplot(n.surf, aes(x = ave.day, y = val.m, fill = chem, ymin = val.m + val.se, ymax = val.m - val.se)) +
+#     geom_col(position = position_dodge(width = 27.5)) +
+#     geom_errorbar(position = position_dodge(width = 27.5), width = 0.3*27.5))
+```
+
+### CRC-P data
+
+```{r load crcp nutrient data}
+n.CRC = read.csv("C:/Users/treimer/OneDrive - University of Tasmania/Other people's data/CRC-P WP1 & 2 data - old/seawater_nutrients.csv", sep = ',')
+
+n.CRC = n.CRC %>%
+  dplyr::select(Day, Month, Year, Name_site, Depth_m, NO3.NO2, NH4, Near_salmon, Longitude, Latitude)
+
+n.CRC$Near_salmon[n.CRC$Name_site == "Tower Bay"] = "Unk"
+
+n.CRC = n.CRC %>% 
+  mutate(month = as.numeric(Month),
+         year = as.numeric(Year),
+         date = make_date(year, month, Day),
+         site = as.factor(Name_site),
+         depth = as.factor(Depth_m),
+         nitrate = NO3.NO2,
+         ammonium = NH4,
+         near_sal = as.factor(Near_salmon)) %>% 
+  dplyr::select(-Day,-Month,-Name_site,-Depth_m,-NO3.NO2,-NH4,-Near_salmon)
+
+n.CRC$near_sal[n.CRC$site == "Tower Bay"] = as.factor("Unk")
+```
+
+```{r initial N plot crcp}
+n.data = n.CRC %>%
+  gather("chem", "val", ammonium,nitrate, factor_key = TRUE) %>% 
+  mutate(ave.day = month * 30.345) %>%
+  group_by(site, ave.day, chem, near_sal) %>%
+  reframe(val.m = mean(val),
+          val.se = std.error(val))
+
+# (p.init.N = ggplot(n.data, aes(x = ave.day, y = val.m, fill = chem, ymin = val.m + val.se, ymax = val.m - val.se)) +
+#     geom_col(position = position_dodge(width = 27.8)) +
+#     geom_errorbar(position = position_dodge(width = 27.8), width = 27.5*0.3) +
+#     facet_wrap(vars(site, near_sal), nrow = 2))
+```
+
+### Combining data
+
+```{r combining nutrient data}
+n.1 = nitrogen %>%
+  filter(depth <= 50) %>%
+  mutate(near_sal = as.factor("Unk"),
+         source = as.factor("swadling")) %>% 
+  dplyr::select(-nitrite)
+
+n.2 = n.CRC %>%
+  mutate(date = date) %>%
+  mutate(month = as.numeric(month),
+         year = as.numeric(Year),
+         latitude = Latitude,
+         longitude = Longitude) %>%
+  relocate(date, .before = month) %>%
+  relocate(near_sal, .after = nitrate) %>%
+  relocate(latitude, .after = site) %>%
+  relocate(longitude, .after = latitude) %>%
+  relocate(ammonium, .before = nitrate) %>%
+  mutate(source = as.factor("CRC")) %>%
+  dplyr::select(-Year, -Longitude, -Latitude)
+n.2$near_sal[n.2$near_sal=="Unk"] = "Y"
+
+n.all.long = rbind(n.1, n.2) %>% 
+  gather("chem", "val", ammonium, nitrate,  factor_key = TRUE) %>%
+  mutate(ave.day = month * 30.345,
+         val.umol.L = val,
+         val.mgN.m3 = val * 14.0067) %>% 
+  dplyr::select(-val)
+  
+n.all.sites = n.all.long %>%
+  group_by(site) %>%
+  reframe(longitude = mean(longitude),
+          latitude = mean(latitude))
+
+n.all.short = n.all.long %>%
+  group_by(source, ave.day, chem, near_sal) %>%
+  reframe(m.umol.L = mean(val.umol.L, na.rm = TRUE),
+          umol.L.se = std.error(val.umol.L),
+          m.mgN.m3 = mean(val.mgN.m3),
+          mgN.m3.se = std.error(val.mgN.m3, na.rm = TRUE))
+
+rm(n.1, n.2)
+```
+
+```{r initial plot all nutrients, eval=F}
+(p.all.N = ggplot(n.all.short, aes(x = ave.day, y = m.umol.L, fill = near_sal, group = source, ymin = m.umol.L + umol.L.se, ymax = m.umol.L - umol.L.se)) +
+   geom_col(position = position_dodge(width = 27.5)) +
+   geom_errorbar(position = position_dodge(width = 27.5), width = 27.5*0.3) +
+   facet_wrap(vars(chem), scales = "free_y") +
+   theme_classic() +
+   labs(x = "Day", y = "umol/L"))
+```
+
+It's pretty clear from the above facet chart that nitrate is pretty unaffected by whether or not salmon are nearby, but ammonium clearly is. I'm going to deal with them seperately, since they're so different.
+
+```{r seperate by nutrient}
+n.amm.long = n.all.long %>%
+  filter(chem == "ammonium")
+n.amm.short = n.amm.long %>%
+  group_by(source, ave.day, near_sal) %>%
+  reframe(m.umol.L = mean(val.umol.L),
+          umol.L.se = std.error(val.umol.L),
+          m.mgN.m3 = mean(val.mgN.m3),
+          mgN.m3.se = std.error(val.mgN.m3))
+
+n.nit.long = n.all.long %>%
+  filter(chem == "nitrate")
+n.nit.short = n.nit.long %>%
+  group_by(source, ave.day) %>%
+  reframe(m.umol.L = mean(val.umol.L),
+          umol.L.se = std.error(val.umol.L),
+          m.mgN.m3 = mean(val.mgN.m3),
+          mgN.m3.se = std.error(val.mgN.m3))
+
+# (p.amm = ggplot(n.amm.short, aes(x = ave.day, y = m.umol.L, ymin = m.umol.L + umol.L.se, ymax = m.umol.L - umol.L.se)) +
+#     geom_col(position = position_dodge(width = 27.5)) +
+#     geom_errorbar(position = position_dodge(width = 27.5), width = 0.3*27.5) +
+#     facet_wrap(vars(source)) +
+#     ggtitle("ammonium"))
+# 
+# (p.nit = ggplot(n.nit.short, aes(x = ave.day, y = m.umol.L, fill = source, ymin = m.umol.L + umol.L.se, ymax = m.umol.L - umol.L.se)) +
+#     geom_col(position = position_dodge(width = 27.5)) +
+#     geom_errorbar(position = position_dodge(width = 27.5), width = 0.3*27.5) +
+#     ggtitle("nitrate"))
+
+back.Am = n.amm.short %>% 
+  group_by(source) %>% 
+  reframe(mg.N = mean(m.mgN.m3, na.rm = TRUE),
+          umol.L = mean(m.umol.L, na.rm = TRUE))
+```
+### New forcing functions
+
+It's pretty clear that the "background" ammonium should basically be constant.
+
+```{r nls ammonium}
+(back.amm.N = mean(n.amm.long$val.mgN.m3[n.amm.long$source == "swadling"], na.rm = TRUE))
+
+x.N = as.formula(m.mgN.m3 ~ aN + sin((2 * pi * (ave.day + bN) + pi / 2) / 365) * cN)
+
+y.N.amm = nls(x.N, start = list(aN = 1, bN = 100, cN = 2), data = filter(n.amm.short, source == "CRC"))
+summary(y.N.amm)
+aN.amm = 6 #round(coef(summary(y.N.amm))[1], 2)
+bN.amm = 190 #round(coef(summary(y.N.amm))[2], 0)
+cN.amm = 60 #round(coef(summary(y.N.amm))[3], 2)
+
+n.amm.short$ave.day = round(n.amm.short$ave.day)
+
+# C stack usage is too close to the limit?
+rm(y.N.amm, n.CRC, n.data, niceplot, n.surf, n.sites, prettybars)
+
+n.amm.short$ave.day = round(n.amm.short$ave.day, 0)
+
+year.amm = merge(t, n.amm.short, by.x = "day_t", by.y = "ave.day", all.x = TRUE) 
+year.amm = year.amm %>% 
+  mutate(f.amm = aN.amm + sin((2 * pi * (day_t + bN.amm) + pi / 2) / 365) * cN.amm,
+         source = "CRC") %>% 
+  mutate(f.amm2 = case_when(f.amm > back.amm.N ~ f.amm,
+                            TRUE ~ back.amm.N)) %>% 
+  pivot_longer(names_to = "method", values_to = "conc", cols = c(f.amm2, mgN.m3.se))
+
+# ggplot(data = year.amm, aes(x = day_t, y = conc, shape = method, color = near_sal)) +
+#     geom_point()
+  #geom_errorbar(position = position_dodge(width = 2)) +
+    #geom_line(aes(x = day_t, y = f.amm2))
+```
+
+```{r nls nitrate}
+x.N = as.formula(m.mgN.m3 ~ aN + sin((2 * pi * (ave.day + bN) + pi / 2) / 365) * cN)
+
+y.N.nit =
+  nls(x.N,
+      start = list(aN = 4, bN = 10, cN = 2),
+      data = n.nit.short)
+
+summary(y.N.nit)
+(aN.nit = round(coef(summary(y.N.nit))[1], 2))
+(bN.nit = round(coef(summary(y.N.nit))[2], 0))
+(cN.nit = round(coef(summary(y.N.nit))[3], 2))
+
+mean(n.nit.short$m.mgN.m3[n.nit.short$source == "CRC"])
+mean(n.nit.short$m.mgN.m3[n.nit.short$source == "swadling"], na.rm = TRUE)
+
+t = as.data.frame(seq(1:365))
+colnames(t) = "day_t"
+n.nit.short$ave.day = round(n.nit.short$ave.day, 0)
+write.csv(n.nit.short, "data/processed/n.nit.short.csv")
+
+year.nit = merge(t, n.nit.short, by.x = "day_t", by.y = "ave.day", all.x = TRUE) 
+year.nit = year.nit %>% 
+  mutate(f.nit = (aN.nit*1.25 + sin((2 * pi * (day_t + bN.nit) + pi / 2) / 365) * cN.nit))
+year.nit = as.data.frame(year.nit)
+
+(ggplot(data = year.nit, aes(x = day_t, y = m.mgN.m3, fill = source)) +
+    geom_col(width = 50, position = position_dodge2(width = 0.8)) +
+    geom_errorbar(aes(x = day_t,
+                      ymin = m.mgN.m3 + mgN.m3.se,
+                      ymax = m.mgN.m3 - mgN.m3.se),
+                  position = position_dodge2(width = 0.8), width = 10) +
+    geom_line(aes(x = day_t,
+                  y = f.nit))) +
+  theme_classic()
+
+rm(y.N.nit)
+```
+
+## Final plots
+
+```{r final tn plot}
+TN.nosal = t %>% 
+  mutate(amm = 4.89154,
+         nit = 24.2625 - 20.68 * sin((2 * pi * (day_t - 315) + pi / 2) / 365),
+         TN = amm + nit) %>% 
+  pivot_longer(names_to = "form", values_to = "mg.m3", cols = c("nit", "amm", "TN")) %>% 
+  mutate(sal = "N")
+
+TN.sal = t %>% 
+  mutate(amm = 4.89154 + 12.8 + 4.95 * sin((2 * pi * (day_t+60) + pi / 2) / 365),
+         nit = 24.2625 - 20.68 * sin((2 * pi * (day_t - 315) + pi / 2) / 365),
+         TN = amm + nit) %>% 
+  pivot_longer(names_to = "form", values_to = "mg.m3", cols = c("nit", "amm", "TN")) %>% 
+  mutate(sal = "Y")
+
+TN = rbind(TN.nosal, TN.sal) %>% 
+  mutate(form = as.factor(form),
+         sal = as.factor(sal),
+         umol = mgm3_umolL(mg.m3))
+write.csv(TN, "data/processed/TN.csv")
+
+TN.stats = TN %>% 
+  group_by(sal, form) %>% 
+  reframe(max.abs = max(umol),
+          min.abs = min(umol),
+          ave.abs = mean(umol))
+
+TN.diff = merge(TN.nosal, TN.sal, by = c("day_t", "form")) %>% 
+  mutate(form = as.factor(form),
+         umol.sal = mgm3_umolL(mg.m3.y),
+         umol.nosal = mgm3_umolL(mg.m3.x),
+         diff.abs = umol.sal - umol.nosal,
+         diff.rel = diff.abs/umol.nosal) %>% 
+  group_by(form) %>% 
+  reframe(max.abs = max(diff.abs),
+          min.abs = min(diff.abs),
+          ave.abs = mean(diff.abs),
+          max.rel = max(diff.rel),
+          min.rel = min(diff.rel),
+          ave.rel = mean(diff.rel))
+
+# (p.amm = ggplot(TN, aes(x = day_t, y = umol, color = sal, linetype = form)) +
+#    geom_line(linewidth = 0.75) +
+#     scale_x_continuous(limits = c(0, 365), breaks = seq(0, 365, 60)) +
+#     #scale_y_continuous(limits = c(0, 4.5), breaks = seq(0, 4.5, 0.5)) +
+#     scale_linetype_manual(limits = c("TN", "amm", "nit"), values = c("solid", "dashed", "dotted")) +
+#     scale_color_manual(values = IMTA.colours) +
+#     # scale_color_manual(limits = c("amm", "nit", "TN"), values = c("red2", "turquoise3", "black")) +
+#     niceplot +
+#     labs(x = "Day of the year", y = expression("Concentration ("*mu*"M)")))
+```
+
+```{r final nitrate plot}
+year.nit.2 = year.nit %>% 
+  dplyr::select(day_t, f.nit)
+write.csv(year.nit.2, "data/processed/year.nit.2.csv")
+
+# (p.nit = ggplot(data = n.nit.short, 
+#                  aes(x = ave.day, y = m.umol.L), position = position_dodge()) +
+#    geom_col(aes(fill = source), alpha = 0.6, position = position_dodge2(), width = 25, color = "black") +
+#    geom_errorbar(aes(fill = source, ymin = m.umol.L + umol.L.se, ymax = m.umol.L - umol.L.se),
+#                  width = 8, position = position_dodge(width = 25)) +
+#    geom_line(data = year.nit.2, aes(x = day_t, y = f.nit/14.0067)) +
+#    niceplot + prettybars + labs(x = "Day of the year", y = lab_nit))
+```
+
+```{r save nutrient plots, eval = FALSE}
+w.h = 1.61803398875  # aspect ratio, w/h
+w = 0.393701*23.87*0.65
+
+ggsave("outputs/p.amm.png",
+  p.amm, width = w, height = w/w.h, unit = "in")
+```
+
+

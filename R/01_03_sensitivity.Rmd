@@ -1,0 +1,349 @@
+---
+title: Model sensitivity testing
+execute:
+  eval: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Users/treimer/OneDrive - University of Tasmania/Macroalgae growth & attenuation/R stuff")
+#knitr::opts_knit$set(root.dir = "C:/Users/PC/OneDrive - University of Tasmania/Macroalgae growth & attenuation/R stuff")
+# install.packages("pacman")
+pacman::p_load("tidyverse", "magrittr","forcats", "MASS", "ggplot2", "car", "gamlss", "fitdistrplus", "statmod", "stats", "tweedie", "geosphere", "stringr", "ggmap", "scales", "kableExtra", "multcomp", "insight", "ggeffects", "plotrix", "Rmisc", "BSagri", "magick", "cowplot", "broom", "lubridate", "nlstools", "dplyr", "tidyr", "devtools", "readxl", "rmarkdown")
+
+# Special, not on CRAN
+# devtools::install_github("pecanproject/pecan/modules/data.atmosphere")
+
+# Outdated, possibly not in use any more
+# p_load("nlstimedist")
+
+nice <- theme_classic() + theme(legend.position = "none") + theme(text = element_text(size = 12, family = "sans", colour = "black"))
+```
+
+## Set up conditions
+
+```{r sensitivity}
+site_params <- read.csv("data/raw/site-params.csv", header = TRUE, sep = ",")
+spec_params <- read_excel("data/raw/species-params_MAC2.xlsx") 
+alg.vars <- spec_params$species
+```
+
+## Run all the stuff
+
+```{r run sensitivities}
+source("Markdowns/00_00_model_function.R", local = knitr::knit_global())
+
+site <- "Okehampton Bay"
+d_top <- 1
+hc <- 5.5
+farmA <- 100*50
+farmV <- farmA*hc
+amm_sal <- 0
+
+QQ <- 0.9162
+g.plant <- 20 # arbitrary
+plants.mlin <- 50 # plants/mline, arbitrary
+
+mrop <- 3 * 100 # total surface line, m (3 x 100m double-backbone))
+mlin <- 2000 * (mrop/100) # total m of seeded line (2000 m per 100 m double-backbone)
+plants.m3 <- plants.mlin * mlin / farmV
+gww.mlin <- g.plant * plants.mlin
+gww.m3 <- gww.mlin * mlin / farmV
+
+# Other start conditions
+start_date <- make_date(y = 2022, m = 4, d = 26)
+grow_days <- 115
+salmon <- "N"
+
+dfs <- list()
+for (i in 1:length(alg.vars)) {
+  alg <- alg.vars[i]
+  dwww <- as.numeric(spec_params$dwww[spec_params$species == alg])
+  qmin <- as.numeric(spec_params$qmin[spec_params$species == alg])
+  qmax <- as.numeric(spec_params$qmax[spec_params$species == alg])
+  nmin <- as.numeric(spec_params$nmin[spec_params$species == alg])
+  nmax <- as.numeric(spec_params$nmax[spec_params$species == alg])
+  kc <- as.numeric(spec_params$kc[spec_params$species == alg])
+  
+  # Starting algae conditions
+  Q <- qmax - QQ*(qmax - qmin)
+  Qlim <- (Q - qmin)/(Q - kc)
+  nperc <- nmax - QQ*(nmax - nmin)
+
+  mgN.m3 <- (gww.m3/dwww) * 1000 * nperc
+  nf <- qmin * mgN.m3 / Q
+  ns <- nf*(Q/qmin - 1)
+  
+  outputs <- suppressWarnings(grow_macroalgae(start_date, grow_days, site, d_top, hc, farmV, salmon, alg, nf, QQ, site_params, spec_params))
+  
+  dfs[[i]] <- outputs
+}
+```
+
+## Process data and plot
+
+```{r dfs from outputs}
+dfs_env <- list()
+dfs_alg <- list()
+#dfs_mod <- list()
+dfs_lim <- list()
+dfs_Nch <- list()
+
+for (i in 1:length(alg.vars)) {
+  df <- dfs[[i]]
+  time <- df[, 1:2]
+  dfs_env[[i]] <- cbind(time, df[, 3:11])
+  dfs_alg[[i]] <- cbind(time, df[, 12:17])
+  #dfs_mod[[i]] <- cbind(time, df[, 18:22])
+  dfs_lim[[i]] <- cbind(time, df[, 23:25])
+  dfs_Nch[[i]] <- cbind(time, df[, 26:31])
+}
+rm(df, time)
+```
+
+```{r sensitivity gather}
+pars <- colnames(spec_params)
+no.pars <- length(pars)-1
+pars <- c(pars, pars[2:length(pars)])
+
+alg.0 <- dfs_alg[[1]] %>% 
+  mutate(TN = (nf+ns) * hm, 
+         yield.mg = B.ww.mg * hm)
+alg.0.g <- dfs_Nch[[1]]
+
+sensY <- out <- sensN <- diff.levs <- data.frame()
+
+for (i in seq(2,no.pars+1,1)){
+  lo <- dfs_alg[[i]] %>% 
+    mutate(TN = (nf+ns) * hm, 
+           yield.mg = B.ww.mg * hm, setting = "low")
+  hi <- dfs_alg[[i + no.pars]] %>% 
+    mutate(TN = (nf+ns) * hm, 
+           yield.mg = B.ww.mg * hm, setting = "high")
+  
+  lo.TN <- diff(lo$TN)
+  hi.TN <- diff(hi$TN)
+  lo.Y <- diff(lo$yield.mg)
+  hi.Y <- diff(hi$yield.mg)
+  
+  diff.lo <- as.data.frame(cbind(lo$t[2:nrow(lo)], lo.TN, lo.Y, lo$setting[2:nrow(lo)]))
+  colnames(diff.lo) <- c("t", "TN", "yield.mg", "setting")
+  diff.lo <- diff.lo %>% 
+    mutate(TN.perc = NA, yield.perc = NA,
+           t = as.numeric(t), 
+           TN = as.numeric(TN), 
+           yield.mg = as.numeric(yield.mg))
+  diff.hi <- as.data.frame(cbind(hi$t[2:nrow(hi)], hi.TN, hi.Y, hi$setting[2:nrow(hi)])) 
+  colnames(diff.hi) <- c("t", "TN", "yield.mg", "setting")
+  diff.hi <- diff.hi %>% 
+    mutate(TN.perc = NA, yield.perc = NA,
+           t = as.numeric(t), 
+           TN = as.numeric(TN), 
+           yield.mg = as.numeric(yield.mg))
+  
+  for (j in 2:nrow(diff.lo)){
+    diff.lo$TN.perc[j] <- 100*(diff.lo$TN[j]-diff.lo$TN[j-1])/diff.lo$TN[j]
+    diff.hi$TN.perc[j] <- 100*(diff.hi$TN[j]-diff.hi$TN[j-1])/diff.hi$TN[j]
+    diff.lo$yield.perc[j] <- 100*(diff.lo$yield.mg[j]-diff.lo$yield.mg[j-1])/ diff.lo$yield.mg[j]
+    diff.hi$yield.perc[j] <- 100*(diff.hi$yield.mg[j]-diff.hi$yield.mg[j-1])/ diff.hi$yield.mg[j]
+  }
+  
+  diff.levs1 <- rbind(diff.lo, diff.hi) %>% 
+    mutate(setting = as.factor(setting),
+           param = pars[i]) %>% 
+    dplyr::select(t, TN, yield.mg, setting, param, TN.perc, yield.perc)
+  diff.levs <- rbind(diff.levs, diff.levs1)
+  
+  out.1 <- rbind(lo, hi) %>% 
+    mutate(setting = as.factor(setting),
+           param = as.factor(pars[i])) %>% 
+    dplyr::select(t, TN, yield.mg, setting, param)
+  out <- rbind(out, out.1)
+  
+  sens.1 <- (hi$yield.mg[grow_days+1] - lo$yield.mg[grow_days+1]) / (0.2 * alg.0$yield.mg[grow_days + 1])
+  sens.1 <- as.data.frame(sens.1) %>%
+    mutate(param = as.factor(pars[i]))
+  
+  sens.2 <- (hi$TN[grow_days + 1] - lo$TN[grow_days + 1]) / (0.2 * alg.0$TN[grow_days + 1])
+  sens.2 <- as.data.frame(sens.2) %>%
+    mutate(param = as.factor(pars[i]))
+  
+  sensY <- rbind(sensY, sens.1)
+  sensN <- rbind(sensN, sens.2)
+}
+
+diff.levs$param <- as.factor(diff.levs$param)
+
+param.labs <- c(bquote("V"["Am"]), bquote("K"["Am"]), bquote("V"["Ni"]), bquote("K"["Ni"]), bquote("Q"["min"]), bquote("Q"["max"]), bquote("K"["c"]), "DW", bquote("% N"["min"]), bquote("% N"["max"]), bquote(mu),  bquote("h"["x"]), bquote("h"["y"]), bquote("h"["z"]),bquote("D"["m"]), bquote("a"["cs"]), bquote("I"["o"]), bquote("T"["opt"]), bquote("T"["min"]), bquote("T"["max"]))
+
+sensY <- sensY %>% 
+  mutate(measure = "yield.mg",
+         sensitivity = sens.1) %>% 
+  dplyr::select(-sens.1)
+sensN <- sensN %>% 
+  mutate(measure = "N removed",
+         sensitivity = sens.2) %>% 
+  dplyr::select(-sens.2)
+
+sens <- rbind(sensY, sensN) %>% 
+  mutate(measure = as.factor(measure),
+         sensitivity = as.numeric(sensitivity))
+
+rm(out.1, sens.1, sens.2, sensN, sensY, lo, hi, diff.lo, diff.hi, diff.levs1)
+```
+
+```{r sensitivity plots}
+(p.sens <- ggplot(sens, aes(x = param, y = sensitivity, fill = measure)) +
+   geom_col(position = "dodge", color = "black") +
+   scale_x_discrete(labels = param.labs) +
+   #scale_y_continuous(breaks = round(seq(-0.3, 0.3, 0.1), 2), limits = c(-0.35,0.35)) +
+   coord_flip() + 
+   nice + labs(y = "Sensitivity", x = "Parameter"))
+
+diff.levs <- diff.levs %>%
+  dplyr::select(-TN)
+
+ggplot(diff.levs, aes(x = t, y = yield.mg*10^-6, linetype = setting)) +
+  geom_line() +
+  facet_wrap(~ param) + theme_classic() +
+  labs(y = "Daily change in yield (kg)", x = "t")
+
+ggplot(data = filter(diff.levs, yield.perc < 99), aes(x = t, y = yield.perc, linetype = setting)) +
+  geom_line() +
+  facet_wrap(~ param) + theme_classic() +
+  labs(y = "Daily % change in yield", x = "t")
+```
+
+```{r lim gather}
+lim.0 <- dfs_lim[[1]]
+
+lim <- data.frame()
+
+for (i in seq(2,no.pars+1,1)){
+  lo <- dfs_lim[[i]] %>% 
+    mutate(setting = "low")
+  hi <- dfs_lim[[i + no.pars]] %>% 
+    mutate(setting = "high")
+  
+  lim1 <- rbind(lo, hi) %>% 
+    mutate(setting = as.factor(setting),
+           param = as.factor(pars[i]))
+  
+  lim <- rbind(lim, lim1)
+}
+rm(lim1, lo, hi)
+
+lim.I <- lim %>% 
+  dplyr::select(dates, setting, param, t, Ilim) %>% 
+  filter(# param != "io", param != "acs", 
+    param != "to", param != "ti", param != "ta", 
+    # param != "h_a", param != "h_b", param != "h_c", 
+    param != "dm", param != "dwww", 
+    # param != "vam", param != "kam", param != "vni", param != "kni",
+    #param != "qmin", param != "qmax", param != "kc", param != "nmin", param != "nmax", param != "mu"     
+           )
+
+lim.Q <- lim %>% 
+  dplyr::select(dates, setting, param, t, Qlim) %>% 
+  filter(param != "io", param != "acs", 
+    param != "to", param != "ti", param != "ta", 
+    #param != "h_a", param != "h_b", param != "h_c", 
+    param != "dm", param != "dwww", 
+    # param != "vam", param != "kam", param != "vni", param != "kni",
+    #param != "qmin", param != "qmax", param != "kc", param != "nmin", param != "nmax", param != "mu"     
+           )
+
+(p.Ilim <- ggplot(lim.I, aes(x = t, y = Ilim, linetype = setting)) +
+  geom_line() + ggtitle("Ilim effect on yield") +
+  facet_wrap(~ param) + theme_classic() + labs(y = "Daily Ilim", x = "t"))
+
+(p.Qlim <- ggplot(lim.Q, aes(x = t, y = Qlim, linetype = setting)) +
+  geom_line() +
+  facet_wrap(~ param) + theme_classic() + labs(y = "Daily Qlim", x = "t"))
+
+(p.Tlim <- ggplot(filter(lim, param == "ti" | param == "to" | param == "ta"), aes(x = t, y = Tlim, linetype = setting)) +
+  geom_line() +
+  facet_wrap(~ param) + theme_classic() + labs(y = "Daily Tlim", x = "t"))
+```
+
+```{r env gather}
+env.0 <- dfs_env[[1]]
+
+env.N <- env.0 %>% 
+  dplyr::select(dates, t, Am1, Ni1, Am, Ni, det) %>% 
+  pivot_longer(names_to = "env.fact", values_to = "mg.N.m3", cols = c(Am1, Ni1, Am, Ni, det))
+env.I <- env.0 %>% 
+  dplyr::select(dates, t, I, Itop) %>% 
+  pivot_longer(names_to = "I.fact", values_to = "ppfd", cols = c(I, Itop))
+
+(p.Tc <- ggplot(env.0, aes(x = t, y = Tc)) + geom_line() + theme_classic() + labs(y = "Temperature", x = "t"))
+(p.U <- ggplot(env.0, aes(x = t, y = U)) + geom_line() + theme_classic() + labs(y = "Daily U", x = "t"))
+(p.N <- ggplot(env.N, aes(x = t, y = mg.N.m3, color = env.fact)) + geom_line() + theme_classic() + labs(y = "N Concentration", x = "t"))
+(p.I <- ggplot(env.I, aes(x = t, y = ppfd, linetype = I.fact)) + geom_line() + theme_classic() + labs(y = "Daily irradience", x = "t"))
+```
+
+```{r mod gather}
+mod.0 <- dfs_mod[[1]]
+
+mod <- data.frame()
+
+for (i in seq(2,no.pars+1,1)){
+  lo <- dfs_mod[[i]] %>% 
+    mutate(setting = "low")
+  hi <- dfs_mod[[i + no.pars]] %>% 
+    mutate(setting = "high")
+  
+  mod1 <- rbind(lo, hi) %>% 
+    mutate(setting = as.factor(setting),
+           param = as.factor(pars[i]))
+  
+  mod <- rbind(mod, mod1)
+}
+rm(mod1, lo, hi)
+
+mod.uc <- mod %>% 
+  mutate(D.e1 = D*10^-1,
+         Ct.e1 = Ct*10^1) %>% 
+    dplyr::select(-K) %>% 
+  pivot_longer(names_to = "mod.fact", values_to = "value", cols = c("uc", "lambda", "D.e1", "Ct.e1")) %>%
+  filter(param != "io", param != "acs", 
+    param != "to", param != "ti", param != "ta", 
+    param != "h_a", param != "h_b", param != "h_c", param != "dm",
+    param != "vam", param != "kam", param != "vni", param != "kni",
+    #param != "qmin", param != "qmax", param != "kc", param != "dwww", param != "nmin", param != "nmax", param != "mu"     
+           )
+  
+mod.K <- mod %>% 
+  dplyr::select(dates, t, K, param, setting) %>% 
+  filter(param != "io", #param != "acs", 
+    param != "to", param != "ti", param != "ta", 
+    param != "h_a", param != "h_b", param != "h_c", param != "dm",
+    #param != "vam", param != "kam", param != "vni", param != "kni",
+    #param != "qmin", param != "qmax", param != "kc", param != "dwww", param != "nmin", param != "nmax", param != "mu"     
+           )
+
+(p.uc <- ggplot(mod.uc, aes(x = t, y = value, color = mod.fact, linetype = setting)) +
+  geom_line() + facet_wrap(~ param) + theme_classic() + labs(y = "Daily water attenuation", x = "t"))
+
+(p.K <- ggplot(mod.K, aes(x = t, y = K, linetype = setting)) +
+  geom_line() + facet_wrap(~ param) + theme_classic() + labs(y = "Daily light attenuation", x = "t"))
+```
+
+## Save
+
+```{r saveplot}
+sens <- cbind(sens.1m, sens.5m)
+colnames(sens) <- c("param", "measure", "sens_1m", "param.labs2", "param2", "measure2", "sens_5m", "param.labs")
+sens <- sens %>% 
+  dplyr::select(-c(param2, measure2, param.labs2)) %>% 
+  pivot_longer(names_to = "depth", values_to = "sensitivity", cols = c(sens_1m, sens_5m)) %>% 
+  mutate(depth = as.factor(depth))
+levels(sens$depth) <- c("1m", "5m")
+
+ggsave("outputs/ECK_sensitivity_5m.1m.png",
+       p.sens, # Name of plot
+       width = 0.393701*23.87*0.75,
+       height = 0.393701*10.41,
+       unit = "in")
+write.matrix(sens, "data/processed/sensitivity_MAC.csv")
+```

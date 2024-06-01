@@ -1,0 +1,253 @@
+---
+title: Run the growth model
+output: html_document
+execute:
+  eval: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "C:/Users/treimer/OneDrive - University of Tasmania/Macroalgae growth & attenuation/R stuff - Growth")
+#knitr::opts_knit$set(root.dir = "C:/Users/PC/OneDrive - University of Tasmania/Macroalgae growth & attenuation/R stuff")
+# install.packages("pacman")
+pacman::p_load("tidyverse", "magrittr","forcats", "MASS", "ggplot2", "car", "gamlss", "fitdistrplus", "statmod", "stats", "tweedie", "geosphere", "stringr", "ggmap", "scales", "kableExtra", "multcomp", "insight", "ggeffects", "plotrix", "Rmisc", "BSagri", "magick", "cowplot", "broom", "lubridate", "nlstools", "dplyr", "tidyr", "devtools", "readxl")
+
+# Special, not on CRAN
+# devtools::install_github("pecanproject/pecan/modules/data.atmosphere")
+
+# Outdated, possibly not in use any more
+# p_load("nlstimedist")
+```
+
+# Model macroalgae growth
+
+This sets up model runs and executes them.
+
+```{r load parameter dataframes}
+site_params <- read.csv("data/raw/site-params.csv", header = TRUE, sep = ",")
+spec_params <- read.csv("data/raw/spec_params_MAC.csv")
+```
+
+```{r starting conditions}
+alg = "MAC"
+
+# Starting internal conditions
+nf <- 37.27
+QQ <- 0.855
+
+# Other start conditions
+start_date1 <- make_date(y = 2022, m = 5, d = 1)
+# start_date2 <- make_date(y = 2022, m = 11, d = 1)
+grow_days <- 200
+site <- "Great Taylor Bay" # site name
+d_top <- 2 # depth of the top of the canopy
+hc <- 5.7 # whole depth of the canopy
+salmon <- "N"
+
+# Farm dimensions
+farmV <- 100*50*5.7
+# This is more for interest - not actually in use
+# mrope <- 100*50/2
+# mlin <- mrope * 1.66667
+# plants.mlin <- 10
+# plants.m3 <- plants.mlin * mlin / farmV
+# nf <- mg.N.mlin * mlin / farmV
+# g.mlin <- 200
+# mg.mlin <- g.mlin * 10^3
+# mg.N.mlin <- mg.mlin * nperc
+# rm(mg.mlin, mg.N.mlin, mrope, mlin, plants.mlin, g.mlin, plants.m3)
+
+```
+
+```{r run}
+source("markdowns/00_00_model_function.R", local = knitr::knit_global())
+
+outputs <- suppressWarnings(
+              grow_macroalgae(start_date1, grow_days, site, d_top, hc, farmV, salmon, alg, nf, QQ, site_params, spec_params)
+              )
+# outputs2 <- suppressWarnings(
+#               grow_macroalgae(start_date2, grow_days, site, d_top, hc, farmV, salmon, alg, nf, QQ, site_params, spec_params)
+#               )
+
+# outputs <- rbind(outputs1, outputs2)
+
+ggplot(outputs, aes(x = dates)) +
+  geom_line(aes(y = uc)) +
+  #lims(y = c(0.5,1)) +
+  theme_classic()
+
+maxB = max(outputs$B.ww.mg, na.rm = T)
+maxD = max(outputs$D, na.rm = T)
+outputs = outputs %>% 
+  mutate(B2 = B.ww.mg/maxB,
+         D2 = D/maxD)
+
+year_D2 = outputs[2:186, ] %>% 
+  mutate(B = B.ww.mg/10^3/391.1804,
+         dates = as.Date(dates)) %>% 
+  dplyr::select(B, D, dates) %>% 
+  pivot_longer(names_to = "measure", values_to = "value", cols = c(B, D)) %>% 
+  mutate(measure = as.factor(measure))
+
+write.csv(year_D2, "data/year_D1.csv")
+
+year_D3 = outputs[2:186, ] %>% 
+  mutate(B.kg.m3 = B.ww.mg/10^6,
+         B.kg.Hf = 10^-3*D/((0.5*3.06*10^-2)/2),
+         B.kg.m3.2 = B.kg.Hf/(hm/hc),
+         dates = as.Date(dates)) %>% 
+  dplyr::select(B.kg.m3, B.kg.Hf, B.kg.m3.2, dates)
+
+write.csv(year_D3, "data/year_D3.csv")
+```
+
+```{r year D plotting}
+scaleFUN1 <- function(x) strftime(x, format = "%b")
+scaleFUN2 <- function(x) sprintf("%.1f", x)
+Spec.colours <- c(RColorBrewer::brewer.pal(8,"Set1")[3], RColorBrewer::brewer.pal(8,"Set1")[1])
+tinyplot <- theme_classic() + theme(legend.position = "none") + theme(text = element_text(size = 16, family = "sans", colour = "black"))
+
+(p.year_D2 = ggplot(year_D2, aes(x = dates)) +
+    geom_line(aes(y = value, color = measure), linewidth = 0.75) +
+    scale_color_manual(values = Spec.colours) +
+    scale_x_date(date_breaks = "1 month", labels = scaleFUN1) + 
+    scale_y_continuous(labels = scaleFUN2) +
+    tinyplot + 
+    labs(y = "Kelp density (D)", x = "Date"))
+
+ggsave("outputs/year_D2.png", p.year_D2, width = (0.393701*23.87*0.5), height = (0.393701*23.87*0.5)/1.1, unit = "in")
+
+year_D2.1 = filter(year_D2, measure == "D")
+write.csv(year_D2.1, "../OceanParcels for real/data/raw/year_D2.csv")
+```
+
+```{r input plots}
+t0 <- make_date(d = 31, m = 12, y = year(start_date) - 1) #t0 is Jan 1st
+    t1 <- as.numeric(start_date - t0) # t1 is the start DOY
+    t2 <- t1 + grow_days # t2 is the end DOY
+    t <- seq(t1, t2, 1)
+hz <- as.numeric(site_params$wc_z[site_params$site == site])
+    I_a <- as.numeric(site_params$I_a[site_params$site == site])
+    I_b <- as.numeric(site_params$I_b[site_params$site == site])
+    I_c <- as.numeric(site_params$I_c[site_params$site == site])
+    T_a <- as.numeric(site_params$T_a[site_params$site == site])
+    T_b <- as.numeric(site_params$T_b[site_params$site == site])
+    T_c <- as.numeric(site_params$T_c[site_params$site == site])
+    inputs <- as.data.frame(t) %>%
+      mutate(I = I_a + sin((2 * pi * (t + 100) + pi / 2) / 365) * 605,
+        Tc = T_a + sin((2 * pi * (t + T_b) + pi / 2) / 365) * T_c,
+        Am = 4.89154, # 0.3492286 umol/L
+        Ni = (18.54 * 1.25) - sin((2 * pi * (t + 416) + pi / 2) / 365) * 20.81,
+        U = 0.5 - sin((2 * pi * (t + 416) + pi / 2) / 365) * 0.25)
+
+ggplot(data = inputs) +
+  geom_line(aes(x = outputs$dates,
+                y = I/max(I)),
+            color = "gold") +
+  geom_line(aes(x = outputs$dates,
+                y = Tc/max(Tc)),
+            color = "red") +
+  geom_line(aes(x = outputs$dates,
+                y = U/max(U)),
+            color = "blue") +
+  # geom_line(aes(x = outputs$dates,
+  #               y = Am/max(Ni)),
+  #           color = "green",
+  #           linetype = "solid") +
+  geom_line(aes(x = outputs$dates,
+                y = Ni/max(Ni)),
+            color = "green") +
+  theme_classic()
+```
+
+# Results
+
+```{r gather data}
+dwww <- as.numeric(spec_params$dwww[spec_params$species == alg])
+
+outputs$daily.elon[2:nrow(outputs)] <- diff(outputs$hm)
+outputs$daily.perc[3:nrow(outputs)] <- outputs$daily.elon[3:nrow(outputs)] / outputs$hm[2:nrow(outputs)-1]
+
+outputs <- outputs %>%
+  mutate(B.ww.mg = dwww * ((nf + ns)*hm)/nperc,
+         B.ww.g1 = B.ww.mg/1000,
+         B.ww.g0 = NA,
+         SGR = NA)
+outputs$B.ww.g0[2:nrow(outputs)] <- outputs$B.ww.g1[2:nrow(outputs)-1]
+outputs$t1 <- outputs$t - outputs$t[1]
+outputs$SGR <- 100 * (log(outputs$B.ww.g1)-log(outputs$B.ww.g0))/(outputs$t1)
+
+nutrients <- pivot_longer(outputs, names_to = "nutrient", values_to = "mgNm3", 
+                    cols = c(Ni, Am, det)) %>%
+  dplyr::select(dates, nutrient, mgNm3) %>% 
+  mutate(umolL = mgNm3/14.0067,
+         nutrient = as.factor(nutrient))
+
+algae <- pivot_longer(outputs, names_to = "N.pool", values_to = "mgN.m3", cols = c(ns, nf)) %>% 
+  dplyr::select(dates, N.pool, mgN.m3) %>% 
+  mutate(N.pool = as.factor(N.pool))
+
+lims <- pivot_longer(outputs, names_to = "fact", values_to = "rel.lim", cols = c(uc, Tlim, Qlim, Ilim)) %>%
+  dplyr::select(dates, fact, rel.lim) %>% 
+  mutate(fact = as.factor(fact))
+```
+
+```{r quick plots}
+ggplot(data = nutrients) +
+  geom_line(aes(x = dates, y = umolL, color = nutrient)) +
+  theme_classic() +
+  labs(x = "Date", y = "umol.L of nutrients")
+
+ggplot(data = outputs) +
+  geom_line(aes(x = dates, y = ns/nf)) +
+  theme_classic() +
+  labs(x = "Date", y = "Ratio of ns:nf")
+  
+ggplot(data = outputs) +
+  geom_line(aes(x = dates, y = ((ns+nf) * hm)/nperc * dwww/10^6)) +
+  theme_classic() +
+  ggtitle("Yield") +
+  labs(x = "Date", y = "Biomass of kelp (kg ww/m2)")
+
+ggplot(data = outputs) +
+  geom_line(aes(x = dates, y = nperc*100)) +
+  theme_classic() +
+  ggtitle("% N (dw)") +
+  labs(x = "Date", y = "N concentration in tissue")
+
+ggplot(data = lims) +
+  geom_line(aes(x = dates, y = 1 - rel.lim, color = fact)) +
+  theme_classic() +
+  labs(x = "Date", y = "Relative limitation on growth")
+
+ggplot(data = outputs) +
+  geom_line(aes(x = dates, y = daily.perc * 100)) +
+  theme_classic() +
+  labs(x = "Date", y = "Daily change in height (%)")
+
+ggplot(data = filter(outputs, SGR > 0)) +
+  geom_line(aes(x = dates, y = SGR)) +
+  theme_classic() +
+  labs(x = "Date", y = "SGR (% gww/day)")
+```
+
+```{r testing}
+#Ni
+alpha <- seq(0.05,0.95,0.01) #Qmin/kc
+1.748036/72.83484 # macrocystis ni uptake
+5.2541925	/(910.6806/2) #ecklonia ni uptake
+38.86	/3460.80 # mac amm uptake
+10.81282	/1605.048 #ecklonia am uptake
+
+
+  
+  
+N <- seq(50, 2000, 1)
+
+h_a <- 7375.399
+h_b <- 1.1520
+h_c <- 0.1
+
+hm <- ((N)/h_a)^(1/h_b) + h_c
+
+plot(N, hm)
+```

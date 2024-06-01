@@ -47,3 +47,9 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+.Rproj.user
+
+# From example R project
+inst/doc
+.DS_Store
+

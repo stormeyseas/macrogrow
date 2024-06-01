@@ -1,0 +1,32 @@
+---
+title: "Example article"
+author: "Matti Vuorre"
+date: "`r Sys.Date()`"
+---
+
+The data contained in the exampleRPackage R package was analyzed exactly like detailed in this document.
+
+First, because the data is contained in a package, we can easily call it from R
+
+```{r}
+library(exampleRPackage)
+head(exampleData)
+```
+
+We drew a boxplot:
+
+```{r}
+boxplot(score ~ group, data = exampleData)
+```
+
+And conducted a t-test:
+
+```{r}
+t.test(score ~ group, data = exampleData)
+```
+
+We also used the `hello()` function:
+
+```{r}
+hello("my name")
+```

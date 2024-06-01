@@ -1,0 +1,19 @@
+url: #URL for package documentation
+title: Nutrient remediation docs
+destination: docs
+development:
+  mode: release
+template:
+  params:
+    bootswatch: spacelab
+navbar:
+  structure:
+    left:  [home, articles, reference, news]
+    right: [github]
+components:
+  home: ~
+  articles:
+    text: Articles
+    menu:
+    - text: Example analysis
+      href: articles/Example-analysis.html
