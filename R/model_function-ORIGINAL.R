@@ -1,67 +1,22 @@
-#' Title
-#'
-#' @param start_date A starting (out-planting) day for macroalgae growth. Can be given as a date class object from `as.Date`, a character string coercible to date by `lubridate::ymd()` (e.g. "2009-03-08"), or an integer representing a day of the year.
-#' @param grow_days An integer of the number of days to grow macroalgae before harvesting.
-#' @param temperature A vector of temperature readings from 
-#' @param d_top 
-#' @param hc 
-#' @param farmV 
-#' @param salmon 
-#' @param alg 
-#' @param nf 
-#' @param QQ 
-#' @param spec_params 
-#' 
-#' @importFrom lubridate ymd time_length yday is.Date duration
-#' @inheritParams temp_atsite
-#'
-#' @return
-#' @export
-#'
-#' @examples
-grow_macroalgae <- function(start, grow_days, # DONE
-                            temperature, 
-                            light, 
-                            nitrate, ammonium, 
-                            other_N,
-                            d_top, hc, farmV, salmon, alg, nf, QQ, site_params, spec_params,
-                            ...) {
-
-  # Get start and end dates
-  if (is.Date(start)) {
-    start_date <- start
-  } else if (is.integer(start) | is.numeric(start)) {
-    if (missing(start_year)){start_year = 2000}
-    start_date <- (parse_date_time(x = paste(start_year, start), orders = "yj")) # - duration(1, "days")
-  }
-  end_date <- start_date + duration(grow_days, "days")
-  start_t <- yday(start_date)
-  end_t <- start_t + grow_days
-  
-  outputs <- data.frame(t = seq(start_t, end_t, 1), date = seq(start_date, end_date, by = 'days'))
-  
-  # Light, temperature and nutrient levels must be passed to the function as vectors - check length
-  if (length(temperature) != nrow(outputs)) {
-    stop("Error: temperature vector is length ", length(temperature), " but timspan vector is length ", nrow(outputs))
-  }
-  if (length(light) != nrow(outputs)) {
-    stop("Error: light vector is length ", length(light), " but timspan vector is length ", nrow(outputs))
-  }
-  if (length(nitrate) != nrow(outputs)) {
-    stop("Error: nitrate vector is length ", length(nitrate), " but timspan vector is length ", nrow(outputs))
-  }
-  if (length(ammonium) != nrow(outputs)) {
-    stop("Error: ammonium vector is length ", length(ammonium), " but timspan vector is length ", nrow(outputs))
-  }
-  
-  outputs$temperature <- temperature
-  outputs$light <- light
-  outputs$nitrate <- nitrate
-  outputs$ammonium <- ammonium
-  
-  # Set up output data frame
-  outputs <- cbind(dates, outputs, data.frame(matrix(ncol = 29, nrow = nrow(outputs))))
-  colnames(outputs) <- c("t", "dates", "I", "Itop", "Tc", "Am1", "Ni1", "U", # first 8 colums are inputs
+grow_macroalgae <-
+  function(start_date, grow_days, site, d_top, hc, farmV, salmon, alg, nf, QQ, site_params, spec_params) {
+    # Model pre-run
+    # Set up time series
+    if (is.Date(start_date)) {
+      t0 <- make_date(d = 31, m = 12, y = year(start_date) - 1) #t0 is Jan 1st
+      t1 <- as.numeric(start_date - t0 - 1) # t1 is the start DOY
+    } else {
+      t0 <- make_date(d = 31, m = 12, y = 2022 - 1) #t0 is Jan 1st
+      t1 <- start_date
+    }
+    t2 <- t1 + grow_days # t2 is the end DOY
+    t <- seq(t1, t2, 1)
+    dates <- as.Date(t, origin = t0)
+    
+    # Set up output data frame
+    outputs <- as.data.frame(t)
+    outputs <- cbind(dates, outputs, data.frame(matrix(ncol = 29, nrow = nrow(outputs))))
+    colnames(outputs) <- c("dates", "t", "I", "Itop", "Tc", "Am1", "Ni1", "U", # first 8 colums are inputs
                            "Am", "Ni", "det", # next 3 columns are environmental states
                            "nf", "ns", "nperc", "B.dw.mg", "B.ww.mg", "hm", # next 6 columns are algae states
                            "uc", "lambda", "kma", "D", "Ct", # next 5 columns are environmental modifications from algae
@@ -70,16 +25,21 @@ grow_macroalgae <- function(start, grow_days, # DONE
     
     # Set up input forcing
     hz <- as.numeric(site_params$wc_z[site_params$site == site])
+    I_a <- as.numeric(site_params$I_a[site_params$site == site])
+    I_b <- as.numeric(site_params$I_b[site_params$site == site])
+    I_c <- as.numeric(site_params$I_c[site_params$site == site])
+    T_a <- as.numeric(site_params$T_a[site_params$site == site])
+    T_b <- as.numeric(site_params$T_b[site_params$site == site])
+    T_c <- as.numeric(site_params$T_c[site_params$site == site])
     extra <- as.numeric(site_params$extra[site_params$site == site])
     
-    # # Old forcing
-    # outputs <- outputs %>% 
-    #   mutate(I = I_a + I_c * sin((2 * pi * (t + I_b) + pi / 2) / 365),
-    #          Tc = T_a + T_c * sin((2 * pi * (t + T_b) + pi / 2) / 365),
-    #          Am1 = case_when(salmon == "Y" ~ 4.89154 + 12.8 + 4.95 * sin((2 * pi * (t+60) + pi / 2) / 365),
-    #                          salmon == "N" ~ 4.89154),
-    #          Ni1 = 24.2625 - 20.68 * sin((2 * pi * (t - 315) + pi / 2) / 365),
-    #          U = 0.3 - 0.15 * sin((2 * pi * (t + 416) + pi / 2) / 365))
+    outputs <- outputs %>% 
+      mutate(I = I_a + I_c * sin((2 * pi * (t + I_b) + pi / 2) / 365),
+             Tc = T_a + T_c * sin((2 * pi * (t + T_b) + pi / 2) / 365),
+             Am1 = case_when(salmon == "Y" ~ 4.89154 + 12.8 + 4.95 * sin((2 * pi * (t+60) + pi / 2) / 365),
+                             salmon == "N" ~ 4.89154),
+             Ni1 = 24.2625 - 20.68 * sin((2 * pi * (t - 315) + pi / 2) / 365),
+             U = 0.3 - 0.15 * sin((2 * pi * (t + 416) + pi / 2) / 365))
     
     # Starting conditions
     outputs$Am[1] <- outputs$Am1[1]

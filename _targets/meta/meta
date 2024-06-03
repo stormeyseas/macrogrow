@@ -1,0 +1,31 @@
+name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
+algae_height|function|98548ed484b029c4|||||||||||||||
+Amm_data|stem|cee2e19c13b60d2c|106700693533a134|71119b1d73e355bf|-558763223||t19877.3879734973s|cf808555a0017c26|201|qs|local|vector|||0||
+Amm_func|stem|f1c2a85ad1fcd36e|d4182d78bb1e1c56|b9dd41cb0f837da5|420148114||t19877.3879744587s|af94fcb8e6165bbe|176|qs|local|vector|||0||
+attenuate|function|7a0a674f3e98447f|||||||||||||||
+grow_macroalgae|function|16643c29e93fb9be|||||||||||||||
+growtime|stem|080fe3564a391f84|4c0d68f01ad598a8|2c530c1562a7fbd1|163851163||t19877.3879729903s|e12065d620e41fd5|76|qs|local|vector|||0.813|package ggplot2 was built under R version 4.3.3. package tidyr was built under R version 4.3.2. package readr was built under R version 4.3.2. package purrr was built under R version 4.3.2. package dplyr was built under R version 4.3.2. package stringr was built under R version 4.3.2. package lubridate was built under R version 4.3.2|
+I_data|stem|6265545573a971e8|285bc9eea0cc0234|71119b1d73e355bf|1967569649||t19877.3879734973s|46c3705007889b1f|183|qs|local|vector|||0||
+I_func|stem|ea733c092c9133d1|e8383ed00e371df3|394fbc647c59fe37|-297078641||t19877.3879743715s|cf7aa924f3ed9ba7|168|qs|local|vector|||0||
+I_lim|function|73fa71119ec9f5a5|||||||||||||||
+I_plot|stem|39640922bdfd2b58|14bb012c25f5390b|9535d15b082de883|1201121506||t19877.3879753059s|13e084c476629b99|92714|qs|local|vector|||0.016||
+Irr_atsite|function|4e33e4fc0e6c4432|||||||||||||||
+model_run|stem|0eb139f58b0553a9|eb6bcf37d5764663|3e7bcdcfec7bb9d7|1487626768||t19877.4274198754s|30b1670b2dd6472a|3583|qs|local|vector|||0.297|NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced. NaNs produced|
+N_atsite|function|89cdb2a670b558e0|||||||||||||||
+N_func|stem|6d434baa58b13163|2f24ee975c2186ed|0dab6022fd76c3aa|-1882070993||t19877.1700515487s|03cc8e66bfe2a4c6|2273|qs|local|vector|||0.015||
+N_plot|stem|a92b9fbcdb7122a3|5c26495fd115d2e2|636f09ec94942046|-87931203||t19877.427420237s|c057d9f701fac606|93498|qs|local|vector|||0.016||
+N_uptake|function|4944542d05916b84|||||||||||||||
+Nit_data|stem|674865db5e62588e|a739f9ad3c5bd273|71119b1d73e355bf|-1524626729||t19877.3879736875s|7441a7e00258ee99|194|qs|local|vector|||0||
+Nit_func|stem|bb761c32c386e696|eeb354fa720246d1|32ef550b4cebe9a7|-1556314794||t19877.3879746494s|42e429e60361e54e|178|qs|local|vector|||0.015||
+Nlim_atsite|function|4728dba8f7e1c312|||||||||||||||
+Q_lim|function|85043290c6dc9b45|||||||||||||||
+relrefresh_atsite|function|3f120da46cfde217|||||||||||||||
+site_params|stem|4239fae9cd8eaf7d|3fc200180bb9550e|2c530c1562a7fbd1|-154654360||t19877.3592316318s|9f6df4a48581fac2|133|qs|local|vector|||0.813|package ggplot2 was built under R version 4.3.3. package tidyr was built under R version 4.3.2. package readr was built under R version 4.3.2. package purrr was built under R version 4.3.2. package dplyr was built under R version 4.3.2. package stringr was built under R version 4.3.2. package lubridate was built under R version 4.3.2|
+spec_params|stem|35c9ac6600f24bef|d630ab9e7973f42e|2c530c1562a7fbd1|628122807||t19877.2221022771s|ed14b4d8526ebe37|334|qs|local|vector|||0.766|package ggplot2 was built under R version 4.3.3. package tidyr was built under R version 4.3.2. package readr was built under R version 4.3.2. package purrr was built under R version 4.3.2. package dplyr was built under R version 4.3.2. package stringr was built under R version 4.3.2. package lubridate was built under R version 4.3.2|
+T_data|stem|067f8f1a09858b39|3c165a4e24a838b3|71119b1d73e355bf|-884864714||t19877.3879733005s|7441a7e00258ee99|194|qs|local|vector|||0.016||
+T_func|stem|7fec0563df92e3fe|f463c88f762083ad|6f84ebb8aec35995|87077820||t19877.3879736875s|af94fcb8e6165bbe|176|qs|local|vector|||0||
+T_lim|function|4bd3191d5bb79227|||||||||||||||
+T_plot|stem|727efc50bb96100e|82ddf10d67a56f5b|82ad924e71900dc4|270481644||t19877.3879750382s|355bac319b6f7a7e|92734|qs|local|vector|||0.031||
+temp_atsite|function|a3430e22ed590a3a|||||||||||||||
+U_func|stem|b7b0668295509015|eb6ea0562bc94197|19dfc97728cca28a|-1846379436||t19877.3879733005s|7b8f0f8ef52093dd|191|qs|local|vector|||0||
+U_plot|stem|4bd22444bf047809|2019d23341a365e1|47e11c33e1e936c7|-895690242||t19877.3879742791s|9cf29dedb425a429|93145|qs|local|vector|||0||

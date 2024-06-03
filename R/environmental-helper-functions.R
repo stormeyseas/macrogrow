@@ -4,9 +4,9 @@
 #' A short description... 
 #'
 #' @param tspan A vector of timesteps
-#' @param Ta The mean temperature across timesteps at the site
-#' @param Tb The temporal phase shift (the timestep where the temperature is at maximum)
-#' @param Tc The amplitude multiplier for the curve
+#' @param a The mean temperature across timesteps at the site
+#' @param b The temporal phase shift (the timestep where the temperature is at maximum)
+#' @param c The amplitude multiplier for the curve
 #' @param period The total number of timesteps
 #'
 #' @return A vector of temperatures for the given site
@@ -28,12 +28,12 @@
 #' temp <- temp_atsite(tspan = yearpart, 18.5, 60, 2.5, period = 365)
 #' plot(yearpart, temp)
 #' 
-temp_atsite <- function(tspan = seq(1,365,1), Ta, Tb, Tc, period) {
+temp_atsite <- function(tspan = seq(1,365,1), a, b, c, period) {
   if (missing(period)) {
     period <- max(tspan)
     cat("period defaulting to maximum tstep =", period, "\n")
   }
-  temp <- Ta + Tc * sin((2 * pi * (tspan + Tb) + pi / 2) / period)
+  temp <- a + b * sin((2 * pi * (tspan + c) + pi / 2) / period)
   return(temp)
 }
 
@@ -43,9 +43,9 @@ temp_atsite <- function(tspan = seq(1,365,1), Ta, Tb, Tc, period) {
 #' A short description... 
 #'
 #' @param tspan A vector of timesteps
-#' @param Na The mean NX concentration across timesteps at the site
-#' @param Nb The temporal phase shift (the timestep where concentration is at maximum)
-#' @param Nc The amplitude multiplier for the curve
+#' @param a The mean NX concentration across timesteps at the site
+#' @param b The temporal phase shift (the timestep where concentration is at maximum)
+#' @param c The amplitude multiplier for the curve
 #' @param period The total number of timesteps
 #'
 #' @return A vector of concentrations for the given site
@@ -58,12 +58,12 @@ temp_atsite <- function(tspan = seq(1,365,1), Ta, Tb, Tc, period) {
 #'
 #' @examples
 #' 
-N_atsite <- function(tspan = seq(1,365,1), Na, Nb, Nc, period) {
+N_atsite <- function(tspan = seq(1,365,1), a, b, c, period) {
   if (missing(period)) {
     period <- max(tspan)
     cat("period defaulting to maximum tstep =", period, "\n")
   }
-  N <- Na + Nb * sin((2 * pi * (tspan - Nc) + pi / 2) / period)
+  N <- a + b * sin((2 * pi * (tspan - c) + pi / 2) / period)
   return(N)
 }
 
@@ -73,9 +73,9 @@ N_atsite <- function(tspan = seq(1,365,1), Na, Nb, Nc, period) {
 #' A short description... 
 #'
 #' @param tspan A vector of timesteps
-#' @param Ia The mean irradience across timesteps at the site
-#' @param Ib The temporal phase shift (the timestep where irradience is at maximum)
-#' @param Ic The amplitude multiplier for the curve
+#' @param a The mean irradience across timesteps at the site
+#' @param b The temporal phase shift (the timestep where irradience is at maximum)
+#' @param c The amplitude multiplier for the curve
 #' @param period The total number of timesteps
 #'
 #' @return An irradience vector for the given site
@@ -88,12 +88,12 @@ N_atsite <- function(tspan = seq(1,365,1), Na, Nb, Nc, period) {
 #'
 #' @examples
 #' 
-Irr_atsite <- function(tspan = seq(1,365,1), Ia, Ib, Ic, period) {
+Irr_atsite <- function(tspan = seq(1,365,1), a, b, c, period) {
   if (missing(period)) {
     period <- max(tspan)
     cat("period defaulting to maximum tstep =", period, "\n")
   }
-  I <- Ia + Ib * sin((2 * pi * (tspan - Ic) + pi / 2) / period)
+  I <- a + b * sin((2 * pi * (tspan - c) + pi / 2) / period)
   return(I)
 }
 
@@ -103,9 +103,9 @@ Irr_atsite <- function(tspan = seq(1,365,1), Ia, Ib, Ic, period) {
 #' A short description... 
 #'
 #' @param tspan A vector of timesteps
-#' @param Ia The mean irradience across timesteps at the site
-#' @param Ib The temporal phase shift (the timestep where irradience is at maximum)
-#' @param Ic The amplitude multiplier for the curve
+#' @param a The mean irradience across timesteps at the site
+#' @param b The temporal phase shift (the timestep where irradience is at maximum)
+#' @param c The amplitude multiplier for the curve
 #' @param period The total number of timesteps
 #'
 #' @return An irradience vector for the given site
@@ -118,12 +118,12 @@ Irr_atsite <- function(tspan = seq(1,365,1), Ia, Ib, Ic, period) {
 #'
 #' @examples
 #' 
-relrefresh_atsite <- function(tspan = seq(1,365,1), Ua, Ub, Uc, period) {
+relrefresh_atsite <- function(tspan = seq(1,365,1), a, b, c, period) {
   if (missing(period)) {
     period <- max(tspan)
     cat("period defaulting to maximum tstep =", period, "\n")
   }
-  U <- Ua + Ub * sin((2 * pi * (tspan - Uc) + pi / 2) / period)
+  U <- a + b * sin((2 * pi * (tspan - c) + pi / 2) / period)
   return(U)
 }
 
