@@ -11,8 +11,7 @@
 #' @param site_params 
 #' @param spec_params 
 #' @param Nf_start 
-#' @param QQ_start 
-#' @param ... 
+#' @param Q_start 
 #'
 #' @importFrom lubridate ymd time_length yday is.Date duration
 #' @importFrom magrittr use_pipe
