@@ -127,4 +127,31 @@ relrefresh_atsite <- function(tspan = seq(1,365,1), a, b, c, period) {
   return(U)
 }
 
+##' Solar Radiation to PPFD
+##'
+##' The following function and documentation was copied verbatim from file modules/data.atmosphere/R/metutils.R in https://github.com/PecanProject/pecan/.
+##' 
+##' There is no easy straight way to convert MJ/m2 to mu mol photons / m2 / s (PAR).
+##' Note: 1 Watt = 1J/s
+##' The above conversion is based on the following reasoning
+##' 0.12 is about how much of the total radiation is expected to ocurr during the hour of maximum insolation (it is a guesstimate)
+##' 2.07 is a coefficient which converts from MJ to mol photons (it is approximate and it is taken from ...
+##' Campbell and Norman (1998). Introduction to Environmental Biophysics. pg 151 'the energy content of solar radiation in the PAR waveband is 2.35 x 10^5 J/mol'
+##' See also the chapter radiation basics (10)
+##' Here the input is the total solar radiation so to obtain in the PAR spectrum need to multiply by 0.486
+##' This last value 0.486 is based on the approximation that PAR is 0.45-0.50 of the total radiation
+##' This means that 1e6 / (2.35e6) * 0.486 = 2.07
+##' 1e6 converts from mol to mu mol
+##' 1/3600 divides the values in hours to seconds
+##'
+##' @title MJ to PPFD
+##' @author Fernando Miguez
+##' @author David LeBauer
+##' @param solarMJ MJ per day
+##' @export
+##' @return PPFD umol /m2 / s
+solarMJ2ppfd <- function(solarMJ) {
+  ppfd <- (0.12 * solarMJ) * 2.07 * 1e+06 / 3600
+  return(ppfd)
+} 
 
