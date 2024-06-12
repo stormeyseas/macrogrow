@@ -1,0 +1,94 @@
+---
+title: "Model PDEs"
+output: html_document
+bibliography: /resources/bibliography.bib 
+execute:
+  eval: false
+---
+
+```{r setup}
+#| include: false
+
+# install.packages("pacman")
+
+packs <- c("knitr", "tidyverse", "tidymodels", "arrow", "deSolve", "cubature"
+           # , "MASS", "car", "gamlss", "fitdistrplus", "statmod", "stats", "tweedie", "geosphere", "ggmap", "scales", "kableExtra", "multcomp", "insight", "ggeffects", "plotrix", "Rmisc", "BSagri", "magick",  "nlstools", "EnvStats"
+           )
+
+pacman::p_load(char = packs)
+```
+
+This shows the change in states (P, C) over time. parameters are fixed.
+
+```{r testing with LV}
+LVmod0D <- function(Time, State, Pars) {
+  with(as.list(c(State, Pars)), {
+
+    IngestC <- rI * P * C
+    GrowthP <- rG * P * (1 - P/K)
+    MortC <- rM * C
+    
+    dP <- GrowthP - IngestC
+    dC <- IngestC * AE - MortC
+    
+    return(list(c(dP, dC)))
+  })
+}
+
+pars <- c(rI = 0.2, rG = 1.0, rM = 0.2, AE = seq(0.2, 0.7, by = 0.05), K = 10)
+yini <- c(P = 1, C = 2)
+times <- seq(0, 200, by = 1)
+out <- ode(func = LVmod0D, y = yini, parms = pars, times = times)
+plot(out)
+```
+
+Can I use the 2D solver?
+States: Conc, Biom
+Params: Vmax, Kc, mu, Dm
+
+```{r}
+MMmod0D <- function(Time, State, Pars) {
+  with(as.list(c(State, Pars)), {
+
+    rL*det + UC1*(Y+Y1-am) - (Vam(alg)*(am/(Kam(alg)+am))) * ((Qmax(alg)-Q)/(Qmax(alg)-Qmin(alg))) * B - Rd*am + Dm(alg)*ns
+    
+    return(list(c(Conc, Biom)))
+  })
+}
+
+pars <- c(Vmax = 1.1, Kc = 2, Dm = 0.005, Eff = 0.5)
+yini <- c(Conc = 0.5, Biom = 0.5)
+times <- seq(0, 200, by = 1)
+out <- ode(func = MMmod0D, y = yini, parms = pars, times = times)
+plot(out)
+```
+
+```{r}
+LVmod <- function(Time, State, Pars) {
+  with(as.list(c(State, Pars)), {
+    Ingestion    <- rIng * Prey * Predator
+    GrowthPrey   <- rGrow * Prey * (1 - Prey/K)
+    MortPredator <- rMort * Predator
+
+    dPrey        <- GrowthPrey - Ingestion
+    dPredator    <- Ingestion * assEff - MortPredator
+
+    return(list(c(dPrey, dPredator)))
+  })
+}
+
+pars  <- c(rIng   = 0.2,    # /day, rate of ingestion
+           rGrow  = 1.0,    # /day, growth rate of prey
+           rMort  = 0.2 ,   # /day, mortality rate of predator
+           assEff = 0.5,    # -, assimilation efficiency
+           K      = 10)     # mmol/m3, carrying capacity
+
+yini  <- c(Prey = 1, Predator = 2)
+times <- seq(0, 200, by = 1) # days
+out   <- ode(yini, times, LVmod, pars)
+summary(out)
+
+## Default plot method
+plot(out)
+```
+

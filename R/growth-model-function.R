@@ -22,7 +22,7 @@
 #'@details 
 #'
 grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitrate, ammonium, other_N, # model does not yet have parameters for uptake rate of other_N
-                            site_params, spec_params, Nf_start, Q_start) {
+                            site_params, spec_params, initials) {
 
   # Get start and end dates
   if (is.Date(start)) {
@@ -33,7 +33,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
     }
     start_date <- (parse_date_time(x = paste(start_year, start), orders = "yj")) # - duration(1, "days")
   }
-  end_date <- start_date + duration(grow_days, "days")
+  end_date <- start_date + lubridate::duration(grow_days, "days")
   start_t <- yday(start_date)
   end_t <- start_t + grow_days
   
@@ -78,35 +78,37 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   kW <- 0.58 #0.65
   
   # Set up site parameters & starting conditions
-  d_top <- site_params$value[site_params$parameter == "d_top"]
-  hc <- site_params$value[site_params$parameter == "hc"]
-  farmV <- site_params$value[site_params$parameter == "farmA"] * hc
-  hz <- site_params$value[site_params$parameter == "hz"]
+  Nf_start <- initials["Nf_start"]
+  Q_start <- initials["Q_start"]
+  d_top <- site_params["d_top"]
+  hc <- site_params["hc"]
+  farmV <- site_params["farmA"] * hc
+  hz <- site_params["hz"]
   externals$lambda[1] <- lambda <- (externals$U[1]*60*60*24)/farmV # U needs to be in m d-1
   externals$Am_add[1] <- externals$Am_base[1]
   externals$Ni_add[1] <- externals$Ni_base[1]
   
   # Set up all species parameters & starting conditions
-  V_am <- spec_params$value[spec_params$parameter == "V_am"]
-  K_am <- spec_params$value[spec_params$parameter == "K_am"]
-  V_ni <- spec_params$value[spec_params$parameter == "V_ni"]
-  K_ni <- spec_params$value[spec_params$parameter == "K_ni"]
-  Q_min <- spec_params$value[spec_params$parameter == "Q_min"]
-  Q_max <- spec_params$value[spec_params$parameter == "Q_max"]
-  K_c <- spec_params$value[spec_params$parameter == "K_c"]
-  mu  <- spec_params$value[spec_params$parameter == "mu"]
-  N_min <- spec_params$value[spec_params$parameter == "N_min"]
-  N_max <- spec_params$value[spec_params$parameter == "N_max"]
-  D_m  <- spec_params$value[spec_params$parameter == "D_m"]
-  a_cs <- spec_params$value[spec_params$parameter == "a_cs"]
-  I_o <- spec_params$value[spec_params$parameter == "I_o"]
-  T_opt <- spec_params$value[spec_params$parameter == "T_opt"]
-  T_min <- spec_params$value[spec_params$parameter == "T_min"]
-  T_max <- spec_params$value[spec_params$parameter == "T_max"]
-  h_a <- spec_params$value[spec_params$parameter == "h_a"]
-  h_b <- spec_params$value[spec_params$parameter == "h_b"]
-  h_c <- spec_params$value[spec_params$parameter == "h_c"]
-  DWWW <- spec_params$value[spec_params$parameter == "DWWW"]
+  V_am <- spec_params["V_am"]
+  K_am <- spec_params["K_am"]
+  V_ni <- spec_params["V_ni"]
+  K_ni <- spec_params["K_ni"]
+  Q_min <- spec_params["Q_min"]
+  Q_max <- spec_params["Q_max"]
+  K_c <- spec_params["K_c"]
+  mu  <- spec_params["mu"]
+  N_min <- spec_params["N_min"]
+  N_max <- spec_params["N_max"]
+  D_m  <- spec_params["D_m"]
+  a_cs <- spec_params["a_cs"]
+  I_o <- spec_params["I_o"]
+  T_opt <- spec_params["T_opt"]
+  T_min <- spec_params["T_min"]
+  T_max <- spec_params["T_max"]
+  h_a <- spec_params["h_a"]
+  h_b <- spec_params["h_b"]
+  h_c <- spec_params["h_c"]
+  DWWW <- spec_params["DWWW"]
   
   internals$Nf[1] <- Nf <- Nf_start
   Q <- Q_start
@@ -169,5 +171,8 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
         rates$N_change[i+1] <- up_Am + up_Ni - Ns_loss - Nf_loss
       }
     }
-    return(cbind(externals, internals, rates))
+    
+    df <- merge(externals, internals, by = c("t", "date"))
+    df <- merge(df, rates, by = c("t", "date"))
+    return(df)
   }

@@ -78,8 +78,8 @@ T_lim <- function(TT, T_max, T_opt, T_min){
   if (T_opt > T_max) {stop("Error: maximum temperature is lower than optimum temperature")} 
   if (T_opt-T_min <= T_max-T_opt) {stop("Species CTMI function not valid! Must satisfy T_opt-T_min > T_max-T_opt")}
   
-  if (TT > T_max) {T_lim <- 0
-  } else if (TT < T_min) {T_lim <- 0
+  if (TT > T_max) {Tlim <- 0
+  } else if (TT < T_min) {Tlim <- 0
   } else {Tlim <- ((TT - T_max)*(TT - T_min)^2)/((T_opt - T_min)*((T_opt - T_min)*(TT - T_opt) - (T_opt - T_max)*(T_opt + T_min - 2*TT)))}
   
   return(Tlim)

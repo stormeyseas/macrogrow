@@ -1,28 +1,24 @@
 ---
 title: "Forcing functions"
+output: html_document
+bibliography: /resources/bibliography.bib 
 execute:
   eval: false
 ---
 
-```{r setup, include=FALSE}
-#install.packages("NCmisc", "knitr")
-#library(NCmisc)
-#fname <- "C:/Users/PC/Downloads/01_forcing.Rmd"
-#knitr::purl(fname, documentation = 0)
-#required <- NCmisc::list.functions.in.file(filename = "C:/Users/PC/OneDrive - University of Tasmania/Macroalgae growth & attenuation/R stuff/Markdowns/01_forcing.R")
-#summary(required)
-#install.packages(setdiff(required, rownames(installed.packages())))  
-#knitr::opts_knit$set(root.dir = "C:/Users/PC/OneDrive - University of Tasmania/Macroalgae growth & attenuation/R stuff")
-#library(tidyverse)
-knitr::opts_knit$set(root.dir = "C:/Users/treimer/OneDrive - University of Tasmania/Macroalgae growth & attenuation/R stuff")
+```{r setup}
+#| include: false
+
+# install.packages("pacman")
 
 # Special, not on CRAN
 # devtools::install_github("pecanproject/pecan/modules/data.atmosphere")
 
-pacman::p_load("knitr", "tidyverse", "magrittr","forcats", "MASS", "ggplot2", "car", "gamlss", "fitdistrplus", "statmod", "stats", "tweedie", "geosphere", "stringr", "ggmap", "scales", "kableExtra", "multcomp", "insight", "ggeffects", "plotrix", "Rmisc", "BSagri", "magick", "cowplot", "broom", "lubridate", "nlstools", "dplyr", "tidyr", "devtools", "EnvStats", "PEcAn.data.atmosphere")
+packs <- c("knitr", "tidyverse", "tidymodels", "arrow"
+           # , "MASS", "car", "gamlss", "fitdistrplus", "statmod", "stats", "tweedie", "geosphere", "ggmap", "scales", "kableExtra", "multcomp", "insight", "ggeffects", "plotrix", "Rmisc", "BSagri", "magick",  "nlstools", "EnvStats"
+           )
 
-nice <- theme_classic() + theme(legend.position = "none") + theme(text = element_text(size = 12, family = "sans", colour = "black"))
-prettybars <- scale_fill_brewer(palette = "Set1")
+pacman::p_load(char = packs)
 
 # Outdated, possibly not in use any more
 # p_load("nlstimedist")
@@ -40,280 +36,315 @@ lab_nit <- bquote("Concentration ("*mu*"mol "~NO[3]*")")
 temp_lab <- expression(Temperature ~ (degree * C))
 t <- data.frame(as.numeric(1:(365 + 30)))
 colnames(t) <- c("day_t")
+
+nice <- theme_classic() + 
+  theme(legend.position = "none") + theme(text = element_text(size = 12, family = "sans", colour = "black"))
+prettybars <- scale_fill_brewer(palette = "Set1")
 ```
 
 # Light and temperature
 
 ## Environmental data
 
-This loads all the environmental data from WP1 and WP2 (data.CRC), as well as data from the BOM.
+This loads all the environmental data from WP1 and WP2 (all_CRC), as well as data from the BOM.
 
-```{r load environmental data}
-setwd(
-  "C:/Users/treimer/OneDrive - University of Tasmania/Other people's data/CRC-P WP1 & 2 data"
+```{r load and clean BOM data}
+solar_BOM <- list(
+  read.csv("data-raw/IDCJAC0016_094020_2021_Data.csv", sep = ','),
+  read.csv("data-raw/IDCJAC0016_092157_2021_Data.csv", sep = ',')
 )
+colnames(solar_BOM[[1]]) <- colnames(solar_BOM[[2]]) <- c("Product.code", "BOM.station.number", "Year", "Month", "Day", "DOY", "Daily.solar.exp.MJmm")
 
-data.CRC <-
-  read.csv("all_env_data.csv",
-           sep = ',')
+solar_BOM <- bind_rows(solar_BOM)
 
-data.CRC <- data.CRC %>%
-  mutate(site = as.factor(site)) %>%
-  mutate(depth_m = as.factor(depth_m)) %>%
-  mutate(date = as.Date(date, "%d/%m/%y"))
-levels(data.CRC$site) <- c("Okehampton", "Tower Bay")
+solar_BOM <- solar_BOM %>% 
+  mutate(I_ppfd = solarMJ2ppfd(Daily.solar.exp.MJmm),
+         Product.code = as.factor(Product.code),
+         BOM.station.number = as.factor(BOM.station.number),
+         site = case_when(BOM.station.number == "94020" ~ "Dover",
+                          BOM.station.number == "92157" ~ "Triabunna"),
+         site = as.factor(site),
+         date = make_date(y = Year, m = Month, d = Day)) %>% 
+  dplyr::select(-c(Year, Month, Day))
 
-solar_dov <-
-  read.csv("bom data/IDCJAC0016_094020_2021_Data.csv", sep = ',') %>%
-  mutate(site = as.factor("Dover"))
-solar_tri <-
-  read.csv("bom data/IDCJAC0016_092157_2021_Data.csv", sep = ',') %>%
-  mutate(site = as.factor("Triabunna"))
-temp.BOM.min <-
-  read.csv("bom data/IDCJAC0011_094020_2021_Data.csv", sep = ',')
-colnames(temp.BOM.min) <-
-  c("code",
-    "site_no",
-    "y",
-    "m",
-    "d",
-    "day_t",
-    "temp.min",
-    "days_acc",
-    "quality")
-temp.BOM.min <- temp.BOM.min %>%
-  mutate(site = case_when(
-    site_no == as.integer(94020) ~ as.factor("Dover"),
-    site_no == as.integer(92157) ~ as.factor("Triabunna")
-  ))
-temp.BOM.max <-
-  read.csv("bom data/IDCJAC0010_094020_2021_Data.csv", sep = ',')
-colnames(temp.BOM.max) <-
-  c("code",
-    "site_no",
-    "y",
-    "m",
-    "d",
-    "day_t",
-    "temp.max",
-    "days_acc",
-    "quality")
-temp.BOM.max <- temp.BOM.max %>%
-  mutate(site = case_when(
-    site_no == as.integer(94020) ~ as.factor("Dover"),
-    site_no == as.integer(92157) ~ as.factor("Triabunna")
-  ))
+temp_BOM <- list(
+  read.csv("data-raw/IDCJAC0011_094020_2021_Data.csv", sep = ',') %>% 
+    mutate(measure = "minimum"),
+  read.csv("data-raw/IDCJAC0010_094020_2021_Data.csv", sep = ',') %>% 
+    mutate(measure = "maximum")
+)
+colnames(temp_BOM[[1]]) <- colnames(temp_BOM[[2]]) <- c("Product.code", "BOM.station.number", "Year", "Month", "Day", "DOY", "temperature.C", "Days.of.accumulation", "Quality", "measure")
+
+temp_BOM <- bind_rows(temp_BOM) 
+
+temp_BOM <- temp_BOM %>% 
+  mutate(measure = as.factor(measure),
+         Product.code = as.factor(Product.code),
+         BOM.station.number = as.factor(BOM.station.number),
+         Quality = as.factor(Quality),
+         site = case_when(BOM.station.number == "94020" ~ "Dover",
+                          BOM.station.number == "92157" ~ "Triabunna"),
+         site = as.factor(site),
+         date = make_date(y = Year, m = Month, d = Day)) %>% 
+  dplyr::select(-c(Year, Month, Day))
 ```
 
-```{r combine bom data}
-solar.BOM <- rbind(solar_dov, solar_tri)
-colnames(solar.BOM) <-
-  c("prod", "code", "y", "m", "d", "day_t", "I.MJ", "site")
-solar.BOM <- solar.BOM %>%
-  mutate(date = make_date(y = y, m = m, d = d)) %>%
-  mutate(I.ppfd = solarMJ2ppfd(I.MJ)) %>%
-  dplyr::select(-c(prod, code, y, m, d))
+```{r load and inspect crcp light data}
+all_CRC <- read.csv("data-raw/all_env_data.csv", sep = ',')
 
-temp.BOM <-
-  merge(temp.BOM.min, temp.BOM.max, by.x = "day_t", by.y = "day_t") %>%
-  mutate(date = make_date(y = y.x, m = m.x, d = d.x)) %>%
-  dplyr::select(
-    -c(
-      "code.x",
-      "site_no.x",
-      "y.x",
-      "m.x",
-      "d.x",
-      "days_acc.x" ,
-      "quality.x",
-      "code.y",
-      "site_no.y",
-      "y.y",
-      "m.y",
-      "d.y",
-      "days_acc.y",
-      "quality.y" ,
-      "site.y"
-    )
-  )
-colnames(temp.BOM) <-
-  c("day_t", "temp.min", "site", "temp.max", "date")
+all_CRC <- all_CRC %>%
+  mutate(site = factor(site, levels = c("Oakhampton", "Tower Bay"), labels = c("Okehampton", "Tower Bay")),
+         depth_m = as.factor(depth_m),
+         date_time = as_datetime(date_time, format = "%d/%m/%Y %H:%M:%S"),
+         date = dmy(date))
 
-data.BOM <-
-  merge(
-    solar.BOM,
-    temp.BOM,
-    by.x = c("day_t", "site"),
-    by.y = c("day_t", "site"),
-    all.x = TRUE,
-    all.y = TRUE
-  ) %>%
-  mutate(temp.ave = (temp.min + temp.max) / 2) %>% 
-  dplyr::select(-c(date.x))
-colnames(data.BOM) <-
-  c("day_t",
-    "site",
-    "I.MJ",
-    "I.BOM.ppfd",
-    "temp.BOM.min",
-    "temp.BOM.max",
-    "date",
-    "temp.BOM.ave")
+solar_CRC <- all_CRC %>% 
+  dplyr::select(-temp_C)
 
-rm(solar_dov,solar_tri, solar.BOM,temp.BOM,temp.BOM.max,temp.BOM.min)
+plot(solar_CRC$day_t, solar_CRC$I_ppfd) 
+# There are three points where I_ppfd seems to have maxed out (?) at ~25000, clear outliers
+solar_CRC$I_ppfd[solar_CRC$I_ppfd > 20000] <- NA
+# Only interested in daytime (>0) light
+solar_CRC$I_ppfd[solar_CRC$I_ppfd == 0] <- NA
+
+plot(solar_CRC$day_t, solar_CRC$I_ppfd)
 ```
 
-```{r combine crcp data}
-means.CRC <- data.CRC %>%
-  dplyr::filter(I_lux > 0, I_ppfd < 20000) %>%  # one giant outlier
-  dplyr::group_by(site, depth_m, day_t) %>%
-  dplyr::summarise(I.CRCP.ave = mean(I_ppfd),
-                   temp.CRCP.ave = mean(temp_C))
+```{r inspect CRCP temperature data}
+temp_CRC <- all_CRC %>% 
+  dplyr::select(-I_lux, -I_ppfd) %>% 
+  mutate(daynight = case_when(hour(date_time) >= 7 & hour(date_time) < 19 ~ "day",
+                              TRUE ~ "night"))
 
-# ggplot(means.crcp) +
-#   geom_point(aes(
-#     x = day_t,
-#     y = temp.CRCP.ave,
-#     color = depth_m,
-#     shape = site
-#   ),
-#   size = 2) +
-#   theme_classic()
+plot(temp_CRC$day_t, temp_CRC$temp_C) 
+# No obvious outliers, just a few very cold days (normal for Tassie)
 ```
+
+```{r daily means}
+# Irradience
+solar_CRC_means <- solar_CRC %>%
+  group_by(site, depth_m, day_t) %>%
+  reframe(daynight = "day",
+          I_mean = mean(I_ppfd, na.rm = T),
+          I_sd = sd(I_ppfd, na.rm = T),
+          n = n())
+
+ggplot(solar_CRC_means, 
+       aes(x = day_t, y = I_mean, color = depth_m, shape = site)) +
+  geom_point() +
+  ggtitle("Mean daily irradience, CRCP data")
+
+solar_BOM_means <- solar_BOM %>% 
+  group_by(site, DOY) %>% 
+  reframe(depth_m = "0",
+          day_t = DOY,
+          daynight = "day",
+          I_mean = mean(I_ppfd, na.rm = T),
+          I_sd = sd(I_ppfd, na.rm = T),
+          n = n()) %>% 
+  dplyr::select(-DOY)
+
+ggplot(solar_BOM_means, 
+       aes(x = day_t, y = I_mean, colour = site)) +
+  geom_point() +
+  ggtitle("Mean daily irradience, BOM data")
+
+# Temperature
+temp_CRC_means <- temp_CRC %>%
+  group_by(site, depth_m, day_t, daynight) %>%
+  reframe(T_mean = mean(temp_C, na.rm = T),
+          T_sd = sd(temp_C, na.rm = T),
+          n = n())
+
+ggplot(temp_CRC_means, 
+       aes(x = day_t, y = T_mean, color = interaction(depth_m, daynight), shape = site)) +
+  geom_point() +
+  ggtitle("Mean daily temperature, CRCP data")
+
+temp_BOM_means <- temp_BOM %>% 
+  group_by(site, DOY, measure) %>% 
+  reframe(depth_m = "0",
+          day_t = DOY,
+          daynight = "day",
+          T_mean = mean(temperature.C, na.rm = T),
+          T_sd = sd(temperature.C, na.rm = T),
+          n = n()) %>% 
+  dplyr::select(-DOY)
+
+levels(temp_BOM_means$measure) <- c("mean_max", "mean_min")
+
+ggplot(temp_BOM_means, 
+       aes(x = day_t, y = T_mean, colour = interaction(site, measure))) +
+  geom_point() +
+  ggtitle("Mean daily min and max temperature, BOM data")
+```
+
 
 ```{r combine all data}
-env.BOM <- data.BOM %>%
-  mutate(source = as.factor("BOM")) %>%
-  mutate(depth_m = as.factor("surf")) %>%
-  dplyr::select(-date, -I.MJ)
-colnames(env.BOM) <- c("day_t",
-                       "site",
-                       "I.ppfd",
-                       "temp.min" ,
-                       "temp.max" ,
-                       "temp.ave",
-                       "source",
-                       "depth_m")
-env.CRC <- means.CRC %>%
-  mutate(source = as.factor("CRC")) %>%
-  mutate(temp.min = NA) %>%
-  mutate(temp.max = NA)
-colnames(env.CRC) <- c("site",
-                       "depth_m",
-                       "day_t",
-                       "I.ppfd",
-                       "temp.ave",
-                       "source",
-                       "temp.min" ,
-                       "temp.max")
+solar_means <- list(
+  solar_CRC_means %>% mutate(source = "CRC"),
+  solar_BOM_means %>% mutate(source = "BOM")
+)
 
-data.env <- rbind(env.BOM,
-                  env.CRC)
+solar_means <- bind_rows(solar_means) %>% 
+  mutate(source = as.factor(source),
+         daynight = factor(daynight, levels = "day", "night"),
+         depth_m = as.factor(depth_m))
+
+# write_parquet(solar_means, sink = tempfile(pattern = "solar_means", fileext = ".parquet", tmpdir = "D:/R_temp_files/NR-model-package/data"))
+
+temp_means <- list(
+  temp_CRC_means %>% mutate(source = "CRC"),
+  temp_BOM_means %>% mutate(source = "BOM")
+)
+
+temp_means <- bind_rows(temp_means) %>% 
+  mutate(source = as.factor(source),
+         daynight = as.factor(daynight),
+         depth_m = as.factor(depth_m))
+
+# write_parquet(temp_means, sink = tempfile(pattern = "temp_means", fileext = ".parquet", tmpdir = "D:/R_temp_files/NR-model-package/data"))
 ```
 
-## Plotting environmental data
+# Initial plotting
 
 ```{r initial I plot}
-(p.init.I <- ggplot(data.env) +
-  geom_point(
-    aes(x = day_t,
-        y = I.ppfd,
-        shape = site,
-        color = depth_m,
-        size = source)) +
-  scale_color_manual(values = c("surf" = "grey",
-                                "2" = "orange",
-                                "5" = "steelblue")) +
-  scale_size_manual(values = c("BOM" = 1.5,
-                               "CRC" = 2.5)) +
-  scale_shape_manual(values = c("Dover" = 1,
-                                "Triabunna" = 1,
-                                "Okehampton" = 0,
-                                "Tower Bay" = 2)) +
+(p_I <- ggplot(solar_means, 
+               aes(x = day_t, y = I_mean, shape = site, color = depth_m, size = source)) +
+  geom_point() +
+  scale_color_manual(values = c("0" = "grey", "2" = "orange", "5" = "steelblue")) +
+  scale_size_manual(values = c("BOM" = 1.5, "CRC" = 2.5)) +
+  scale_shape_manual(values = c("Dover" = 1, "Triabunna" = 1, "Okehampton" = 0, "Tower Bay" = 2)) +
   theme_classic())
 ```
 
 ```{r initial T plot}
-(p.init.T <- ggplot(data.env) +
-  geom_point(
-    aes(x = day_t,
-        y = temp.ave,
-        shape = site,
-        color = depth_m,
-        size = source)) +
-  scale_color_manual(values = c("surf" = "grey",
-                                "2" = "orange",
-                                "5" = "steelblue")) +
-  scale_size_manual(values = c("BOM" = 1.5,
-                               "CRC" = 2.5)) +
-  scale_shape_manual(values = c("Dover" = 1,
-                                "Triabunna" = 1,
-                                "Okehampton" = 0,
-                                "Tower Bay" = 2)) +
-  theme_classic())
+(p_T <- ggplot(filter(temp_means, is.na(measure) | measure == "mean_max")) +
+   geom_point(aes(x = day_t, y = T_mean, shape = site, color = depth_m, size = source)) +
+   scale_color_manual(values = c("surf" = "grey", "2" = "orange", "5" = "steelblue")) +
+   scale_size_manual(values = c("BOM" = 1.5, "CRC" = 2.5)) +
+   scale_shape_manual(values = c("Dover" = 1, "Triabunna" = 1, "Okehampton" = 0, "Tower Bay" = 2)) +
+   theme_classic())
 ```
 
-## New forcing functions
+# Fitting functions to data
 
-### Irradience
+## Temperature
+
+There is only Dover for BOM temperature, and the mean maximum is a much closer fit to the CRCP data. However, basically the only point of the BOM data is to fill in the gaps where the CRC wasn't collecting data.
+
+```{r nls on BOM temp}
+# Based on CRCP and BOM data (max only)
+xT <- as.formula(T_mean ~ a + sin((2 * pi * (day_t + b) + pi / 2) / 365) * c)
+yT <- nls(xT, start = list(a = 15, b = 60, c = 2), 
+           data = filter(temp_means, is.na(measure) | measure == "mean_max"))
+# summary(yT)
+aT <- coef(summary(yT))[1]
+bT <- round(coef(summary(yT))[2], 0)
+cT <- coef(summary(yT))[3]
+
+# Based on CRCP data only
+yT1 <- nls(xT, start = list(a = 15, b = 60, c = 2), data = filter(temp_means, is.na(measure)))
+# summary(yT1)
+aT1 <- coef(summary(yT1))[1]
+bT1 <- round(coef(summary(yT1))[2], 0)
+cT1 <- coef(summary(yT1))[3]
+
+# Based on CRCP data or BOM data, depending on whether CRCP data is available
+ydata <- temp_means %>%
+  filter(measure == "mean_max" | is.na(measure)) %>% 
+  dplyr::select(-measure, -n, -T_sd) %>% 
+  pivot_wider(names_from = c(source, site, daynight, depth_m), values_from = T_mean)
+
+ydata <- ydata %>% 
+  mutate(T_mean_2 = case_when(
+    !is.na(CRC_Okehampton_day_2) | !is.na(`CRC_Tower Bay_day_2`) | !is.na(`CRC_Tower Bay_night_2`) ~ 
+      mean(c(CRC_Okehampton_day_2, `CRC_Tower Bay_day_2`, `CRC_Tower Bay_night_2`), na.rm = T),
+    TRUE ~ BOM_Dover_day_0),
+         T_mean_5 = case_when(
+    !is.na(`CRC_Tower Bay_day_5`) | !is.na(`CRC_Tower Bay_night_5`) ~ 
+      mean(c(`CRC_Tower Bay_day_2`, `CRC_Tower Bay_night_2`), na.rm = T),
+    TRUE ~ BOM_Dover_day_0))
+
+xT2 <- as.formula(T_mean_2 ~ a + sin((2 * pi * (day_t + b) + pi / 2) / 365) * c)
+yT2 <- nls(xT2, start = list(a = 15, b = 60, c = 2), data = ydata)
+# summary(yT2)
+aT2 <- coef(summary(yT2))[1]
+bT2 <- round(coef(summary(yT2))[2], 0)
+cT2 <- coef(summary(yT2))[3]
+
+xT5 <- as.formula(T_mean_5 ~ a + sin((2 * pi * (day_t + b) + pi / 2) / 365) * c)
+yT5 <- nls(xT5, start = list(a = 15, b = 60, c = 2), data = ydata)
+# summary(yT5)
+aT5 <- coef(summary(yT5))[1]
+bT5 <- round(coef(summary(yT5))[2], 0)
+cT5 <- coef(summary(yT5))[3]
+
+xT <- 1:365
+ydata <- data.frame(x = xT) %>% 
+  mutate(yT = aT + sin((2 * pi * (x + bT) + pi / 2) / 365) * cT,
+         yT1 = aT1 + sin((2 * pi * (x + bT1) + pi / 2) / 365) * cT1,
+         yT2 = aT2 + sin((2 * pi * (x + bT2) + pi / 2) / 365) * cT2,
+         yT5 = aT5 + sin((2 * pi * (x + bT5) + pi / 2) / 365) * cT5)
+```
+
+I've chosen the BOM + CRCP method.
+
+```{r chosen}
+summary(yT)
+
+p_T + 
+  geom_line(data = ydata, aes(x = x, y = yT), linetype = "dashed") +
+  geom_line(data = ydata, aes(x = x, y = yT1), linetype = "solid") #+
+  # geom_line(data = ydata, aes(x = x, y = yT2),  linetype = "solid", color = "orange") +
+  # geom_line(data = ydata, aes(x = x, y = yT5), linetype = "solid", color = "steelblue")
+```
+
+## Irradience
 
 Below I seemed to be using a lot of trial and error so I thought I would do it somewhat properly.
 
 ```{r nls on BOM ppfd}
-x.I <-
-  as.formula(I.ppfd ~ aI + sin((2 * pi * (day_t + bI) + pi / 2) / 365) * cI)
+xI <- as.formula(I_mean ~ aI + sin((2 * pi * (day_t + bI) + pi / 2) / 365) * cI)
 
-y.I.Dov <-
-  nls(
-    x.I,
-    start = list(aI = 850, bI = 60, cI = 600),
-    data = filter(env.BOM, site == "Dover")
-  )
-summary(y.I.Dov)
-aI.Dov <- round(coef(summary(y.I.Dov))[1], 2)
-bI.Dov <- round(coef(summary(y.I.Dov))[2],0)
-cI.Dov <- round(coef(summary(y.I.Dov))[3],2)
+yI_Dov <- nls(xI, start = list(aI = 850, bI = 60, cI = 600), 
+              data = filter(solar_means, source == "BOM" & site == "Dover"))
+summary(yI_Dov)
+a_Dov <- coef(summary(yI_Dov))[1]
+b_Dov <- round(coef(summary(yI_Dov))[2],0)
+c_Dov <- coef(summary(yI_Dov))[3]
 
-y.I.Tri <-
-  nls(
-    x.I,
-    start = list(aI = 850, bI = 60, cI = 600),
-    data = filter(env.BOM, site == "Triabunna")
-  )
-summary(y.I.Tri)
-aI.Tri <- round(coef(summary(y.I.Tri))[1],2)
-bI.Tri <- round(coef(summary(y.I.Tri))[2],0)
-cI.Tri <- round(coef(summary(y.I.Tri))[3],2)
+yI_Tri <- nls(xI, start = list(aI = 850, bI = 60, cI = 600), 
+              data = filter(solar_means, source == "BOM" & site == "Triabunna"))
+summary(yI_Tri)
+a_Tri <- coef(summary(yI_Tri))[1]
+b_Tri <- round(coef(summary(yI_Tri))[2],0)
+c_Tri <- coef(summary(yI_Tri))[3]
 
-y.I.BOM <- t %>%
-  mutate(Dover = aI.Dov + sin((2 * pi * (day_t + bI.Dov) + pi / 2) / 365) * cI.Dov) %>%
-  mutate(Triabunna = aI.Tri + sin((2 * pi * (day_t + bI.Tri) + pi / 2) / 365) * cI.Tri)
-y.I.BOM <- as.data.frame(y.I.BOM)
+yI_BOM <- as.data.frame(xT) %>%
+  mutate(Dover = a_Dov + sin((2 * pi * (xT + b_Dov) + pi / 2) / 365) * c_Dov,
+         Triabunna = a_Tri + sin((2 * pi * (xT + b_Tri) + pi / 2) / 365) * c_Tri) %>% 
+  pivot_longer(names_to = "site", values_to = "I_mean", cols = c(Dover, Triabunna)) %>% 
+  mutate(depth_m = "0",
+         source = "BOM")
 
-p.init.I + geom_line(data = y.I.BOM,
-                     aes(x = day_t,
-                         y = log10(Dover),
-                         linetype = "solid")) +
-  geom_line(data = y.I.BOM,
-            aes(x = day_t,
-                y = log10(Triabunna),
-                linetype = "dashed"))
-
-rm(y.I.Dov, y.I.Tri)
+p_I + 
+  geom_line(data = yI_BOM, aes(x = xT, y = I_mean), linetype = "solid") +
+  geom_line(data = yI_BOM, aes(x = xT, y = I_mean), linetype = "dashed")
 ```
 
 The existing coefficients stay the same as the BOM plot, and now I'm just adjusting the kW.I'm going to go with the Triabunna irradience, but they're basically the same.
 
 ```{r adapting for CRC ppfd}
-x.I.2m <- as.formula(I.ppfd ~ (aI.Tri + sin((2 * pi * (day_t + bI.Tri) + pi / 2) / 365) * cI.Tri) * exp(-kW.2 * 2))
-y.I.2m <- nls(x.I.2m,
+xI.2m <- as.formula(I_ppfd ~ (aI.Tri + sin((2 * pi * (day_t + bI.Tri) + pi / 2) / 365) * cI.Tri) * exp(-kW.2 * 2))
+y.I.2m <- nls(xI.2m,
               start = list(kW.2 = 0.6),
               data = filter(env.CRC, depth_m == "2"))
 summary(y.I.2m)
 kW.2 <- coef(summary(y.I.2m))[1]
 
-x.I.5m <- as.formula(I.ppfd ~ (aI.Tri + sin((2 * pi * (day_t + bI.Tri) + pi / 2) / 365) * cI.Tri) * exp(-kW.5 * 5))
-y.I.5m <- nls(x.I.5m,   
+xI.5m <- as.formula(I_ppfd ~ (aI.Tri + sin((2 * pi * (day_t + bI.Tri) + pi / 2) / 365) * cI.Tri) * exp(-kW.5 * 5))
+y.I.5m <- nls(xI.5m,   
               start = list(kW.5 = 0.6),
               data = filter(env.CRC, depth_m == "5"))
 summary(y.I.5m)
@@ -357,7 +388,7 @@ m5.KwO <- t %>%
 
 y.I.CRC <- as.data.frame(rbind(m2.Kw2, m2.Kw5, m2.KwM, m5.Kw2, m5.Kw5, m5.KwM, m2.KwO, m5.KwO))
 
-p.init.I + 
+p_I + 
   geom_line(data = y.I.CRC, 
             aes(x = day_t, y = val, color = kW.used, linetype = depth)) +
   scale_color_manual(values = c("2m" = "orange", "5m" = "steelblue", "mean" = "black", "other" = "red"))+
@@ -365,94 +396,12 @@ p.init.I +
 
 rm(m2.Kw2, m2.Kw5, m2.KwM, m5.Kw2, m5.Kw5, m5.KwM, m2.KwO, m5.KwO)
 ```
-### Temperature
-
-There is only Dover for BOM temperature.
-
-```{r nls on BOM temp}
-x.T <-
-  as.formula(temp.ave ~ aT.Dov + sin((2 * pi * (day_t + bT.Dov) + pi / 2) / 365) * cT.Dov)
-
-y.T.Dov <-
-  nls(
-    x.T,
-    start = list(
-      aT.Dov = 15,
-      bT.Dov = 60,
-      cT.Dov = 2
-    ),
-    data = env.BOM
-  )
-summary(y.T.Dov)
-aT.Dov <- round(coef(summary(y.T.Dov))[1], 2)
-bT.Dov <- round(coef(summary(y.T.Dov))[2], 0)
-cT.Dov <- round(coef(summary(y.T.Dov))[3], 2)
-
-y.T.BOM <- t %>%
-  mutate(Dover = aT.Dov + sin((2 * pi * (day_t + bT.Dov) + pi / 2) / 365) * cT.Dov)
-y.T.BOM <- as.data.frame(y.T.BOM)
-
-p.init.T + geom_line(data = y.T.BOM,
-                     aes(x = day_t,
-                         y = Dover,
-                         linetype = "solid"))
-
-rm(y.T.Dov)
-```
-
-This time only the b value stays the same, so that the peak is in the correct place.
-
-```{r adapting for CRC temp}
-x.T.Oke <-
-  as.formula(temp.ave ~ aT.Oke + sin((2 * pi * (day_t + bT.Dov) + pi / 2) / 365) * cT.Oke)
-y.T.Oke <-
-  nls(
-    x.T.Oke,
-    start = list(aT.Oke = aT.Dov, cT.Oke = cT.Dov),
-    data = filter(env.CRC,site=="Okehampton")
-  )
-summary(y.T.Oke)
-aT.Oke <- round(coef(summary(y.T.Oke))[1], 2)
-cT.Oke <- round(coef(summary(y.T.Oke))[2], 2)
-
-x.T.Tow <-
-  as.formula(temp.ave ~ aT.Tow + sin((2 * pi * (day_t + bT.Dov) + pi / 2) / 365) * cT.Tow)
-y.T.Tow <-
-  nls(
-    x.T.Tow,
-    start = list(aT.Tow = aT.Dov, cT.Tow = cT.Dov),
-    data = filter(env.CRC,site=="Tower Bay")
-  )
-summary(y.T.Tow)
-aT.Tow <- round(coef(summary(y.T.Tow))[1], 2)
-cT.Tow <- round(coef(summary(y.T.Tow))[2], 2)
-
-y.T.CRC <- t %>%
-  mutate(Tow = aT.Tow + sin((2 * pi * (day_t + bT.Dov) + pi / 2) / 365) * cT.Tow) %>%
-  mutate(Oke = aT.Oke + sin((2 * pi * (day_t + bT.Dov) + pi / 2) / 365) * cT.Oke)
-y.T.CRC <- as.data.frame(y.T.CRC)
-
-p.init.T + geom_line(
-  data = y.T.CRC,
-  aes(x = day_t,
-      y = Oke),
-  linetype = "dashed"
-) +
-  geom_line(
-    data = y.T.CRC,
-    aes(x = day_t,
-        y = Tow),
-    linetype = "solid"
-  ) 
-
-rm(y.T.Oke,y.T.Tow)
-```
 
 ## Plots
 
 ```{r final I plot}
 (p.Irr <- ggplot() +
-   geom_point(data = data.env, aes(x = day_t, y = log(I.ppfd), shape = site, color = depth_m, size = source)) +
+   geom_point(data = data.env, aes(x = day_t, y = log(I_ppfd), shape = site, color = depth_m, size = source)) +
     scale_color_manual(values = c("surf" = "grey","2" = "orange", "5" = "steelblue")) +
     scale_size_manual(values = c("BOM" = 1.5, "CRC" = 2.5)) +
     scale_shape_manual(values = c("Dover" = 1, "Triabunna" = 1, "Okehampton" = 0, "Tower Bay" = 2)) +

@@ -42,3 +42,13 @@ N_umolL_mgm3 <- function(umol_L){
   return(mg_m3)
 }
 
+name_vector <- function(x, names) {
+  names(x) <- names
+  return(x)
+}
+
+new_params <- function(params, num, factor) {
+  newparams <- params
+  newparams[num] <- newparams[num] * factor
+  return(newparams)
+}
