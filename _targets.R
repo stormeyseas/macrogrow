@@ -66,7 +66,7 @@ list(
   
   # Set up culture space
   # , tar_target(site_data, format = "parquet") # replace with data
-  , tar_target(site_params, command = c(d_top = 2.5, hc = 5, farmA = 60 * 50, hz = 35), format = "rds")
+  , tar_target(site_params, command = c(d_top = 2, hc = 5, farmA = 60 * 50, hz = 35, kW = 0.58), format = "rds")
 
   # Set up macroalgae species
   # Se data/example.Rmd for all sources and data processing
@@ -74,11 +74,12 @@ list(
   , tar_target(spec_params, name_vector(spec_data$value, spec_data$parameter), format = "rds")
   
   , tar_target(start_date, as.Date(x = "2017-04-26"))
-  , tar_target(init_state, c(Nf_start = 50, Q_start = 15))
+  , tar_target(init_state, c(Nf = 50, Q = 15))
     
   # RUN MODEL
   , tar_target(model_base, 
-               command = grow_macroalgae(start = start_date, grow_days = length(growtime)-1, 
+               command = grow_macroalgae(start = start_date, 
+                                         grow_days = length(growtime)-1, 
                                          temperature = T_func, light = I_func, velocity = U_func, 
                                          nitrate = Nit_func, ammonium = Amm_func, 
                                          site_params = site_params, spec_params = spec_params, 
@@ -105,19 +106,19 @@ list(
                pattern = index,
                iteration = "list")
   
-  , tar_target(model_low, 
-               command = grow_macroalgae(start = start_date, grow_days = length(growtime)-1, 
-                                         temperature = T_func, light = I_func, velocity = U_func, 
-                                         nitrate = Nit_func, ammonium = Amm_func, 
-                                         site_params = site_params, spec_params = spec_params_low, 
+  , tar_target(model_low,
+               command = grow_macroalgae(start = start_date, grow_days = length(growtime)-1,
+                                         temperature = T_func, light = I_func, velocity = U_func,
+                                         nitrate = Nit_func, ammonium = Amm_func,
+                                         site_params = site_params, spec_params = spec_params_low,
                                          initials = init_state),
                pattern = spec_params_low, format = "parquet")
-  
-  , tar_target(model_high, 
-               command = grow_macroalgae(start = start_date, grow_days = length(growtime)-1, 
-                                         temperature = T_func, light = I_func, velocity = U_func, 
-                                         nitrate = Nit_func, ammonium = Amm_func, 
-                                         site_params = site_params, spec_params = spec_params_high, 
+
+  , tar_target(model_high,
+               command = grow_macroalgae(start = start_date, grow_days = length(growtime)-1,
+                                         temperature = T_func, light = I_func, velocity = U_func,
+                                         nitrate = Nit_func, ammonium = Amm_func,
+                                         site_params = site_params, spec_params = spec_params_high,
                                          initials = init_state),
                pattern = spec_params_high, format = "parquet")
   
@@ -126,16 +127,30 @@ list(
   , tar_target(lowhigh_long, format = "parquet", command = merge(low_long, high_long, by = c("t", "date", "output")))
 
   , tar_target(lowhighbase_long, format = "parquet", command = merge(lowhigh_long, output_long, by = c("t", "date", "output")))
-  , tar_target(sensitivities, format = "parquet", 
-               command = lowhighbase_long %>% 
-                 filter(output == output_names) %>% 
+  , tar_target(sensitivities, format = "parquet",
+               command = lowhighbase_long %>%
+                 filter(output == output_names) %>%
                  mutate(sens = (value.y - value.x)/(0.2*value)),
                pattern = output_names)
   , tar_target(sens_plots,
                ggplot(filter(sensitivities, output == output_names), aes(x = t, y = sens)) +
                  geom_line() + ggtitle(output_names),
                pattern = output_names,
-               iteration = "list", 
+               iteration = "list",
                format = "rds")
 )
 
+
+# For testing:
+# source("R/growth-helper-functions.R")
+# start <- tar_read(start_date)
+# growtime <- tar_read(growtime)
+# temperature <- tar_read(T_func)
+# light <- tar_read(I_func)
+# velocity <- tar_read(U_func)
+# nitrate <- tar_read(Nit_func)
+# ammonium <- tar_read(Amm_func)
+# site_params <- tar_read(site_params)
+# spec_params <- tar_read(spec_params)
+# initials <- tar_read(init_state)
+# grow_days <- length(growtime)-1
