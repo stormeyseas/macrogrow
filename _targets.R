@@ -2,8 +2,8 @@ library(targets)
 library(qs)
 
 tar_option_set(
-  packages = c("tidyverse", "ggplot2", "arrow"), # Packages that your targets need for their tasks.
-  # format = "parquet", # Optionally set the default storage format. qs is fast.
+  packages = c("tidyverse", "ggplot2", "arrow", "lubridate"), # Packages that your targets need for their tasks.
+  # format = "parquet", # Optionally set the default storage format
   controller = crew::crew_controller_local(workers = 5, seconds_idle = 60)
 )
 
@@ -25,15 +25,9 @@ list(
   
   # Get data, define environmental space (as functions if necessary)
   
-  # tar_target(data, get_data(file)), # See data/example.Rmd for processing
+  # See data/example.Rmd for processing
   , tar_target(T_data, command = rnorm(length(growtime), mean = 20, sd = 1), format = "rds")
   , tar_target(T_func, command = temp_atsite(tspan = growtime, a = mean(T_data), b = sd(T_data), c = 20, period = 365), format = "rds")
-  
-  # Plot temperature data/curve
-  , tar_target(T_plot, command = 
-               ggplot(data = data.frame(t = growtime, func = T_func, data = T_data), aes(x = t)) +
-               geom_line(aes(y = func)) +
-               geom_point(aes(y = data)), format = "rds")
   
   # Replace with actual data
   , tar_target(Nit_data, command = rnorm(length(growtime), mean = 5, sd = 0.5), format = "rds")
@@ -41,35 +35,19 @@ list(
   , tar_target(Nit_func, command = N_atsite(tspan = growtime, a = mean(Nit_data), b = sd(Nit_data), c = 60, period = 365))
   , tar_target(Amm_func, command = N_atsite(tspan = growtime, a = mean(Amm_data), b = sd(Amm_data), c = 60, period = 365))
   
-  # Plot nitrogen parts
-  , tar_target(N_plot, command = 
-               ggplot(data = data.frame(t = growtime, func = Nit_func+Amm_func, Nit = Nit_data, Amm = Amm_data), aes(x = t)) +
-               geom_line(aes(y = func)) + 
-               geom_point(aes(y = Amm+Nit)) +
-               geom_point(aes(y = Nit), color = "blue") + geom_point(aes(y = Amm), color = "orange")  )
-  
   # Replace with actual data
   , tar_target(I_data, command = rnorm(length(growtime), mean = 600, sd = 10))
   , tar_target(I_func, command = Irr_atsite(tspan = growtime, a = mean(I_data), b = sd(I_data), c = 15, period = 365))
   
-  # Plot irradience parts
-  , tar_target(I_plot, command =
-               ggplot(data = data.frame(t = growtime, func = I_func, data = I_data), aes(x = t)) +
-               geom_line(aes(y = func)) + 
-               geom_point(aes(y = data)))
-
   # Replace with actual data
   , tar_target(U_func, command = relrefresh_atsite(tspan = growtime, a = 0.3, b = -0.15, c = 60, period = 365))
-  , tar_target(U_plot, command = 
-               ggplot(data = data.frame(t = growtime, func = U_func), aes(x = t)) +
-               geom_line(aes(y = func)))
-  
+
   # Set up culture space
   # , tar_target(site_data, format = "parquet") # replace with data
   , tar_target(site_params, command = c(d_top = 2, hc = 5, farmA = 60 * 50, hz = 35, kW = 0.58), format = "rds")
 
   # Set up macroalgae species
-  # Se data/example.Rmd for all sources and data processing
+  # See data/example.Rmd for all sources and data processing
   , tar_target(spec_data, command = read.csv("data-raw/macrocystis.csv") %>% mutate(value = as.numeric(value)), format = "parquet")
   , tar_target(spec_params, name_vector(spec_data$value, spec_data$parameter), format = "rds")
   
@@ -78,12 +56,12 @@ list(
     
   # RUN MODEL
   , tar_target(model_base, 
-               command = grow_macroalgae(start = start_date, 
-                                         grow_days = length(growtime)-1, 
-                                         temperature = T_func, light = I_func, velocity = U_func, 
-                                         nitrate = Nit_func, ammonium = Amm_func, 
-                                         site_params = site_params, spec_params = spec_params, 
-                                         initials = init_state),
+               grow_macroalgae(start = start_date, 
+                               grow_days = length(growtime)-1, 
+                               temperature = T_func, light = I_func, velocity = U_func, 
+                               nitrate = Nit_func, ammonium = Amm_func, 
+                               site_params = site_params, spec_params = spec_params, 
+                               initials = init_state),
                format = "parquet")
   , tar_target(output_long, command = pivot_longer(model_base, names_to = "output", values_to = "value", col = (3:ncol(model_base))), format = "parquet")
   
