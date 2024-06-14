@@ -8,7 +8,7 @@
 #' @param Nf Fixed nitrogen (mg m\eqn{^{-3}})
 #' @param Ns Stored nitrogen (mg m\eqn{^{-3}})
 #' @param spec_params A vector of named numbers. Must include:
-#'    * \eqn{Q_{min}}, the minimum nutrient quotient
+#'    * \eqn{Q_{min}}, the minimum internal nutrient quotient
 #'
 #' @return the non-dimensionalised internal nutrient quotient
 #'
@@ -20,10 +20,10 @@ Q <- function(Nf, Ns, spec_params) {
 
 #' Relative nutrient quotient
 #'
-#' @param Q 
+#' @param Q Non-dimentionalised internal nutrient quotient
 #' @param spec_params A vector of named numbers. Must include:
-#'    * \eqn{Q_{min}}, the minimum nutrient quotient
-#'    * \eqn{Q_{max}}, the minimum nutrient quotient
+#'    * \eqn{Q_{min}}, the minimum internal nutrient quotient
+#'    * \eqn{Q_{max}}, the maximum internal nutrient quotient
 #'    * \eqn{K_{c}}, the half-saturation constant for internal nutrient reserves
 #'
 #' @return the relative (0-1) internal nutrient quotient
