@@ -1,24 +1,59 @@
-#' Nitrogen uptake rate
+#' Internal nitrogen concentration
 #'
-#' @param conc 
-#' @param V 
-#' @param K 
+#' @param Q,QQ Non-dimentionalised internal nutrient quotient (Q) or relative nutrient quotient (QQ). 
+#' Only one is needed; if both are supplied only Q is used.
+#' @param spec_params A vector of named numbers. Must include:
+#'    * \eqn{N_{min}}, the minimum internal nitrogen concentration
+#'    * \eqn{N_{max}}, the maximum internal nitrogen concentration
+#'    * \eqn{Q_{min}}, the minimum nutrient quotient (if QQ is not supplied)
+#'    * \eqn{Q_{max}}, the maximum nutrient quotient (if QQ is not supplied)
+#' 
+#' @return
+#' @export
+#'
+N_int <- function(Q, QQ, spec_params) {
+  if (missing(Q)) {
+    N_int <- spec_params['N_max'] - (spec_params['N_max'] - spec_params['N_min']) * QQ
+  } else if (missing(QQ)) {
+    N_int <- spec_params['N_max'] - (spec_params['N_max'] - spec_params['N_min']) * QQ(Q, spec_params)
+  } else {
+    warning("Both QQ and Q supplied: calculating internal nitrogen from Q only")
+    N_int <- spec_params['N_max'] - (spec_params['N_max'] - spec_params['N_min']) * QQ(Q, spec_params)
+  }
+  return(N_int)
+}
+
+#' Relative internal nitrogen concentration
+#'
+#' @param N_int the internal nitrogen concentration
+#' @param spec_params A vector of named numbers. Must include:
+#'    * \eqn{N_{min}}, the minimum internal nitrogen concentration
+#'    * \eqn{N_{max}}, the maximum internal nitrogen concentration
+#'
+#' @return
+#' @export
+#'
+NN <- function(N_int, spec_params) {
+  NN <- (spec_params["N_max"] - N_int)/(spec_params["N_max"] - spec_params["N_min"])
+  return(NN)
+}
+
+#' Uptake rate (Michaelis-Menton)
+#'
+#' @param conc external substrate concentration
+#' @param V the maximum uptake rate \eqn{V_{max}}
+#' @param K the half-saturation constant \eqn{K_{c}}
 #'
 #' @return
 #' @export
 #'
 #' @examples
-N_uptake <- function(conc, V, K) {
+MM_uptake <- function(conc, V, K) {
   uprate <- (V * conc / (K + conc))
   return(uprate)
 }
 
-NN <- function(N_perc, spec_params) {
-  NN <- (spec_params["N_max"] - N_perc)/(spec_params["N_max"] - spec_params["N_min"])
-  return(NN)
-}
-
-#' Convert mg N m^{-3} d^{-1} to \mu mol N hr^{-1}
+#' Convert mg N m\eqn{^{-3}} d\eqn{^{-1}} to \eqn{\mu} mol N hr\eqn{^{-1}}
 #'
 #' @param N_mg_m3 Nitrogen (or any compound containing a single N atom) concentration in mg N m^{-3} d^{-1}
 #'
