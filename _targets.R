@@ -12,8 +12,8 @@ tar_source(files = c(
   "R/environmental-helper-functions.R"
   , "R/growth-helper-functions.R"
   #, "R/special_growth_functions.R"
-  , "R/misc-helper-functions.R"
-  , "R/growth-model-function.R"
+  , "R/targets-functions.R"
+  , "R/growth-function.R"
   )
 )
 
@@ -76,11 +76,11 @@ list(
   
   , tar_target(index, 1:length(spec_params))
   , tar_target(spec_params_low, 
-               command = new_params(spec_params, num = index, factor = 0.9),
+               command = adj_params(spec_params, num = index, factor = 0.9),
                pattern = index,
                iteration = "list")
   , tar_target(spec_params_high, 
-               command = new_params(spec_params, num = index, factor = 1.1),
+               command = adj_params(spec_params, num = index, factor = 1.1),
                pattern = index,
                iteration = "list")
   

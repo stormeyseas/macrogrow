@@ -1,3 +1,23 @@
+#' Nitrogen uptake rate
+#'
+#' @param conc 
+#' @param V 
+#' @param K 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+N_uptake <- function(conc, V, K) {
+  uprate <- (V * conc / (K + conc))
+  return(uprate)
+}
+
+NN <- function(N_perc, spec_params) {
+  NN <- (spec_params["N_max"] - N_perc)/(spec_params["N_max"] - spec_params["N_min"])
+  return(NN)
+}
+
 #' Convert mg N m^{-3} d^{-1} to \mu mol N hr^{-1}
 #'
 #' @param N_mg_m3 Nitrogen (or any compound containing a single N atom) concentration in mg N m^{-3} d^{-1}
@@ -42,13 +62,3 @@ N_umolL_mgm3 <- function(umol_L){
   return(mg_m3)
 }
 
-name_vector <- function(x, names) {
-  names(x) <- names
-  return(x)
-}
-
-new_params <- function(params, num, factor) {
-  newparams <- params
-  newparams[num] <- newparams[num] * factor
-  return(newparams)
-}
