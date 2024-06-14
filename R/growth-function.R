@@ -61,7 +61,7 @@ grow_macroalgae <- function(start, grow_days,
            Q_lim = NA, 
            T_lim = NA, 
            I_lim = NA, 
-           N_perc = NA, 
+           N_int = NA, 
            B_dw.mg = NA, 
            B_ww.mg = NA, 
            hm = NA)
@@ -76,26 +76,29 @@ grow_macroalgae <- function(start, grow_days,
   
   # For adding other_N (e.g. urea)
   # if (!missing(other_N)) {
+    # if (length(other_N) != nrow(outputs)) {
+    #   stop("Error: other_N vector is length ", length(other_N), " but timespan vector is length ", nrow(outputs))
+    # }
   #   externals$other_N <- other_N
   # }
 
-  # Set up site parameters & starting conditions
-  farmV <- site_params['farmA'] * site_params['hc']
-  externals$lambda[1] <- lambda <- (externals$U[1]*60*60*24)/farmV # U needs to be in m d-1
-  externals$Am_add[1] <- externals$Am_conc[1]
-  externals$Ni_add[1] <- externals$Ni_conc[1]
+  # Site parameters
+  farmV <- site_params['farmA'] * site_params['hc']                 # Volume of farm site
+  externals$lambda[1] <- lambda <- (externals$U[1]*60*60*24)/farmV  # Refresh rate based on U (U in m d-1)
+  externals$Am_add[1] <- externals$Am_conc[1]                       # Ambient ammonium concentration (no seaweed)
+  externals$Ni_add[1] <- externals$Ni_conc[1]                       # Ambient nitrate concentration (no seaweed)
   
-  # Set up starting conditions
-  internals$Nf[1] <- Nf <- Nf <- initials['Nf']
-  Q <- initials['Q']
-  internals$Ns[1] <- Ns <- Nf*(Q/spec_params['Q_min'] - 1)
+  # Starting state
+  internals$Nf[1] <- Nf <- Nf <- initials['Nf']                     # Fixed nitrogen
+  Q <- initials['Q']                                                # Internal nutrient quotient
+  internals$Ns[1] <- Ns <- Nf*(Q/spec_params['Q_min'] - 1)          # Stored nitrogen
 
     # Start model run
     for (i in 1:nrow(outputs)) {
       
       # Start of the day
-      internals$N_perc[i]   <- N_perc <- spec_params['N_max'] - (spec_params['N_max'] - spec_params['N_min']) * QQ(Q, spec_params)
-      internals$B_dw.mg[i]  <- B_dw.mg <- (Nf+Ns) / N_perc
+      internals$N_int[i]    <- N_int <- N_int(Q, spec_params)
+      internals$B_dw.mg[i]  <- B_dw.mg <- (Nf+Ns) / N_int
       internals$B_ww.mg[i]  <- B_ww.mg <- B_dw.mg * spec_params['DWWW']
       internals$hm[i]       <- hm <- algae_height(Nf, spec_params)
       
@@ -130,8 +133,8 @@ grow_macroalgae <- function(start, grow_days,
       rates$Ns_to_Nf[i]     <- Ns_to_Nf     <- min(growth_rate * Ns, Ns) # cannot convert more Ns than available
                                Ns_loss      <- spec_params['D_m'] * Ns
       rates$Nf_loss[i]      <- Nf_loss      <- spec_params['D_m'] * Nf
-      rates$up_Am[i]        <- up_Am        <- N_uptake(conc = Am_conc, V = spec_params['V_am'], K = spec_params['K_am']) * Q * B_dw.mg/1000
-      rates$up_Ni[i]        <- up_Ni        <- N_uptake(conc = Ni_conc, V = spec_params['V_ni'], K = spec_params['K_ni']) * Q * B_dw.mg/1000
+      rates$up_Am[i]        <- up_Am        <- MM_uptake(conc = Am_conc, V = spec_params['V_am'], K = spec_params['K_am']) * Q * B_dw.mg/1000
+      rates$up_Ni[i]        <- up_Ni        <- MM_uptake(conc = Ni_conc, V = spec_params['V_ni'], K = spec_params['K_ni']) * Q * B_dw.mg/1000
                                red_Am       <- other_constants['Rd'] * Am_conc # Reduction of ammonium (to nitrate)
                                remin        <- other_constants['rL'] * det # Remineralisation of detritus (to ammonium)
       
@@ -150,7 +153,7 @@ grow_macroalgae <- function(start, grow_days,
         internals$Nf[i+1]   <- Nf           <- Nf + Ns_to_Nf - Nf_loss
         internals$Ns[i+1]   <- Ns           <- Ns + up_Am + up_Ni - Ns_to_Nf - Ns_loss
                                Q            <- spec_params['Q_min']*(Ns/Nf + 1)
-        internals$N_perc[i+1] <- N_perc     <- spec_params['N_max'] - (spec_params['N_max'] - spec_params['N_min']) * QQ(Q, spec_params)
+        internals$N_int[i+1] <- N_int       <- N_int(Q, spec_params)
         rates$N_change[i+1]                 <- up_Am + up_Ni - Ns_loss - Nf_loss
       }
     }
