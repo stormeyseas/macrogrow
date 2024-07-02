@@ -12,9 +12,9 @@
 #' @export
 #'
 N_int <- function(Q, QQ, spec_params) {
-  if (missing(Q)) {
+  if (is.na(Q)) {
     N_int <- spec_params['N_max'] - (spec_params['N_max'] - spec_params['N_min']) * QQ
-  } else if (missing(QQ)) {
+  } else if (is.na(QQ)) {
     N_int <- spec_params['N_max'] - (spec_params['N_max'] - spec_params['N_min']) * QQ(Q, spec_params)
   } else {
     warning("Both QQ and Q supplied: calculating internal nitrogen from Q only")
