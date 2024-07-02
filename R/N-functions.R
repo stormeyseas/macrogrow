@@ -53,6 +53,21 @@ MM_uptake <- function(conc, V, K) {
   return(uprate)
 }
 
+#' Uptake rate (linear)
+#' 
+#' @inheritParams MM_uptake
+#' @param M 
+#' @param C 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+lin_uptake <- function(conc, M, C) {
+  uprate <- M * conc + C
+  return(uprate)
+}
+
 #' Convert mg N m\eqn{^{-3}} d\eqn{^{-1}} to \eqn{\mu} mol N hr\eqn{^{-1}}
 #'
 #' @param N_mg_m3 Nitrogen (or any compound containing a single N atom) concentration in mg N m^{-3} d^{-1}
