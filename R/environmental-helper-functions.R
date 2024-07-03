@@ -148,8 +148,9 @@ relrefresh_atsite <- function(tspan = seq(1,365,1), a, b, c, period) {
 ##' @author Fernando Miguez
 ##' @author David LeBauer
 ##' @param solarMJ MJ per day
-##' @export
+##' 
 ##' @return PPFD umol /m2 / s
+##' 
 solarMJ2ppfd <- function(solarMJ) {
   ppfd <- (0.12 * solarMJ) * 2.07 * 1e+06 / 3600
   return(ppfd)
