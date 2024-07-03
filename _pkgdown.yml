@@ -1,5 +1,5 @@
 url: #URL for package documentation
-title: Nutrient remediation docs
+title: Nutrient remediation model
 destination: docs
 development:
   mode: release
