@@ -34,6 +34,12 @@ plot_T_range = function(T_range = seq(-10,35,0.25), spec_params){
 #' @seealso [I_lim() algae_height()]
 plot_I_range = function(I_range = seq(1, 2500, 1), I_top = c(1, 2, 5), spec_params, site_params){
   
+  T_lim <- I_lim(Nf, I_top, spec_params, site_params)
+  range <- as.data.frame(T_C = T_range, T_lim = T_lim)
+  
+  p <- ggplot2::ggplot(range, aes(x = T_C, y = T_lim))
+  
+  return(p)
   site.I = as.data.frame(range.I) %>% 
     mutate(Ic = range.I)
   
@@ -86,30 +92,55 @@ plot_h = function(Nf = seq(1, 4500, 1), spec_params){
   return(range.Nf)
 }
 
-#' Title
+#' Plot a species uptake rate over a range of N concentrations
 #'
-#' @param conc 
-#' @param spec_params 
-#' @param shape 
+#' @param conc a vector of the range of N concentrations to be tested (defaults to seq(0, 50, 0.25))
+#' @param spec_params a vector of named numbers. Must include parameters for the appropriate form as:
+#' * \eqn{V_{max}}, the maximum uptake rate and \eqn{K_{c}}, the half-saturation constant 
+#' AND/OR
+#' * M, the slope of N uptake with increasing substrate concentration and C, the intercept 
+#' @param form form of nitrogen taken up, to correspond to given parameters. One of "ammonium" (default), "nitrate", or "other".
+#' @param shape one of "Michaelis-Menton" (or "MM", default), "linear", or "both".
 #'
 #' @return a ggplot object of nitrogen uptake rates
 #' @export
 #'
 #' @examples examples
-plot_N_uptake = function(conc = seq(0, 25, 0.25), spec_params, shape = "Michaelis-Menton"){
+plot_N_uptake = function(conc = seq(0, 50, 0.25), spec_params){
   
-  range.N = as.data.frame(conc)
+  up_Am <- 
+    if(is.na(spec_params['M_am']) & is.na(spec_params['C_am'])) {
+      MM_uptake(conc = conc, V = spec_params['V_am'], K = spec_params['K_am'])
+    } else if (is.na(spec_params['V_am']) & is.na(spec_params['K_am'])) {
+      lin_uptake(conc = conc, M = spec_params['M_am'], C = spec_params['C_am'])
+    } else if (uptake_ammonium == "MM") {
+      stop("Error: parameters for ammonium uptake missing! Michaelis-Menton uptake needs V_am and K_am")
+    } else if (uptake_ammonium == "linear") {
+      stop("Error: parameters for ammonium uptake missing! Linear uptake needs M_am and C_am")
+    } else {
+      stop("Error: Unknown uptake of ammonium. Specify uptake shape or provide only one set of parameters (V and K for MM, M and C for linear).")
+    }
   
-  vam = mgd_umolh(spec_df$vam[spec_df$species == species])
-  kam = mgm3_umolL(spec_df$kam[spec_df$species == species])
-  vni = mgd_umolh(spec_df$vni[spec_df$species == species])
-  kni = mgm3_umolL(spec_df$kni[spec_df$species == species])
+  up_Ni <- 
+    if(is.na(spec_params['M_am']) & is.na(spec_params['C_am'])) {
+      MM_uptake(conc = conc, V = spec_params['V_ni'], K = spec_params['K_ni']) * Q * B_dw.mg/1000
+    } else if (is.na(spec_params['V_ni']) & is.na(spec_params['K_ni'])) {
+      lin_uptake(conc = conc, M = spec_params['M_ni'], C = spec_params['C_ni']) * Q * B_dw.mg/1000
+    } else if (uptake_nitrate == "MM") {
+      stop("Error: parameters for nitrate uptake missing! Michaelis-Menton uptake needs V_am and K_am")
+    } else if (uptake_nitrate == "linear") {
+      stop("Error: parameters for nitrate uptake missing! Linear uptake needs M_am and C_am")
+    } else {
+      stop("Error: Unknown uptake of nitrate. Specify uptake shape or provide only one set of parameters (V and K for MM, M and C for linear).")
+    }
   
+  N_range = data.frame(conc = conc, up_Am = up_Am, up_Ni = up_Ni)
+
   range.N = range.N %>% 
     mutate(species = species,
-           ammonium = (vam * Nc)/(kam + Nc),
-           nitrate = (vni * Nc)/(kni + Nc)) %>% 
-    pivot_longer(names_to = "Nform", values_to = "uptake", cols = c(ammonium, nitrate))
+           ammonium = (vam * conc)/(kam + Nc),
+           niT_rangeate = (vni * Nc)/(kni + Nc)) %>% 
+    pivot_longer(names_to = "Nform", values_to = "uptake", cols = c(ammonium, niT_rangeate))
 }
 
   
