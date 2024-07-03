@@ -1,26 +1,23 @@
-
-temperature_range = function(range.T = seq(-10,35,0.5), 
-                             spec_df = spec_params, species = "MAC"){
+#' Plot of species growth response over a range of temperatures
+#' 
+#' @inheritParams T_lim
+#' @param T_range a vector of the range of temperatures to be tested (defaults to seq(-10, 35, 0.25))
+#' @param spec_params
+#'
+#' @import ggplot2
+#' @return a ggplot object of growth response over the specified temperature range
+#' @export
+#'
+#' @examples
+#' @seealso [T_lim()]
+plot_T_range = function(T_range = seq(-10,35,0.25), spec_params){
   
-  range.T = as.data.frame(range.T)
+  T_lim <- T_lim(T_range, spec_params)
+  range <- as.data.frame(T_C = T_range, T_lim = T_lim)
   
-  to = as.numeric(spec_df$to[spec_df$species == species])
-  ti = as.numeric(spec_df$ti[spec_df$species == species])
-  ta = as.numeric(spec_df$ta[spec_df$species == species])
+  p <- ggplot2::ggplot(range, aes(x = T_C, y = T_lim))
   
-  if (to-ti > ta-to){
-    range.T = range.T %>% 
-      mutate(Tc = range.T,
-             species = species,
-             Tlim = case_when(Tc > ta ~ 0, Tc < ti ~ 0,
-                              TRUE ~ ((Tc - ta)*(Tc - ti)^2) /
-                                ((to - ti)*((to - ti)*(Tc - to) - (to - ta)*(to + ti - 2*Tc)))))
-  } else {
-    message("Species CTMI function not valid!")
-  }
-  return(range.T)
-}
-
+  return(p)
 }
 
 irradience_range = function(range.I = seq(1, 2500, 1), kW = 0.58, depths = c(1, 2, 5),
