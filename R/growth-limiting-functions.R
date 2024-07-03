@@ -20,22 +20,18 @@ T_lim <- function(TT, spec_params){
   if (is.na(spec_params['T_min'])) {abort_missing_parameter(param = "T_min", place = "spec_params")}
   if (is.na(spec_params['T_max'])) {abort_missing_parameter(param = "T_max", place = "spec_params")}
   
-  if (is.vector(TT) && is.atomic(TT)) {
-    Tlim <- ((TT - spec_params['T_max'])*(TT - spec_params['T_min'])^2)/((spec_params['T_opt'] - spec_params['T_min'])*((spec_params['T_opt'] - spec_params['T_min'])*(TT - spec_params['T_opt']) - (spec_params['T_opt'] - spec_params['T_max'])*(spec_params['T_opt'] + spec_params['T_min'] - 2*TT)))
-    Tlim[TT >= spec_params['T_max']] <- 0
-    Tlim[TT <= spec_params['T_min']] <- 0
-  } else if (is.numeric(TT) | is.integer(TT)) {
-    if (TT >= spec_params['T_max']) {Tlim <- 0
-    } else if (TT <= spec_params['T_min']) {Tlim <- 0
-    } else {
-      Tlim <- ((TT - spec_params['T_max'])*(TT - spec_params['T_min'])^2)/((spec_params['T_opt'] - spec_params['T_min'])*((spec_params['T_opt'] - spec_params['T_min'])*(TT - spec_params['T_opt']) - (spec_params['T_opt'] - spec_params['T_max'])*(spec_params['T_opt'] + spec_params['T_min'] - 2*TT)))
-    }
-  }
   if (spec_params['T_opt'] < spec_params['T_min']) {rlang::abort("error_bad_parameter", message = "Minimum temperature is higher than optimum temperature")}
   if (spec_params['T_opt'] > spec_params['T_max']) {rlang::abort("error_bad_parameter", message = "Error: maximum temperature is lower than optimum temperature")} 
   if (spec_params['T_opt']-spec_params['T_min'] <= spec_params['T_max']-spec_params['T_opt']) {rlang::abort("error_bad_parameter", message = "Species CTMI function not valid! Must satisfy T_opt-T_min > T_max-T_opt")}
   
-  return(Tlim)
+  if (Tc >= spec_params['T_max']) {
+    Tlim <- 0
+  } else if (Tc <= spec_params['T_min']) {
+    Tlim <- 0
+  } else {
+    Tlim <- ((Tc - spec_params['T_max'])*(Tc - spec_params['T_min'])^2)/((spec_params['T_opt'] - spec_params['T_min'])*((spec_params['T_opt'] - spec_params['T_min'])*(Tc - spec_params['T_opt']) - (spec_params['T_opt'] - spec_params['T_max'])*(spec_params['T_opt'] + spec_params['T_min'] - 2*Tc)))
+  }
+  return(unname(Tlim))
 }
 
 #' Light limitation on growth
