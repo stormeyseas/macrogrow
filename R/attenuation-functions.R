@@ -10,6 +10,7 @@
 #' @param constants vector of named numbers in the form c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025) defining extra constants for the attenuation submodel
 #'
 #' @return the relative water attenuation coefficient (u_c)
+#' @export
 #' 
 #'
 #' @examples examples
