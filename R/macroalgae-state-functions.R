@@ -12,7 +12,7 @@
 #'
 #' @return the non-dimensionalised internal nutrient quotient
 #'
-#' @examples
+#' @examples examples
 Q <- function(Nf, Ns, spec_params) {
   Q <- spec_params['Q_min'] * (1 + N_s/N_f)
   return(Q)
@@ -29,7 +29,7 @@ Q <- function(Nf, Ns, spec_params) {
 #' @return the relative (0-1) internal nutrient quotient
 #' @export
 #'
-#' @examples
+#' @examples examples
 QQ <- function(Q, spec_params) {
   QQ <- (spec_params['Q_max'] - Q)/(spec_params['Q_max'] - spec_params['Q_min'])
   return(QQ)
@@ -84,7 +84,7 @@ NN <- function(N_int, spec_params) {
 #' @return the rate of uptake at the specified external concentration
 #' @export
 #'
-#' @examples
+#' @examples examples
 MM_uptake <- function(conc, V, K) {
   uprate <- (V * conc / (K + conc))
   return(uprate)
@@ -99,7 +99,7 @@ MM_uptake <- function(conc, V, K) {
 #' @return the rate of uptake at the specified external concentration
 #' @export
 #'
-#' @examples
+#' @examples examples
 lin_uptake <- function(conc, M, C) {
   uprate <- M * conc + C
   return(uprate)
@@ -111,9 +111,9 @@ lin_uptake <- function(conc, M, C) {
 #' @param spec_params A vector of named numbers. Must include the parameters:
 #' * \eqn{h_a}, \eqn{h_b} and \eqn{h_c}, parameters governing height change with \eqn{N_f}
 #'
-#' @return
+#' @return a scalar of macroalgae height (m)
 #'
-#' @examples
+#' @examples examples
 algae_height <- function(Nf, spec_params) {
   hm <- (Nf/spec_params['h_a'])^spec_params['h_b'] + spec_params['h_c']
   return(hm)

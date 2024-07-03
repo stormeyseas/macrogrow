@@ -17,7 +17,7 @@
 #' T = T_a + \frac{T_c}{period}  * \sin\left(\frac{2\pi(t+T_b) + \pi}{2}\right)
 #' \end{array}} 
 #'
-#' @examples
+#' @examples examples
 #' # Generate temperature fluctuations in a day
 #' day <- seq(1, 24*60, 5)
 #' temp <- temp_atsite(tspan = day, 18.5, 14*60, 2.5)
@@ -56,7 +56,7 @@ temp_atsite <- function(tspan = seq(1,365,1), a, b, c, period) {
 #' N = N_a + \frac{N_c}{period} \sin\left(\frac{2\pi(t+N_b) + \pi}{2}\right)
 #' \end{array}} 
 #'
-#' @examples
+#' @examples examples
 #' 
 N_atsite <- function(tspan = seq(1,365,1), a, b, c, period) {
   if (missing(period)) {
@@ -86,7 +86,7 @@ N_atsite <- function(tspan = seq(1,365,1), a, b, c, period) {
 #' I = I_a + \frac{I_c}{period} \sin\left(\frac{2\pi(t+I_b) + \pi}{2}\right)
 #' \end{array}} 
 #'
-#' @examples
+#' @examples examples
 #' 
 Irr_atsite <- function(tspan = seq(1,365,1), a, b, c, period) {
   if (missing(period)) {
@@ -116,7 +116,7 @@ Irr_atsite <- function(tspan = seq(1,365,1), a, b, c, period) {
 #' U = U_a + \frac{U_c}{period} \sin\left(\frac{2\pi(t+U_b) + \pi}{2}\right)
 #' \end{array}} 
 #'
-#' @examples
+#' @examples examples
 #' 
 relrefresh_atsite <- function(tspan = seq(1,365,1), a, b, c, period) {
   if (missing(period)) {

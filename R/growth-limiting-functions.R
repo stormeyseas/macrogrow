@@ -7,10 +7,11 @@
 #'    * \eqn{T_{opt}} the optimum temperature for macroalgae growth
 #'    * \eqn{T_{min}} the minimum temperature for macroalgae growth (when \eqn{T < T_{min}}, growth = 0)
 #'    * \eqn{T_{max}} the maximum temperature for macroalgae growth (when \eqn{T > T_{max}}, growth = 0)
-#' @return A dataframe with relative temperature limitation (between 0 and 1) at each timestep.
+#'
+#' @return a scalar of relative temperature limitation on growth (between 0 and 1)
 #' @export
 #'
-#' @examples
+#' @examples examples examples
 #' 
 T_lim <- function(TT, spec_params){
   
@@ -58,10 +59,10 @@ T_lim <- function(TT, spec_params){
 #'    * \eqn{d_{top}} the below-surface  depth (m) of the top of the macroalgae culture
 #'    * \eqn{kW} the light-attenuation coefficient of open water
 #'
-#' @return
+#' @return a scalar of relative light limitation on growth (between 0 and 1)
 #' @export
 #'
-#' @examples
+#' @examples examples
 #' @seealso [algae_height()]
 I_lim <- function(Nf, I, spec_params, site_params) {
   hm <- algae_height(Nf, spec_params)
@@ -87,7 +88,7 @@ I_lim <- function(Nf, I, spec_params, site_params) {
 #' @inheritParams Q
 #' @inheritParams QQ
 #' 
-#' @return numeric from 0-1 describing relative growth rate from internal nutrient reserves
+#' @return a scalar of relative limitation from internal nutrient reserves on growth (between 0 and 1)
 #' 
 Q_lim <- function(Nf, Ns, spec_params) {
   Q <- spec_params['Q_min'] * (1 + Ns/Nf)

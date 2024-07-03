@@ -2,13 +2,12 @@
 #' 
 #' @inheritParams T_lim
 #' @param T_range a vector of the range of temperatures to be tested (defaults to seq(-10, 35, 0.25))
-#' @param spec_params
 #'
 #' @import ggplot2
 #' @return a ggplot object of growth response over the specified temperature range
 #' @export
 #'
-#' @examples
+#' @examples examples
 #' @seealso [T_lim()]
 plot_T_range = function(T_range = seq(-10,35,0.25), spec_params){
   
@@ -20,8 +19,20 @@ plot_T_range = function(T_range = seq(-10,35,0.25), spec_params){
   return(p)
 }
 
-irradience_range = function(range.I = seq(1, 2500, 1), kW = 0.58, depths = c(1, 2, 5),
-                            spec_df = spec_params, species = "MAC", QQ = 0.855, nf = 1000){
+#' Plot of species growth response over a range of surface irradience values
+#'
+#' @param I_range 
+#' @param kW 
+#' @param I_top 
+#' @param QQ 
+#' @param nf 
+#'
+#' @return a ggplot object of growth response over the specified range of surface irradience values
+#' @export
+#'
+#' @examples examples
+#' @seealso [I_lim() algae_height()]
+plot_I_range = function(I_range = seq(1, 2500, 1), I_top = c(1, 2, 5), spec_params, site_params){
   
   site.I = as.data.frame(range.I) %>% 
     mutate(Ic = range.I)
@@ -54,7 +65,16 @@ irradience_range = function(range.I = seq(1, 2500, 1), kW = 0.58, depths = c(1, 
   return(range.I)
 }
 
-height_limits = function(Nf = seq(10, 4500, 1), spec_df = spec_params, species = "MAC"){
+#' Plot height change over a range of fixed-N values
+#'
+#' @param Nf 
+#' @param spec_params 
+#'
+#' @return a ggplot object of growth response over the specified range of fixed-N values
+#' @export
+#'
+#' @examples examples
+plot_h = function(Nf = seq(1, 4500, 1), spec_params){
 
   h_a = spec_df$h_a[spec_df$species == species]
   h_b = spec_df$h_b[spec_df$species == species]
@@ -66,10 +86,19 @@ height_limits = function(Nf = seq(10, 4500, 1), spec_df = spec_params, species =
   return(range.Nf)
 }
 
-
-nitrogen_range = function(Nc = seq(0, 25, 0.25), spec_df = spec_params, species = "MAC"){
+#' Title
+#'
+#' @param conc 
+#' @param spec_params 
+#' @param shape 
+#'
+#' @return a ggplot object of nitrogen uptake rates
+#' @export
+#'
+#' @examples examples
+plot_N_uptake = function(conc = seq(0, 25, 0.25), spec_params, shape = "Michaelis-Menton"){
   
-  range.N = as.data.frame(Nc)
+  range.N = as.data.frame(conc)
   
   vam = mgd_umolh(spec_df$vam[spec_df$species == species])
   kam = mgm3_umolL(spec_df$kam[spec_df$species == species])
