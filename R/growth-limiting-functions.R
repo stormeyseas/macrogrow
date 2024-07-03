@@ -72,16 +72,17 @@ T_lim <- function(Tc, spec_params){
 #' @export
 #'
 #' @examples examples
+#' 
 #' @seealso [algae_height()]
 I_lim <- function(Nf, I, spec_params, site_params) {
-  hm <- algae_height(Nf, spec_params)
-  k_ma <-  Nf * spec_params['a_cs'] * max(hm / site_params['d_top'], 1) * 1 / (min(hm, site_params['d_top']))
+  I_top <- I * exp(-site_params['kW'] * site_params['d_top'])
+
+  h_m <- algae_height(Nf, spec_params)
+  k_ma <-  Nf * spec_params['a_cs'] * max(h_m / site_params['d_top'], 1) * 1 / (min(h_m, site_params['d_top']))
+  K <- k_ma + site_params['kW']
   
-  I_top <- # FINISH THIS
-  x <- 
-  K <- site_params['kW'] + k_ma
-  
-  Ilim <- (exp(1) / (K * site_params['d_top'])) * ((1 / exp(I_top / spec_params['I_o'])) ^ (1 / exp(K * site_params['d_top'])) - 1 / exp(I_top / spec_params['I_o']))
+  Ilim <- (exp(1) / (K * site_params['d_top'])) * 
+    (exp(-(I_top*exp(-K*site_params['d_top'])/spec_params['I_o'])) - exp(-(I_top / spec_params['I_o'])))
   
   return(Ilim)
 }
