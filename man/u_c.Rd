@@ -30,6 +30,3 @@ the relative water attenuation coefficient (u_c)
 #' @description
 A short description...
 }
-\examples{
-examples
-}

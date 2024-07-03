@@ -26,3 +26,7 @@ Q &=& Q_{min} \left(1 + \frac{N_s}{N_f}\right)
 Q_{lim} &=& \frac{Q - Q_{min}}{Q - K_c}
 \end{array}}
 }
+\examples{
+examples
+
+}

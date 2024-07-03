@@ -2,22 +2,29 @@
 % Please edit documentation in R/diagnostic-functions.R
 \name{plot_N_uptake}
 \alias{plot_N_uptake}
-\title{Title}
+\title{Plot a species uptake rate over a range of N concentrations}
 \usage{
-plot_N_uptake(conc = seq(0, 25, 0.25), spec_params, shape = "Michaelis-Menton")
+plot_N_uptake(conc = seq(0, 50, 0.25), spec_params)
 }
 \arguments{
-\item{conc}{}
+\item{conc}{a vector of the range of N concentrations to be tested (defaults to seq(0, 50, 0.25))}
 
-\item{spec_params}{}
+\item{spec_params}{a vector of named numbers. Must include parameters for the appropriate form as:
+\itemize{
+\item \eqn{V_{max}}, the maximum uptake rate and \eqn{K_{c}}, the half-saturation constant
+AND/OR
+\item M, the slope of N uptake with increasing substrate concentration and C, the intercept
+}}
 
-\item{shape}{}
+\item{form}{form of nitrogen taken up, to correspond to given parameters. One of "ammonium" (default), "nitrate", or "other".}
+
+\item{shape}{one of "Michaelis-Menton" (or "MM", default), "linear", or "both".}
 }
 \value{
 a ggplot object of nitrogen uptake rates
 }
 \description{
-Title
+Plot a species uptake rate over a range of N concentrations
 }
 \examples{
 examples

@@ -42,6 +42,7 @@ where \eqn{h_{m}} is the macroalgae height.
 }
 \examples{
 examples
+
 }
 \seealso{
 \code{\link[=algae_height]{algae_height()}}

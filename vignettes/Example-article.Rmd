@@ -1,6 +1,6 @@
 ---
-title: "Example article"
-author: "Matti Vuorre"
+title: "Example vignette"
+author: "Tormey Reimer"
 date: "`r Sys.Date()`"
 ---
 
@@ -9,24 +9,16 @@ The data contained in the exampleRPackage R package was analyzed exactly like de
 First, because the data is contained in a package, we can easily call it from R
 
 ```{r}
-library(exampleRPackage)
-head(exampleData)
+library(macrogrow)
 ```
 
-We drew a boxplot:
+We used the `T_lim()` function:
 
 ```{r}
-boxplot(score ~ group, data = exampleData)
-```
+my_seaweed <- c(T_opt = 20, T_min = 5, T_max = 30)
 
-And conducted a t-test:
+T_lim(Tc = 22, spec_params = my_seaweed)
 
-```{r}
-t.test(score ~ group, data = exampleData)
-```
-
-We also used the `hello()` function:
-
-```{r}
-hello("my name")
+T_range <- 1:30
+sapply(T_range, T_lim, spec_params = my_seaweed)
 ```

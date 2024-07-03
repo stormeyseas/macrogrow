@@ -4,25 +4,33 @@
 \alias{T_lim}
 \title{Temperature limitation on growth}
 \usage{
-T_lim(TT, spec_params)
+T_lim(Tc, spec_params)
 }
 \arguments{
-\item{TT}{temperature to evaluate}
+\item{Tc}{temperature to evaluate}
 
 \item{spec_params}{a vector of named numbers. Must include:
 \itemize{
 \item \eqn{T_{opt}} the optimum temperature for macroalgae growth
-\item \eqn{T_{min}} the minimum temperature for macroalgae growth (when \eqn{T < T_{min}}, growth = 0)
-\item \eqn{T_{max}} the maximum temperature for macroalgae growth (when \eqn{T > T_{max}}, growth = 0)
+\item \eqn{T_{min}} the minimum temperature for macroalgae growth (when \eqn{T_c < T_{min}}, growth = 0)
+\item \eqn{T_{max}} the maximum temperature for macroalgae growth (when \eqn{T_c > T_{max}}, growth = 0)
 }}
 }
 \value{
 a scalar of relative temperature limitation on growth (between 0 and 1)
 }
 \description{
-Given species parameters returns the relative limitation on growth rate according to a CTMI curve.
+Given species parameters, returns the relative limitation on growth rate according to a CTMI curve:
+\deqn{\begin{array}[ccc] 
+T_{lim}=\frac{(T_c-T_{max})(T_c-T_{min})^2}{(T_{opt}-T_{min})[(T_{opt}-T_{min})(T_c-T_{opt})-(T_{opt}-T_{max})(T_{opt}+T_{min}-2T_c)]}
+\end{array}}
 }
 \examples{
-examples examples
+my_seaweed <- c(T_opt = 20, T_min = 5, T_max = 30)
+
+T_lim(Tc = 22, spec_params = my_seaweed)
+
+T_range <- 1:30
+sapply(T_range, T_lim, spec_params = my_seaweed)
 
 }

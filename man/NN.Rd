@@ -9,7 +9,7 @@ NN(N_int, spec_params)
 \arguments{
 \item{N_int}{the internal nitrogen concentration (percentage, as decimal)}
 
-\item{spec_params}{A vector of named numbers. Must include:
+\item{spec_params}{a vector of named numbers. Must include:
 \itemize{
 \item \eqn{N_{min}}, the minimum internal nitrogen concentration
 \item \eqn{N_{max}}, the maximum internal nitrogen concentration
