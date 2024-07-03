@@ -99,6 +99,9 @@ I_lim <- function(Nf, I, spec_params, site_params) {
 #' @inheritParams QQ
 #' 
 #' @return a scalar of relative limitation from internal nutrient reserves on growth (between 0 and 1)
+#' @export
+#' 
+#' @examples examples
 #' 
 Q_lim <- function(Nf, Ns, spec_params) {
   Q <- spec_params['Q_min'] * (1 + Ns/Nf)
