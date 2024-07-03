@@ -63,7 +63,7 @@ N_int <- function(Q, QQ, spec_params) {
 #' Relative internal nitrogen quotient
 #'
 #' @param N_int the internal nitrogen concentration (percentage, as decimal)
-#' @param spec_params A vector of named numbers. Must include:
+#' @param spec_params a vector of named numbers. Must include:
 #'    * \eqn{N_{min}}, the minimum internal nitrogen concentration
 #'    * \eqn{N_{max}}, the maximum internal nitrogen concentration
 #'
