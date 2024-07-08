@@ -30,14 +30,16 @@
 #' 
 #' @seealso [algae_height()]
 I_lim <- function(Nf, I, spec_params, site_params) {
-  I_top <- I * exp(-site_params['kW'] * site_params['d_top'])
+  I_top <- I * exp(-(site_params['kW']*site_params['d_top']))
   
   h_m <- algae_height(Nf, spec_params)
-  k_ma <-  Nf * spec_params['a_cs'] * max(h_m / site_params['d_top'], 1) * 1 / (min(h_m, site_params['d_top']))
+  k_ma <-  Nf * h_m * spec_params['a_cs'] * pmax(h_m/site_params['d_top'], 1) * 1/(pmin(h_m, site_params['d_top']))
   K <- k_ma + site_params['kW']
   
-  Ilim <- (exp(1) / (K * site_params['d_top'])) * 
-    (exp(-(I_top*exp(-K*site_params['d_top'])/spec_params['I_o'])) - exp(-(I_top / spec_params['I_o'])))
+  Ilim <- exp(1)/(K*h_m) *
+    (
+      exp(-(I_top*exp(-K*h_m))/spec_params['I_o']) - exp(-I_top/spec_params['I_o'])
+      )
   
-  return(Ilim)
+  return(unname(Ilim))
 }

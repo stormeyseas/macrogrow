@@ -9,5 +9,5 @@
 #' @examples examples
 algae_height <- function(Nf, spec_params) {
   hm <- (Nf/spec_params['h_a'])^spec_params['h_b'] + spec_params['h_c']
-  return(hm)
+  return(unname(hm))
 }
