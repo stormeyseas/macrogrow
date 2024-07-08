@@ -19,6 +19,3 @@ the rate of uptake at the specified external concentration
 \description{
 Uptake rate (Michaelis-Menton)
 }
-\examples{
-examples
-}

@@ -7,8 +7,11 @@
 #' @return the rate of uptake at the specified external concentration
 #' @export
 #'
-#' @examples examples
 MM_uptake <- function(conc, V, K) {
+  if (missing(V) & missing(K)) {abort_missing_parameter(param = "V and K", place = "spec_params. Did you mean to use lin_uptake() instead?")}
+  if (missing(V)) {abort_missing_parameter(param = "V", place = "spec_params and passed to function as 'V'")}
+  if (missing(K)) {abort_missing_parameter(param = "K", place = "spec_params and passed to function as 'K'")}
+  
   uprate <- (V * conc / (K + conc))
-  return(uprate)
+  return(unname(uprate))
 }
