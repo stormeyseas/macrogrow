@@ -37,7 +37,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   if (lubridate::is.Date(start)) {
     start_date <- start
   } else if (is.integer(start) | is.numeric(start)) {
-    if (missing(start_year)) {start_year = 2000}
+    if (missing(start_year)) {start_year <- 2000}
     start_date <- (parse_date_time(x = paste(start_year, start), orders = "yj")) # - duration(1, "days")
   } else if (is.character(start)) {
     start_date <- lubridate::ymd(start)
