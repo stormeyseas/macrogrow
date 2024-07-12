@@ -5,6 +5,7 @@
 #' * \eqn{h_a}, \eqn{h_b} and \eqn{h_c}, parameters governing height change with \eqn{N_f}
 #'
 #' @return a scalar of macroalgae height (m)
+#' @export
 #'
 #' @examples examples
 algae_height <- function(Nf, spec_params) {

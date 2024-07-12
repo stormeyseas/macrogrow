@@ -10,6 +10,7 @@
 #' @param period The total number of timesteps
 #'
 #' @return A vector of temperatures for the given site
+#' @export
 #' 
 #' @details
 #' A simple temperature curve in the form: 

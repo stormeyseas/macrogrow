@@ -11,6 +11,7 @@
 #'    * \eqn{Q_{min}}, the minimum internal nutrient quotient
 #'
 #' @return the non-dimensionalised internal nutrient quotient
+#' @export
 #'
 #' @examples examples
 Q_int <- function(Nf, Ns, spec_params) {
