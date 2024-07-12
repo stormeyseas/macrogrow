@@ -176,59 +176,24 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
       remin                                 <- unname(other_constants['rL'] * det) # Remineralisation of detritus (to ammonium)
       
       # Apply the correct uptake rate curve depending on parameters supplied
-                               up_Am        <- 
-        if (uptake_ammonium == "linear") {
-          if(is.na(unname(spec_params['M_am'])) | is.na(unname(spec_params['C_am']))) {
-            abort_missing_parameter(param = "M_am and C_am", place = "spec_params for linear uptake")
-          } else {
-            lin_uptake(conc = Am_conc, M = spec_params['M_am'], C = spec_params['C_am']) * Q_int * B_dw.mg/1000
-          }
-        } else if (uptake_ammonium == "MM" | uptake_ammonium == "Michaelis-Menton") {
-          if(is.na(unname(spec_params['V_am'])) | is.na(unname(spec_params['K_am']))) {
-            abort_missing_parameter(param = "V_am and K_am", place = "spec_params for linear uptake")
-          } else {
-            MM_uptake(conc = Am_conc, V = spec_params['V_am'], K = spec_params['K_am']) * Q_int * B_dw.mg/1000
-          }
-        } else {
-          if (!is.na(unname(spec_params['V_am'])) & !is.na(unname(spec_params['K_am']))) {
-            rlang::inform(message = "Ammonium uptake shape not specified, using Michaelis-Menton kinetics because those parameters are provided")
-            MM_uptake(conc = Am_conc, V = spec_params['V_am'], K = spec_params['K_am']) * Q_int * B_dw.mg/1000
-          } else if (!is.na(unname(spec_params['M_am'])) & !is.na(unname(spec_params['C_am']))) {
-            rlang::inform(message = "Ammonium uptake shape not specified, using linear kinetics because those parameters are provided")
-            lin_uptake(conc = Am_conc, M = spec_params['M_am'], C = spec_params['C_am']) * Q_int * B_dw.mg/1000
-          } else {
-            rlang::abort("Error! You haven't provided any ammonium uptake parameters!")
-          }
-        }
+                               up_Am        <- Q_int * (B_dw.mg/1000) * get_uptake(conc = Am_conc, 
+                                                                                   uptake_shape = linear, 
+                                                                                   Nform_abbr = "am", 
+                                                                                   spec_params = spec_params)
       rates$up_Am[i]        <- up_Am        <- pmin(up_Am, Am_conc)
         
         
-                               up_Ni        <- 
-        if (uptake_nitrate == "linear") {
-          if(is.na(unname(spec_params['M_ni'])) | is.na(unname(spec_params['C_ni']))) {
-            abort_missing_parameter(param = "M_ni and C_ni", place = "spec_params for linear uptake")
-          } else {
-            lin_uptake(conc = Ni_conc, M = spec_params['M_ni'], C = spec_params['C_ni']) * Q_int * B_dw.mg/1000
-          }
-        } else if (uptake_nitrate == "MM" | uptake_nitrate == "Michaelis-Menton") {
-          if(is.na(unname(spec_params['V_ni'])) | is.na(unname(spec_params['K_ni']))) {
-            abort_missing_parameter(param = "V_ni and K_ni", place = "spec_params for linear uptake")
-          } else {
-            MM_uptake(conc = Ni_conc, V = spec_params['V_ni'], K = spec_params['K_ni']) * Q_int * B_dw.mg/1000
-          }
-        } else {
-          if (!is.na(unname(spec_params['V_ni'])) & !is.na(unname(spec_params['K_ni']))) {
-            rlang::inform(message = "Nitrate uptake shape not specified, using Michaelis-Menton kinetics because those parameters are provided")
-            MM_uptake(conc = Ni_conc, V = spec_params['V_ni'], K = spec_params['K_ni']) * Q_int * B_dw.mg/1000
-          } else if (!is.na(unname(spec_params['M_ni'])) & !is.na(unname(spec_params['C_ni']))) {
-            rlang::inform(message = "Nitrate uptake shape not specified, using linear kinetics because those parameters are provided")
-            lin_uptake(conc = Ni_conc, M = spec_params['M_ni'], C = spec_params['C_ni']) * Q_int * B_dw.mg/1000
-          } else {
-            rlang::abort("Error! You haven't provided any nitrate uptake parameters!")
-          }
-        }
-      rates$up_Ni[i]        <- up_Ni        <- pmin(up_Am, Am_conc)
+                               up_Ni        <- Q_int * (B_dw.mg/1000) * get_uptake(conc = Ni_conc, 
+                                                                                   uptake_shape = linear, 
+                                                                                   Nform_abbr = "ni", 
+                                                                                   spec_params = spec_params)
+      rates$up_Ni[i]        <- up_Ni        <- pmin(up_Ni, Ni_conc)
       
+      # To eventually become up_Ot
+      if (!is.na(spec_params['V_ot']) | !is.na(spec_params['V_ot']) | !is.na(spec_params['V_ot']) | !is.na(spec_params['V_ot'])) {
+        rlang::inform("Warning: parameters for 'other N' uptake are supplied but there is no mechanism for 'other N' uptake (yet).")
+      }
+      # rates$up_Ot[i]        <- up_Ot        <- pmin(up_Ot, Ot_conc)
       
       # If you haven't reached the end of the run yet, set up for tomorrow
       if (i != nrow(outputs)) {
