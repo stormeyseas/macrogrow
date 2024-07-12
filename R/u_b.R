@@ -10,5 +10,5 @@ u_b <- function(U0, macro_state = c(biomass, hm), SA_WW = 0.5 * (0.0306/2), site
   uc <- uc(U0, macro_state, SA_WW, site_params, constants)
   Hc <- (site_params['d_top'] + site_params['hc']) / site_params['hz']
   u_b <- (1 - u_c * Hc) / (1 - Hc)
-  return(u_b)
+  return(unname(u_b))
 }

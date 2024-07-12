@@ -25,5 +25,5 @@ N_curve <- function(tspan = seq(1,365,1), a, b, c, period) {
     rlang::inform(message = glue::glue("Period defaulting to maximum tstep = {period}.", class = "implicit_defaults"))
   }
   N <- a + b * sin((2 * pi * (tspan - c) + pi / 2) / period)
-  return(N)
+  return(unname(N))
 }

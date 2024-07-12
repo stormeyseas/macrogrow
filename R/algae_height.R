@@ -13,12 +13,12 @@ algae_height <- function(Nf, spec_params) {
   if (is.na(spec_params['h_b'])) {
     h_b <- 1
     rlang::inform(message = "h_b not supplied, defaulting to 1")
-  }
+  } else {h_b <- spec_params['h_b']}
   if (is.na(spec_params['h_c'])) {
     h_c <- 0
     rlang::inform(message = "h_c not supplied, defaulting to 0")
-  }
+  } else {h_c <- spec_params['h_c']}
   
-  hm <- (Nf/spec_params['h_a'])^spec_params['h_b'] + spec_params['h_c']
+  hm <- (Nf/spec_params['h_a'])^h_b + h_c
   return(unname(hm))
 }

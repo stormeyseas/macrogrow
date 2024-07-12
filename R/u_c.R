@@ -28,5 +28,5 @@ u_c <- function(U0,
   } else {
     u_c <- (-constants['a2'] - constants['Cb'] * Hc ^ 2 + (1 - Hc) * drag_test) / (Kd * Hc * (1 - Hc) ^ 3 - constants['a2'] - constants['Cb'] * Hc ^ 3)
   }
-  return(u_c)
+  return(unname(u_c))
 }

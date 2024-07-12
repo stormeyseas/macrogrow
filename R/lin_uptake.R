@@ -10,5 +10,5 @@
 #' @examples examples
 lin_uptake <- function(conc, M, C) {
   uprate <- M * conc + C
-  return(uprate)
+  return(unname(uprate))
 }
