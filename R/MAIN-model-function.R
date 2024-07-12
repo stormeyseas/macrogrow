@@ -236,8 +236,8 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
         externals$det[i+1]                  <- det                      + Nf_loss          - remin
         
         # Algae starting state
-        internals$Nf[i+1]   <- Nf           <- Nf + Ns_to_Nf - Nf_loss
-        internals$Ns[i+1]   <- Ns           <- Ns + up_Am + up_Ni - Ns_to_Nf - Ns_loss
+        internals$Nf[i+1]     <- Nf         <- Nf + Ns_to_Nf - Nf_loss
+        internals$Ns[i+1]     <- Ns         <- Ns + up_Am + up_Ni - Ns_to_Nf - Ns_loss
                               Q_int         <- unname(spec_params['Q_min'])*(Ns/Nf + 1)
         internals$N_int[i+1]  <- N_int      <- N_int(Q_int, NA, spec_params)
         rates$N_change[i+1]                 <- up_Am + up_Ni - Ns_loss - Nf_loss
