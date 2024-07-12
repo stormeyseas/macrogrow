@@ -10,6 +10,7 @@
 #' @param period The total number of timesteps
 #'
 #' @return An irradience vector for the given site
+#' @export
 #' 
 #' @details
 #' A simple sine curve in the form: 

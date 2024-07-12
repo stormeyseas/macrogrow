@@ -3,8 +3,6 @@
 #' @param param missing parameter
 #' @param place place where parameter should be defined
 #'
-#' @export
-#'
 abort_missing_parameter <- function(param, place) {
   if (is.null(place)) {
     msg <- glue::glue("`{param}` must be defined")
