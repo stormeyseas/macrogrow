@@ -116,10 +116,14 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   }
 
   # Site parameters
-  externals$lambda[1] <- lambda <- (externals$U[1]*60*60*24)/farmV  # Refresh rate based on U (U in m d-1)
   farmV <- unname(site_params['farmA'] * site_params['hc'])                 # Volume of farm site
   externals$Am_add[1] <- externals$Am_conc[1]                       # Ambient ammonium concentration (no seaweed)
   externals$Ni_add[1] <- externals$Ni_conc[1]                       # Ambient nitrate concentration (no seaweed)
+  
+  # Get refresh rate from U - should I do this in targets?
+  temp <- units::set_units(externals$U[1], "m s-1")
+  temp <- units::set_units(temp, "m d-1")
+  externals$lambda[1] <- lambda <- unname(units::drop_units(temp)/farmV) # Refresh rate based on U (U in m d-1)
   
   # Starting state
   internals$Nf[1] <- Nf <- Nf <- unname(initials['Nf'])                     # Fixed nitrogen
