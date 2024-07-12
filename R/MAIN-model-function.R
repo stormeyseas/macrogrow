@@ -223,12 +223,13 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
         }
       rates$up_Ni[i]        <- up_Ni        <- pmin(up_Am, Am_conc)
       
-      # New ammonium and nitrate delivered to site
-      externals$Am_add[i]   <- Am_add       <- lambda * Am_conc
-      externals$Ni_add[i]   <- Ni_add       <- lambda * Ni_conc
       
       # If you haven't reached the end of the run yet, set up for tomorrow
       if (i != nrow(outputs)) {
+        # New ammonium and nitrate delivered to site
+        externals$Am_add[i]   <- Am_add       <- u_c * Am_conc[i+1]
+        externals$Ni_add[i]   <- Ni_add       <- u_c * Ni_conc[i+1]
+        
         # New environmental states cannot go below 0
         externals$Am_conc[i+1]              <- Am_conc + Am_add - up_Am + Ns_loss - red_Am + remin
         externals$Ni_conc[i+1]              <- Ni_conc + Ni_add - up_Ni           + red_Am
