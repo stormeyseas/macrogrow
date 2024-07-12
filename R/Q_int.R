@@ -13,11 +13,11 @@
 #' @return the non-dimensionalised internal nutrient quotient
 #'
 #' @examples examples
-Q <- function(Nf, Ns, spec_params) {
+Q_int <- function(Nf, Ns, spec_params) {
   if (is.na(spec_params['Q_min'])) {abort_missing_parameter(param = "Q_min", place = "spec_params")}
   if (Nf <= 0) {rlang::abort("Nf too low! How can fixed N (biomass) be <= 0?", class = "error_bad_parameter")}
   if (Ns < 0) {rlang::abort("Ns too low! How can stored N be < 0?", class = "error_bad_parameter")}
   
-  Q <- spec_params['Q_min'] * (1 + Ns/Nf)
-  return(unname(Q))
+  Q_int <- spec_params['Q_min'] * (1 + Ns/Nf)
+  return(unname(Q_int))
 }

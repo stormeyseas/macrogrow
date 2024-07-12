@@ -2,7 +2,7 @@
 % Please edit documentation in R/Q_lim.R
 \name{Q_lim}
 \alias{Q_lim}
-\title{Q limitation on growth}
+\title{Q_int limitation on growth}
 \usage{
 Q_lim(Nf, Ns, spec_params)
 }
@@ -20,10 +20,10 @@ Q_lim(Nf, Ns, spec_params)
 a scalar of relative limitation from internal nutrient reserves on growth (between 0 and 1)
 }
 \description{
-Calculates the internal nutrient quotient \eqn{Q} and its relative effect on growth rate \eqn{Q_{lim}} via:
+Calculates the internal nutrient quotient \eqn{Q_{int}} and its relative effect on growth rate \eqn{Q_{lim}} via:
 \deqn{\begin{array}[ccc] 
-Q &=& Q_{min} \left(1 + \frac{N_s}{N_f}\right)
-Q_{lim} &=& \frac{Q - Q_{min}}{Q - K_c}
+Q_{int} &=& Q_{min} \left(1 + \frac{N_s}{N_f}\right)
+Q_{lim} &=& \frac{Q_{int} - Q_{min}}{Q_{int} - K_c}
 \end{array}}
 }
 \examples{

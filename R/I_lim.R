@@ -13,7 +13,7 @@
 #' \end{array}}
 #' where \eqn{h_{m}} is the macroalgae height.
 #' 
-#' @inheritParams Q
+#' @inheritParams Q_int
 #' @param I the surface irradiance, PAR (\eqn{\mu}mol photons m\eqn{^{-2}} s\eqn{^{-1}})
 #' @param spec_params a vector of named numbers. Must include:
 #'    * \eqn{a_{cs}}, the carbon-specific self-shading constant

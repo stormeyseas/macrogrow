@@ -91,14 +91,14 @@ grow_macroalgae <- function(start, grow_days,
   
   # Starting state
   internals$Nf[1] <- Nf <- Nf <- initials['Nf']                     # Fixed nitrogen
-  Q <- initials['Q']                                                # Internal nutrient quotient
-  internals$Ns[1] <- Ns <- Nf*(Q/spec_params['Q_min'] - 1)          # Stored nitrogen
+  Q_int <- unname(initials['Q_int'] )                                               # Internal nutrient quotient
+  internals$Ns[1] <- Ns <- unname(Nf*(Q_int/spec_params['Q_min'] - 1))          # Stored nitrogen
 
     # Start model run
     for (i in 1:nrow(outputs)) {
       
       # Start of the day
-      internals$N_int[i]    <- N_int <- N_int(Q, NA, spec_params) # Takes Q or QQ
+      internals$N_int[i]    <- N_int(Q_int, NA, spec_params) # Takes Q_int or Q_rel
       internals$B_dw.mg[i]  <- B_dw.mg <- (Nf+Ns) / N_int
       internals$B_ww.mg[i]  <- B_ww.mg <- B_dw.mg * spec_params['DWWW']
       internals$hm[i]       <- hm <- algae_height(Nf, spec_params)
@@ -178,8 +178,8 @@ grow_macroalgae <- function(start, grow_days,
         # Algae starting state
         internals$Nf[i+1]   <- Nf           <- Nf + Ns_to_Nf - Nf_loss
         internals$Ns[i+1]   <- Ns           <- Ns + up_Am + up_Ni - Ns_to_Nf - Ns_loss
-                               Q            <- spec_params['Q_min']*(Ns/Nf + 1)
-        internals$N_int[i+1] <- N_int       <- N_int(Q, NA, spec_params)
+                              Q_int         <- unname(spec_params['Q_min'])*(Ns/Nf + 1)
+        internals$N_int[i+1]  <- N_int      <- N_int(Q_int, NA, spec_params)
         rates$N_change[i+1]                 <- up_Am + up_Ni - Ns_loss - Nf_loss
       }
     }

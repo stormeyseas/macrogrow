@@ -8,10 +8,10 @@
 #' @return relative internal nitrogen quotient
 #' @export
 #'
-NN <- function(N_int, spec_params) {
+N_rel <- function(N_int, spec_params) {
   if (is.na(spec_params['N_max'])) {abort_missing_parameter(param = "N_max", place = "spec_params")}
   if (is.na(spec_params['N_min'])) {abort_missing_parameter(param = "N_min", place = "spec_params")}
   
-  NN <- (spec_params["N_max"] - N_int)/(spec_params["N_max"] - spec_params["N_min"])
-  return(NN)
+  N_rel <- (spec_params["N_max"] - N_int)/(spec_params["N_max"] - spec_params["N_min"])
+  return(unname(N_rel))
 }

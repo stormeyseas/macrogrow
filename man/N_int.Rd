@@ -4,18 +4,18 @@
 \alias{N_int}
 \title{Internal nitrogen concentration}
 \usage{
-N_int(Q, QQ, spec_params)
+N_int(Q_int, Q_rel, spec_params)
 }
 \arguments{
-\item{Q, QQ}{the non-dimensionalised internal nutrient quotient (Q) or relative internal nutrient quotient (QQ).
-Only one is needed; if both are supplied only Q is used.}
+\item{Q_int, Q_rel}{the non-dimensionalised internal nutrient quotient (\eqn{Q}) or relative internal nutrient quotient (\eqn{Q_{rel}}).
+Only one is needed; if both are supplied only \eqn{Q_{rel}} is used.}
 
 \item{spec_params}{a vector of named numbers. Must include:
 \itemize{
 \item \eqn{N_{min}}, the minimum internal nitrogen concentration
 \item \eqn{N_{max}}, the maximum internal nitrogen concentration
-\item \eqn{Q_{min}}, the minimum nutrient quotient (if QQ is not supplied)
-\item \eqn{Q_{max}}, the maximum nutrient quotient (if QQ is not supplied)
+\item \eqn{Q_{min}}, the minimum nutrient quotient (if \eqn{Q_{rel}} is not supplied)
+\item \eqn{Q_{max}}, the maximum nutrient quotient (if \eqn{Q_{rel}} is not supplied)
 }}
 }
 \value{
