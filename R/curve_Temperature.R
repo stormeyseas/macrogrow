@@ -28,7 +28,7 @@
 #' temp <- temp_curve(tspan = yearpart, 18.5, 60, 2.5, period = 365)
 #' plot(yearpart, temp)
 #' 
-temp_curve <- function(tspan = seq(1,365,1), a, b, c, period) {
+curve_Temperature <- function(tspan = seq(1,365,1), a, b, c, period) {
   if (missing(period)) {
     period <- max(tspan)
     rlang::inform(message = glue::glue("Period defaulting to maximum tstep = {period}.", class = "implicit_defaults"))

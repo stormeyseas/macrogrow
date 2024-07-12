@@ -20,7 +20,7 @@
 #'
 #' @examples examples
 #' 
-relrefresh_curve <- function(tspan = seq(1,365,1), a, b, c, period) {
+curve_RelRefresh <- function(tspan = seq(1,365,1), a, b, c, period) {
   if (missing(period)) {
     period <- max(tspan)
     rlang::inform(message = glue::glue("Period defaulting to maximum tstep = {period}.", class = "implicit_defaults"))
