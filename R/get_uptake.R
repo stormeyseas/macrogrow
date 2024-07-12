@@ -5,10 +5,6 @@
 #' @param Nform_abbr 
 #' @param spec_params 
 #'
-#' @return
-#' @export
-#'
-#' @examples
 get_uptake <- function(conc, uptake_shape, Nform_abbr, spec_params) {
   
   spec_params['M'] <- spec_params[paste0("M", "_", Nform_abbr)]
@@ -38,7 +34,8 @@ get_uptake <- function(conc, uptake_shape, Nform_abbr, spec_params) {
     }
   } 
   
-  else (uptake_shape == "MM" | uptake_shape == "Michaelis-Menton") {
+  # uptake_shape == "MM" | uptake_shape == "Michaelis-Menton"
+  else {
     if(is.na(spec_params['V']) | is.na(spec_params['K'])) {
       abort_missing_parameter(param = "V and K", place = "spec_params for linear uptake")
     } else {
