@@ -83,40 +83,26 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
       exp = nrow(outputs)))
   }
   
+  externals <- internals <- rates <- outputs
+  
   # Add environmental vectors to externals dataframe
-  externals <- outputs %>%
-    dplyr::mutate(TT = temperature, 
-           I = light, 
-           I_top = NA, 
-           Ni_conc = nitrate, 
-           Am_conc = ammonium, 
-           Ni_add = NA, 
-           Am_add = NA, 
-           det = 10, # CHANGE THIS?
-           U = velocity, 
-           u_c = 1, 
-           lambda = NA)
-  
+  externals <- outputs
+  externals$TT <- temperature
+  externals$I <- light
+  externals$Ni_conc <- nitrate
+  externals$Am_conc <- ammonium
+  externals$U <- velocity
+  externals$det <- 10
+  externals$u_c <- 1
+  externals$I_top <- externals$Ni_add <- externals$Am_add <- externals$lambda <- NA
+
   # Set up results data frames
-  internals <- outputs %>%
-    dplyr::mutate(Nf = NA, 
-           Ns = NA, 
-           Q_lim = NA, 
-           T_lim = NA, 
-           I_lim = NA, 
-           N_int = NA, 
-           B_dw.mg = NA, 
-           B_ww.mg = NA, 
-           hm = NA)
-  
-  rates <- outputs %>%
-    dplyr::mutate(up_Am = NA, 
-                  up_Ni = NA, 
-                  growth_rate = NA, 
-                  Ns_to_Nf = NA, 
-                  Nf_loss = NA, 
-                  N_change = NA)
-  
+  internals <- cbind(internals, matrix(data = NA, nrow = nrow(outputs), ncol = 9))
+  colnames(internals) <- c(colnames(outputs), "Nf", "Ns", "Q_lim", "T_lim", "I_lim", "N_int", "B_dw.mg", "B_ww.mg", "hm")  
+
+  rates <- cbind(rates, matrix(data = NA, nrow = nrow(outputs), ncol = 9))
+  colnames(rates) <- c(colnames(outputs), "up_Am", "up_Ni", "growth_rate", "Ns_to_Nf", "Nf_loss", "N_change")  
+
   # For adding other_N (e.g. urea, amino acids)
   if (!missing(other_N) | length(other_N) == 0) {
     externals$other_N <- 0
