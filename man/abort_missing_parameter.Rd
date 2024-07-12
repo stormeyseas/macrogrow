@@ -2,7 +2,7 @@
 % Please edit documentation in R/A_errors.R
 \name{abort_missing_parameter}
 \alias{abort_missing_parameter}
-\title{error handling for missing parameters}
+\title{Custom error for missing parameters}
 \usage{
 abort_missing_parameter(param, place)
 }
@@ -12,5 +12,5 @@ abort_missing_parameter(param, place)
 \item{place}{place where parameter should be defined}
 }
 \description{
-error handling for missing parameters
+Custom error for missing parameters
 }
