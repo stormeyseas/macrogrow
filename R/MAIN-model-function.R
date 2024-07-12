@@ -116,13 +116,13 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   }
 
   # Site parameters
-  farmV <- site_params['farmA'] * site_params['hc']                 # Volume of farm site
   externals$lambda[1] <- lambda <- (externals$U[1]*60*60*24)/farmV  # Refresh rate based on U (U in m d-1)
+  farmV <- unname(site_params['farmA'] * site_params['hc'])                 # Volume of farm site
   externals$Am_add[1] <- externals$Am_conc[1]                       # Ambient ammonium concentration (no seaweed)
   externals$Ni_add[1] <- externals$Ni_conc[1]                       # Ambient nitrate concentration (no seaweed)
   
   # Starting state
-  internals$Nf[1] <- Nf <- Nf <- initials['Nf']                     # Fixed nitrogen
+  internals$Nf[1] <- Nf <- Nf <- unname(initials['Nf'])                     # Fixed nitrogen
   Q_int <- unname(initials['Q_int'] )                                               # Internal nutrient quotient
   internals$Ns[1] <- Ns <- unname(Nf*(Q_int/spec_params['Q_min'] - 1))          # Stored nitrogen
 
@@ -132,7 +132,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
       # Start of the day
       internals$N_int[i]    <- N_int(Q_int, NA, spec_params) # Takes Q_int or Q_rel
       internals$B_dw.mg[i]  <- B_dw.mg <- (Nf+Ns) / N_int
-      internals$B_ww.mg[i]  <- B_ww.mg <- B_dw.mg * spec_params['DWWW']
+      internals$B_ww.mg[i]  <- B_ww.mg <- B_dw.mg * unname(spec_params['DWWW'])
       internals$hm[i]       <- hm <- algae_height(Nf, spec_params)
       
       # Temperature limitation on growth
@@ -144,7 +144,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
       
       # Light limitation on growth
       I <- externals$I[i]
-      externals$I_top[i]    <- I_top        <- I * exp(-site_params['kW'] * site_params['d_top'])
+      externals$I_top[i]    <- I_top        <- unname(I * exp(-site_params['kW'] * site_params['d_top']))
       internals$I_lim[i]    <- I_lim        <- I_lim(Nf, I_top, spec_params, site_params)
       
       # Environmental additions
@@ -155,19 +155,21 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
       # Environmental state (incoming)
       U <- externals$U[i]
       externals$u_c[i]      <- u_c          <- suppressWarnings(
-                                                   u_c(U0 = U, macro_state = c(biomass = unname(B_ww.mg)/1000, hm = unname(hm)), 
-                                                   SA_WW = 0.5 * (0.0306/2), site_params, 
-                                                   constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025))
-                                                   )
+        u_c(U0 = U,
+            macro_state = c(biomass = B_ww.mg/1000, hm),
+            SA_WW = 0.5 * (0.0306 / 2),
+            site_params,
+            constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
+      ))
       externals$lambda[i]   <- lambda       <- (u_c*U*60*60*24)/farmV 
 
       # Nitrogen pool changes
-      rates$growth_rate[i]  <- growth_rate  <- spec_params['mu'] * I_lim * T_lim * Q_lim
-      rates$Ns_to_Nf[i]     <- Ns_to_Nf     <- min(growth_rate * Ns, Ns) # cannot convert more Ns than available
-                               Ns_loss      <- spec_params['D_m'] * Ns
-      rates$Nf_loss[i]      <- Nf_loss      <- spec_params['D_m'] * Nf
-      red_Am                                <- other_constants['Rd'] * Am_conc # Reduction of ammonium (to nitrate)
-      remin                                 <- other_constants['rL'] * det # Remineralisation of detritus (to ammonium)
+      rates$growth_rate[i]  <- growth_rate  <- unname(spec_params['mu'] * I_lim * T_lim * Q_lim)
+      rates$Ns_to_Nf[i]     <- Ns_to_Nf     <- pmin(growth_rate * Ns, Ns) # cannot convert more Ns than available
+                               Ns_loss      <- unname(spec_params['D_m'] * Ns)
+      rates$Nf_loss[i]      <- Nf_loss      <- unname(spec_params['D_m'] * Nf)
+      red_Am                                <- unname(other_constants['Rd'] * Am_conc) # Reduction of ammonium (to nitrate)
+      remin                                 <- unname(other_constants['rL'] * det) # Remineralisation of detritus (to ammonium)
       
       # Apply the correct uptake rate curve depending on parameters supplied
                                up_Am        <- 
