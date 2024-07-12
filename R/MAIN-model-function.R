@@ -1,10 +1,37 @@
-grow_macroalgae <- function(start, grow_days, 
-                            temperature, light, velocity, 
-                            nitrate, ammonium, other_N, # model does not yet have parameters for uptake rate of other_N
-                            uptake_nitrate = "MM", uptake_ammonium = "MM", uptake_other = "MM",
-                            site_params, spec_params, 
-                            other_constants = c(rL = 0.2, Rd = 0.1),
-                            initials) {
+#' Grow macroalgae
+#' 
+#' @description
+#' The main deal 
+#'
+#' @param start 
+#' @param grow_days 
+#' @param temperature 
+#' @param light 
+#' @param velocity 
+#' @param nitrate 
+#' @param ammonium 
+#' @param other_N 
+#' @param uptake_nitrate 
+#' @param uptake_ammonium 
+#' @param uptake_other 
+#' @param site_params 
+#' @param spec_params 
+#' @param other_constants 
+#' @param initials 
+#'
+#' @importFrom lubridate is.Date ymd duration yday
+#' @importFrom glue glue
+#' @import magrittr
+#' @import dplyr
+#' @import rlang
+#' @importFrom units set_units
+#' 
+#' @return dataframe of outputs
+#' @export 
+#'
+#' @examples "see here" link?
+grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitrate, ammonium, other_N, # model does not yet have parameters for uptake rate of other_N
+                            uptake_nitrate = "MM", uptake_ammonium = "MM", uptake_other = "MM", site_params, spec_params, other_constants = c(rL = 0.2, Rd = 0.1), initials) {
 
   # Parse start date
   if (lubridate::is.Date(start)) {
