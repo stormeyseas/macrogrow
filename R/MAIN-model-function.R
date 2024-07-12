@@ -152,8 +152,8 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
       internals$I_lim[i]    <- I_lim        <- I_lim(Nf, I_top, spec_params, site_params)
       
       # Environmental additions
-      Am_conc <- externals$Am_conc[i]
-      Ni_conc <- externals$Ni_conc[i]
+      Am_conc <- externals$Am_conc[i] * externals$u_c[i]
+      Ni_conc <- externals$Ni_conc[i] * externals$u_c[i]
       det <- externals$det[i]
       
       # Environmental state (incoming)
