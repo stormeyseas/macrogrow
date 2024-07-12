@@ -86,7 +86,6 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   externals <- internals <- rates <- outputs
   
   # Add environmental vectors to externals dataframe
-  externals <- outputs
   externals$TT <- temperature
   externals$I <- light
   externals$Ni_conc <- nitrate
@@ -126,7 +125,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   externals$lambda[1] <- lambda <- unname(units::drop_units(temp)/farmV) # Refresh rate based on U (U in m d-1)
   
   # Starting state
-  internals$Nf[1] <- Nf <- Nf <- unname(initials['Nf'])                     # Fixed nitrogen
+  internals$Nf[1] <- Nf <- unname(initials['Nf'])                     # Fixed nitrogen
   Q_int <- unname(initials['Q_int'] )                                               # Internal nutrient quotient
   internals$Ns[1] <- Ns <- unname(Nf*(Q_int/spec_params['Q_min'] - 1))          # Stored nitrogen
 
@@ -134,7 +133,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
     for (i in 1:nrow(outputs)) {
       
       # Start of the day
-      internals$N_int[i]    <- N_int(Q_int, NA, spec_params) # Takes Q_int or Q_rel
+      internals$N_int[i]    <- N_int(Q_int = Q_int, Q_rel = NA, spec_params = spec_params) # Takes Q_int or Q_rel
       internals$B_dw.mg[i]  <- B_dw.mg <- (Nf+Ns) / N_int
       internals$B_ww.mg[i]  <- B_ww.mg <- B_dw.mg * unname(spec_params['DWWW'])
       internals$hm[i]       <- hm <- algae_height(Nf, spec_params)
