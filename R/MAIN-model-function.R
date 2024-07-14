@@ -47,9 +47,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   end_date <- start_date + lubridate::duration(grow_days, "days")
   start_t <- lubridate::yday(start_date)
   end_t <- start_t + grow_days
-  
-  # Set up base outputs dataframe
-  outputs <- data.frame(t = seq(start_t, end_t, 1), date = seq(start_date, end_date, by = 'days'))
+  t = seq(start_t, end_t, 1)
   
   # Light, temperature and nutrient levels are passed to the function as vectors - check length
   if (length(temperature) != nrow(outputs)) {
@@ -85,137 +83,141 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   
   externals <- internals <- rates <- outputs
   
+  # Site parameters
+  farmV <- unname(site_params['farmA'] * site_params['hc'])         # Volume of farm site
+  
   # Add environmental vectors to externals dataframe
-  externals$TT <- temperature
-  externals$I <- light
-  externals$Ni_conc <- nitrate
-  externals$Am_conc <- ammonium
-  externals$U <- velocity
-  externals$det <- 10
-  externals$u_c <- 1
-  externals$I_top <- externals$Ni_add <- externals$Am_add <- externals$lambda <- NA
-
-  # Set up results data frames
-  internals <- cbind(internals, matrix(data = NA, nrow = nrow(outputs), ncol = 9))
-  colnames(internals) <- c(colnames(outputs), "Nf", "Ns", "Q_lim", "T_lim", "I_lim", "N_int", "B_dw.mg", "B_ww.mg", "hm")  
-
-  rates <- cbind(rates, matrix(data = NA, nrow = nrow(outputs), ncol = 9))
-  colnames(rates) <- c(colnames(outputs), "up_Am", "up_Ni", "growth_rate", "Ns_to_Nf", "Nf_loss", "N_change")  
+  Tc <- temperature
+  I <- light
+  Ni_add <- nitrate
+  Am_add <- ammonium
+  U <- velocity
+  u_c <- I_top <- Ni_conc <- Am_conc <- det <- Nf <- Ns <- N_int <- B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- 
+    T_lim <- Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- red_Am <- remin <- other_add <- up_Am <- up_Ni <- 
+    numeric(length = length(t))
 
   # For adding other_N (e.g. urea, amino acids)
   if (!missing(other_N) | length(other_N) == 0) {
-    externals$other_N <- 0
+    other_add[1] <- 0
   } else if (length(other_N) != nrow(outputs)) {
     rlang::abort(message = glue::glue(
       "Error: other_N vector has length {obs} but timespan vector has length {exp}",
       obs = length(other_N),
       exp = nrow(outputs)))
   } else {
-    externals$other_N <- other_N
+    other_add[1] <- other_N[1]
   }
-
-  # Site parameters
-  farmV <- unname(site_params['farmA'] * site_params['hc'])                 # Volume of farm site
-  externals$Am_add[1] <- externals$Am_conc[1]                       # Ambient ammonium concentration (no seaweed)
-  externals$Ni_add[1] <- externals$Ni_conc[1]                       # Ambient nitrate concentration (no seaweed)
   
-  # Get refresh rate from U - should I do this in targets?
-  temp <- units::set_units(externals$U[1], "m s-1")
-  temp <- units::set_units(temp, "m d-1")
-  externals$lambda[1] <- lambda <- unname(units::drop_units(temp)/farmV) # Refresh rate based on U (U in m d-1)
+  # External starting state
+  Am_conc[1]      <- Am_add[1]
+  Ni_conc[1]      <- Ni_add[1]
+  # other_conc[1]    <- other_add[1]
   
-  # Starting state
-  internals$Nf[1] <- Nf <- unname(initials['Nf'])                     # Fixed nitrogen
-  Q_int <- unname(initials['Q_int'] )                                               # Internal nutrient quotient
-  internals$Ns[1] <- Ns <- unname(Nf*(Q_int/spec_params['Q_min'] - 1))          # Stored nitrogen
-
-    # Start model run
-    for (i in 1:nrow(outputs)) {
-      
-      # Start of the day
-      internals$N_int[i]    <- N_int(Q_int = Q_int, Q_rel = NA, spec_params = spec_params) # Takes Q_int or Q_rel
-      internals$B_dw.mg[i]  <- B_dw.mg <- (Nf+Ns) / N_int
-      internals$B_ww.mg[i]  <- B_ww.mg <- B_dw.mg * unname(spec_params['DWWW'])
-      internals$hm[i]       <- hm <- algae_height(Nf, spec_params)
-      
-      # Temperature limitation on growth
-      TT <- externals$TT[i]
-      internals$T_lim[i]    <- T_lim        <- T_lim(TT, spec_params)
-      
-      # Internal nutrient limitation on growth
-      internals$Q_lim[i]    <- Q_lim        <- Q_lim(Nf, Ns, spec_params)
-      
-      # Light limitation on growth
-      I <- externals$I[i]
-      externals$I_top[i]    <- I_top        <- unname(I * exp(-site_params['kW'] * site_params['d_top']))
-      internals$I_lim[i]    <- I_lim        <- I_lim(Nf, I_top, spec_params, site_params)
-      
-      # Environmental additions
-      Am_conc <- externals$Am_conc[i] * externals$u_c[i]
-      Ni_conc <- externals$Ni_conc[i] * externals$u_c[i]
-      det <- externals$det[i]
-      
-      # Environmental state (incoming)
-      U <- externals$U[i]
-      externals$u_c[i]      <- u_c          <- suppressWarnings(
-        u_c(U0 = U,
-            macro_state = c(biomass = B_ww.mg/1000, hm),
-            SA_WW = 0.5 * (0.0306 / 2),
-            site_params,
-            constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
-      ))
-      externals$lambda[i]   <- lambda       <- (u_c*U*60*60*24)/farmV 
-
-      # Nitrogen pool changes
-      rates$growth_rate[i]  <- growth_rate  <- unname(spec_params['mu'] * I_lim * T_lim * Q_lim)
-      rates$Ns_to_Nf[i]     <- Ns_to_Nf     <- pmin(growth_rate * Ns, Ns) # cannot convert more Ns than available
-                               Ns_loss      <- unname(spec_params['D_m'] * Ns)
-      rates$Nf_loss[i]      <- Nf_loss      <- unname(spec_params['D_m'] * Nf)
-      red_Am                                <- unname(other_constants['Rd'] * Am_conc) # Reduction of ammonium (to nitrate)
-      remin                                 <- unname(other_constants['rL'] * det) # Remineralisation of detritus (to ammonium)
-      
-      # Apply the correct uptake rate curve depending on parameters supplied
-                               up_Am        <- Q_int * (B_dw.mg/1000) * get_uptake(conc = Am_conc, 
-                                                                                   uptake_shape = linear, 
-                                                                                   Nform_abbr = "am", 
-                                                                                   spec_params = spec_params)
-      rates$up_Am[i]        <- up_Am        <- pmin(up_Am, Am_conc)
-        
-        
-                               up_Ni        <- Q_int * (B_dw.mg/1000) * get_uptake(conc = Ni_conc, 
-                                                                                   uptake_shape = linear, 
-                                                                                   Nform_abbr = "ni", 
-                                                                                   spec_params = spec_params)
-      rates$up_Ni[i]        <- up_Ni        <- pmin(up_Ni, Ni_conc)
-      
-      # To eventually become up_Ot
-      if (!is.na(spec_params['V_ot']) | !is.na(spec_params['V_ot']) | !is.na(spec_params['V_ot']) | !is.na(spec_params['V_ot'])) {
-        rlang::inform("Warning: parameters for 'other N' uptake are supplied but there is no mechanism for 'other N' uptake (yet).")
-      }
-      # rates$up_Ot[i]        <- up_Ot        <- pmin(up_Ot, Ot_conc)
-      
-      # If you haven't reached the end of the run yet, set up for tomorrow
-      if (i != nrow(outputs)) {
-        # New ammonium and nitrate delivered to site
-        externals$Am_add[i]   <- Am_add       <- u_c * Am_conc[i+1]
-        externals$Ni_add[i]   <- Ni_add       <- u_c * Ni_conc[i+1]
-        
-        # New environmental states cannot go below 0
-        externals$Am_conc[i+1]              <- Am_conc + Am_add - up_Am + Ns_loss - red_Am + remin
-        externals$Ni_conc[i+1]              <- Ni_conc + Ni_add - up_Ni           + red_Am
-        externals$det[i+1]                  <- det                      + Nf_loss          - remin
-        
-        # Algae starting state
-        internals$Nf[i+1]     <- Nf         <- Nf + Ns_to_Nf - Nf_loss
-        internals$Ns[i+1]     <- Ns         <- Ns + up_Am + up_Ni - Ns_to_Nf - Ns_loss
-                              Q_int         <- unname(spec_params['Q_min'])*(Ns/Nf + 1)
-        internals$N_int[i+1]  <- N_int      <- N_int(Q_int, NA, spec_params)
-        rates$N_change[i+1]                 <- up_Am + up_Ni - Ns_loss - Nf_loss
-      }
-    }
+  # Macroalgae starting state
+  Nf[i] <- unname(initials['Nf'])                     # Fixed nitrogen
+  Ns[i] <- unname(Nf[i]*(unname(initials['Q_int'])/spec_params['Q_min'] - 1))          # Stored nitrogen
+  det[i] <- 10
+  
+  for (i in 1:length(t)) {
+    N_int[i]    <- N_int(Q_int = unname(initials['Q_int']), Q_rel = NA, spec_params = spec_params) # Takes Q_int or Q_rel
+    B_dw.mg[i]  <- (Nf[i]+Ns[i]) / N_int[i]
+    B_ww.mg[i]  <- B_dw.mg[i] * unname(spec_params['DWWW'])
+    hm[i]       <- algae_height(Nf[i], spec_params)
     
-    df <- merge(externals, internals, by = c("t", "date"))
-    df <- merge(df, rates, by = c("t", "date"))
+    # Environmental state (incoming)
+    u_c[i]      <- suppressWarnings(
+                      u_c(U0 = U[i],
+                          macro_state = c(biomass = B_ww.mg[i]/1000, hm[i]),
+                          SA_WW = 0.5 * (0.0306 / 2),
+                          site_params,
+                          constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
+                      ))
+    lambda[i]   <- (u_c[i] * U[i]*60*60*24)/farmV 
+    lambda_0[i] <- (U[i]*60*60*24)/farmV 
+  
+    # Temperature limitation on growth
+    T_lim[i]    <- T_lim(Tc[i], spec_params)
+    
+    # Internal nutrient limitation on growth
+    Q_lim[i]    <- Q_lim(Nf[i], Ns[i], spec_params)
+    
+    # Light limitation on growth
+    I_top[i]    <- unname(I[i] * exp(-site_params['kW'] * site_params['d_top']))
+    I_lim[i]    <- I_lim(Nf[i], I_top[i], spec_params, site_params)
+    
+    Am_conc[i]      <- Am_add[i] * lambda_0[i]/lambda[i]
+    Ni_conc[i]      <- Ni_add[i] * lambda_0[i]/lambda[i]
+    # other_conc[i]    <- other_add[i] * lambda_0[i]/lambda[i]
+    
+    # Nitrogen pool changes
+    growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * Q_lim[i])
+    Ns_to_Nf[i]     <- pmin(growth_rate * Ns[i], Ns[i]) # cannot convert more Ns than available
+    Ns_loss[i]      <- unname(spec_params['D_m'] * Ns[i])
+    Nf_loss[i]      <- unname(spec_params['D_m'] * Nf[i])
+    red_Am[i]       <- unname(other_constants['Rd'] * Am_conc[i]) # Reduction of ammonium (to nitrate)
+    remin[i]        <- unname(other_constants['rL'] * det[i]) # Remineralisation of detritus (to ammonium)
+    
+    up_Am[i]        <- Q_rel(Q_int(Nf[i], Ns[i], spec_params), spec_params) * (B_dw.mg[i]/1000) * 
+                        get_uptake(conc = Am_conc[i], 
+                                   uptake_shape = uptake_ammonium, 
+                                   Nform_abbr = "am", 
+                                   spec_params = spec_params)
+    up_Am[i]        <- pmin(up_Am[i], Am_conc[i])
+    
+    up_Ni[i]        <- Q_rel(Q_int(Nf[i], Ns[i], spec_params), spec_params) * (B_dw.mg[i]/1000) * 
+                        get_uptake(conc = Ni_conc[i], 
+                                   uptake_shape = uptake_nitrate, 
+                                   Nform_abbr = "ni", 
+                                   spec_params = spec_params)
+    up_Ni[i]        <- pmin(up_Ni[i], Ni_conc[i])
+    
+    # Changes in external state
+    Am_conc[i]    <- Am_conc[i] - up_Am[i] + Ns_loss[i] - red_Am[i] + remin[i]
+    Ni_conc[i]    <- Ni_conc[i] - up_Ni[i] + red_Am[i]
+    det[i]        <- det[i] + Nf_loss[i] - remin[i]
+    
+    if (i < length(t)) {
+      # Change in algae state
+      Nf[i+1]         <- Nf[i] + Ns_to_Nf[i] - Nf_loss[i]
+      Ns[i+1]         <- Ns[i] + up_Am[i] + up_Ni[i] - Ns_to_Nf[i] - Ns_loss[i]
+    }
+  }
+    
+    df <- data.frame(
+      t = seq(start_t, end_t, 1), 
+      date = seq(start_date, end_date, by = 'days'),
+      Tc = temperature,
+      I = light,
+      Ni_add = nitrate,
+      Am_add = ammonium,
+      other_add = other_add,
+      Nf = Nf,
+      Ns = Ns,
+      N_int = N_int,
+      B_dw.mg = B_dw.mg,
+      B_ww.mg = B_ww.mg,
+      T_lim = T_lim,
+      Q_lim = Q_lim,
+      I_lim = I_lim,
+      up_Am = up_Am,
+      up_Ni = up_Ni,
+      growth_rate = growth_rate,
+      Ns_to_Nf = Ns_to_Nf,
+      Ns_loss = Ns_loss,
+      Nf_loss = Nf_loss,
+      hm = hm,
+      I_top = I_top,
+      Ni_conc = Ni_conc,
+      Am_conc = Am_conc,
+      other_N = other_N,
+      det = det,
+      U = velocity,
+      u_c = u_c,
+      lambda = lambda,
+      lambda_0 = lambda_0,
+      red_Am = red_Am,
+      remin = remin
+    )
     return(df)
   }
 
