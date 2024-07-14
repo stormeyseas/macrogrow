@@ -50,38 +50,36 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   t = seq(start_t, end_t, 1)
   
   # Light, temperature and nutrient levels are passed to the function as vectors - check length
-  if (length(temperature) != nrow(outputs)) {
+  if (length(temperature) != length(t)) {
     rlang::abort(message = glue::glue(
       "Error: temperature vector has length {obs} but timespan vector has length {exp}",
       obs = length(temperature),
-      exp = nrow(outputs)))
+      exp = length(t)))
   }
-  if (length(light) != nrow(outputs)) {
+  if (length(light) != length(t)) {
     rlang::abort(message = glue::glue(
       "Error: light vector has length {obs} but timespan vector has length {exp}",
       obs = length(light),
-      exp = nrow(outputs)))
+      exp = length(t)))
   }
-  if (length(nitrate) != nrow(outputs)) {
+  if (length(nitrate) != length(t)) {
     rlang::abort(message = glue::glue(
       "Error: nitrate vector has length {obs} but timespan vector has length {exp}",
       obs = length(nitrate),
-      exp = nrow(outputs)))
+      exp = length(t)))
   }
-  if (length(ammonium) != nrow(outputs)) {
+  if (length(ammonium) != length(t)) {
     rlang::abort(message = glue::glue(
       "Error: ammonium vector has length {obs} but timespan vector has length {exp}",
       obs = length(ammonium),
-      exp = nrow(outputs)))
+      exp = length(t)))
   }
-  if (length(velocity) != nrow(outputs)) {
+  if (length(velocity) != length(t)) {
     rlang::abort(message = glue::glue(
       "Error: velocity vector has length {obs} but timespan vector has length {exp}",
       obs = length(velocity),
-      exp = nrow(outputs)))
+      exp = length(t)))
   }
-  
-  externals <- internals <- rates <- outputs
   
   # Site parameters
   farmV <- unname(site_params['farmA'] * site_params['hc'])         # Volume of farm site
@@ -99,11 +97,11 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   # For adding other_N (e.g. urea, amino acids)
   if (!missing(other_N) | length(other_N) == 0) {
     other_add[1] <- 0
-  } else if (length(other_N) != nrow(outputs)) {
+  } else if (length(other_N) != length(t)) {
     rlang::abort(message = glue::glue(
       "Error: other_N vector has length {obs} but timespan vector has length {exp}",
       obs = length(other_N),
-      exp = nrow(outputs)))
+      exp = length(t)))
   } else {
     other_add[1] <- other_N[1]
   }
