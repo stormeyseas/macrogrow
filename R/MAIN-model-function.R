@@ -90,7 +90,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   Ni_add <- nitrate
   Am_add <- ammonium
   U <- velocity
-  u_c <- I_top <- Ni_conc <- Am_conc <- det <- Nf <- Ns <- N_int <- B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- 
+  u_c <- I_top <- Ni_conc <- Am_conc <- det <- Nf <- Ns <- N_int <- B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- other_conc <- 
     T_lim <- Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- red_Am <- remin <- other_add <- up_Am <- up_Ni <- 
     numeric(length = length(t))
 
@@ -109,12 +109,12 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   # External starting state
   Am_conc[1]      <- Am_add[1]
   Ni_conc[1]      <- Ni_add[1]
-  # other_conc[1]    <- other_add[1]
+  other_conc[1]    <- other_add[1]
   
   # Macroalgae starting state
-  Nf[i] <- unname(initials['Nf'])                     # Fixed nitrogen
-  Ns[i] <- unname(Nf[i]*(unname(initials['Q_int'])/spec_params['Q_min'] - 1))          # Stored nitrogen
-  det[i] <- 10
+  Nf[1] <- unname(initials['Nf'])                     # Fixed nitrogen
+  Ns[1] <- unname(Nf[1]*(unname(initials['Q_int'])/spec_params['Q_min'] - 1))          # Stored nitrogen
+  det[1] <- 10
   
   for (i in 1:length(t)) {
     N_int[i]    <- N_int(Q_int = unname(initials['Q_int']), Q_rel = NA, spec_params = spec_params) # Takes Q_int or Q_rel
@@ -145,7 +145,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
     
     Am_conc[i]      <- Am_add[i] * lambda_0[i]/lambda[i]
     Ni_conc[i]      <- Ni_add[i] * lambda_0[i]/lambda[i]
-    # other_conc[i]    <- other_add[i] * lambda_0[i]/lambda[i]
+    other_conc[i]    <- other_add[i] * lambda_0[i]/lambda[i]
     
     # Nitrogen pool changes
     growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * Q_lim[i])
@@ -169,12 +169,12 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
                                    spec_params = spec_params)
     up_Ni[i]        <- pmin(up_Ni[i], Ni_conc[i])
     
-    # Changes in external state
-    Am_conc[i]    <- Am_conc[i] - up_Am[i] + Ns_loss[i] - red_Am[i] + remin[i]
-    Ni_conc[i]    <- Ni_conc[i] - up_Ni[i] + red_Am[i]
-    det[i]        <- det[i] + Nf_loss[i] - remin[i]
-    
     if (i < length(t)) {
+      # Changes in external state
+      Am_conc[i+1]    <- Am_conc[i] - up_Am[i] + Ns_loss[i] - red_Am[i] + remin[i]
+      Ni_conc[i+1]    <- Ni_conc[i] - up_Ni[i] + red_Am[i]
+      det[ii+1]       <- det[i] + Nf_loss[i] - remin[i]
+      
       # Change in algae state
       Nf[i+1]         <- Nf[i] + Ns_to_Nf[i] - Nf_loss[i]
       Ns[i+1]         <- Ns[i] + up_Am[i] + up_Ni[i] - Ns_to_Nf[i] - Ns_loss[i]
@@ -184,35 +184,35 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
     df <- data.frame(
       t = seq(start_t, end_t, 1), 
       date = seq(start_date, end_date, by = 'days'),
-      Tc = temperature,
-      I = light,
-      Ni_add = nitrate,
-      Am_add = ammonium,
-      other_add = other_add,
       Nf = Nf,
       Ns = Ns,
-      N_int = N_int,
-      B_dw.mg = B_dw.mg,
-      B_ww.mg = B_ww.mg,
-      T_lim = T_lim,
-      Q_lim = Q_lim,
-      I_lim = I_lim,
-      up_Am = up_Am,
-      up_Ni = up_Ni,
       growth_rate = growth_rate,
       Ns_to_Nf = Ns_to_Nf,
       Ns_loss = Ns_loss,
       Nf_loss = Nf_loss,
-      hm = hm,
-      I_top = I_top,
+      N_int = N_int,
+      Q_lim = Q_lim,
+      B_dw.mg = B_dw.mg,
+      B_ww.mg = B_ww.mg,
+      Ni_add = nitrate,
+      Am_add = ammonium,
+      other_add = other_add,
       Ni_conc = Ni_conc,
       Am_conc = Am_conc,
       other_N = other_N,
-      det = det,
+      up_Am = up_Am,
+      up_Ni = up_Ni,
+      Tc = temperature,
+      T_lim = T_lim,
+      I = light,
+      I_top = I_top,
+      hm = hm,
+      I_lim = I_lim,
       U = velocity,
       u_c = u_c,
       lambda = lambda,
       lambda_0 = lambda_0,
+      det = det,
       red_Am = red_Am,
       remin = remin
     )
