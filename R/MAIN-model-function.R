@@ -120,7 +120,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
     N_int[i]    <- N_int(Q_int = unname(initials['Q_int']), Q_rel = NA, spec_params = spec_params) # Takes Q_int or Q_rel
     B_dw.mg[i]  <- (Nf[i]+Ns[i]) / N_int[i]
     B_ww.mg[i]  <- B_dw.mg[i] * unname(spec_params['DWWW'])
-    hm[i]       <- algae_height(Nf[i], spec_params)
+    hm[i]       <- suppressMessages(algae_height(Nf[i], spec_params))
     
     # Environmental state (incoming)
     u_c[i]      <- suppressWarnings(
