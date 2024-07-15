@@ -149,7 +149,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
     
     # Nitrogen pool changes
     growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * Q_lim[i])
-    Ns_to_Nf[i]     <- pmin(growth_rate * Ns[i], Ns[i]) # cannot convert more Ns than available
+    Ns_to_Nf[i]     <- pmin(growth_rate[i] * Ns[i], Ns[i]) # cannot convert more Ns than available
     Ns_loss[i]      <- unname(spec_params['D_m'] * Ns[i])
     Nf_loss[i]      <- unname(spec_params['D_m'] * Nf[i])
     red_Am[i]       <- unname(other_constants['Rd'] * Am_conc[i]) # Reduction of ammonium (to nitrate)
