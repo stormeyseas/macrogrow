@@ -5,6 +5,8 @@
 #' @param Nform_abbr 
 #' @param spec_params 
 #'
+#' @export
+#' 
 get_uptake <- function(conc, uptake_shape, Nform_abbr, spec_params) {
   
   spec_params['M'] <- spec_params[paste0("M", "_", Nform_abbr)]
