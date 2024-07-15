@@ -112,12 +112,12 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   other_conc[1]    <- other_add[1]
   
   # Macroalgae starting state
-  Nf[1] <- unname(initials['Nf'])                     # Fixed nitrogen
+  Nf[1] <- unname(initials['Nf'])  # Fixed nitrogen
   Ns[1] <- unname(Nf[1]*(unname(initials['Q_int'])/spec_params['Q_min'] - 1))          # Stored nitrogen
   det[1] <- 10
   
   for (i in 1:length(t)) {
-    N_int[i] <- N_int(Q_int(Nf[i], Ns[i], spec_params), Q_rel = NA, spec_params = spec_params) # Takes Q_int or Q_rel
+    N_int[i] <- N_int(Q_int = NA, Q_rel = Q_rel(Q_int = Q_int(Nf[i], Ns[i], spec_params), spec_params), spec_params) # Takes Q_int or Q_rel
     B_dw.mg[i]  <- (Nf[i]+Ns[i]) / N_int[i]
     B_ww.mg[i]  <- B_dw.mg[i] * unname(spec_params['DWWW'])
     hm[i]       <- suppressMessages(algae_height(Nf[i], spec_params))
