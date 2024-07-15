@@ -47,7 +47,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   end_date <- start_date + lubridate::duration(grow_days, "days")
   start_t <- lubridate::yday(start_date)
   end_t <- start_t + grow_days
-  t = seq(start_t, end_t, 1)
+  t <- seq(start_t, end_t, 1)
   
   # Light, temperature and nutrient levels are passed to the function as vectors - check length
   if (length(temperature) != length(t)) {
@@ -117,7 +117,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   det[1] <- 10
   
   for (i in 1:length(t)) {
-    N_int[i]    <- N_int(Q_int = unname(initials['Q_int']), Q_rel = NA, spec_params = spec_params) # Takes Q_int or Q_rel
+    N_int[i] <- N_int(Q_int(Nf[i], Ns[i], spec_params), Q_rel = NA, spec_params = spec_params) # Takes Q_int or Q_rel
     B_dw.mg[i]  <- (Nf[i]+Ns[i]) / N_int[i]
     B_ww.mg[i]  <- B_dw.mg[i] * unname(spec_params['DWWW'])
     hm[i]       <- suppressMessages(algae_height(Nf[i], spec_params))
@@ -182,7 +182,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   }
     
     df <- data.frame(
-      t = seq(start_t, end_t, 1), 
+      t = t, 
       date = seq(start_date, end_date, by = 'days'),
       Nf = Nf,
       Ns = Ns,
