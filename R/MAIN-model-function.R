@@ -90,8 +90,8 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   Ni_add <- nitrate
   Am_add <- ammonium
   U <- velocity
-  u_c <- I_top <- Ni_conc <- Am_conc <- det <- Nf <- Ns <- N_int <- B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- other_conc <- 
-    Q_int <- T_lim <- Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- red_Am <- remin <- other_add <- up_Am <- up_Ni <- 
+  u_c <- I_top <- Ni_conc <- Am_conc <- det <- Nf <- Ns <- N_int <- N_rel <- B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- other_conc <- 
+    Q_int <- Q_rel <- T_lim <- Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- red_Am <- remin <- other_add <- up_Am <- up_Ni <- 
     numeric(length = length(t))
 
   # For adding other_N (e.g. urea, amino acids)
@@ -118,7 +118,9 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   
   for (i in 1:length(t)) {
     Q_int[i]    <- Q_int(Nf[i], Ns[i], spec_params)
-    N_int[i]    <- N_int(Q_int[i], NA, spec_params) # Takes Q_int or Q_rel
+    Q_rel[i]    <- Q_rel(Q_int[i], spec_params)
+    N_int[i]    <- N_int(Q_rel = Q_rel[i], Q_int = NA, spec_params)
+    N_rel[i]    <- N_rel(N_int[i], spec_params)
     B_dw.mg[i]  <- (Nf[i]+Ns[i]) / N_int[i]
     B_ww.mg[i]  <- B_dw.mg[i] * unname(spec_params['DWWW'])
     hm[i]       <- suppressMessages(algae_height(Nf[i], spec_params))
@@ -192,6 +194,9 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
       Ns_loss = Ns_loss,
       Nf_loss = Nf_loss,
       N_int = N_int,
+      N_rel = N_rel,
+      Q_int = Q_int,
+      Q_rel = Q_rel,
       Q_lim = Q_lim,
       B_dw.mg = B_dw.mg,
       B_ww.mg = B_ww.mg,
