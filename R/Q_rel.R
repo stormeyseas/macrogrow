@@ -2,8 +2,8 @@
 #'
 #' @param Q_int Non-dimensionalised internal nutrient quotient
 #' @param spec_params A vector of named numbers. Must include:
-#'    * \eqn{Q_{min}}, the minimum internal nutrient quotient
-#'    * \eqn{Q_{max}}, the maximum internal nutrient quotient
+#'    * Q_min, the minimum internal nutrient quotient
+#'    * Q_max, the maximum internal nutrient quotient
 #'
 #' @return the relative (0-1) internal nutrient quotient
 #' @export
