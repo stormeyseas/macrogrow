@@ -173,7 +173,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
       # Changes in external state
       Am_conc[i+1]    <- Am_conc[i] - up_Am[i] + Ns_loss[i] - red_Am[i] + remin[i]
       Ni_conc[i+1]    <- Ni_conc[i] - up_Ni[i] + red_Am[i]
-      det[ii+1]       <- det[i] + Nf_loss[i] - remin[i]
+      det[i+1]       <- det[i] + Nf_loss[i] - remin[i]
       
       # Change in algae state
       Nf[i+1]         <- Nf[i] + Ns_to_Nf[i] - Nf_loss[i]
