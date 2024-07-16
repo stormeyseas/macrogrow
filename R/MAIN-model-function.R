@@ -35,6 +35,9 @@ grow_macroalgae <- function(start,
                             nitrate,
                             ammonium,
                             other_N,
+                            ni_uptake,
+                            am_uptake,
+                            ot_uptake,
                             # model does not yet have proper parameters for uptake rate of other_N
                             site_params,
                             spec_params,
@@ -168,14 +171,14 @@ grow_macroalgae <- function(start,
     
     up_Am[i]        <- Q_rel(Q_int(Nf[i], Ns[i], spec_params), spec_params) * (B_dw.mg[i]/1000) * 
                         get_uptake(conc = Am_conc[i], 
-                                   uptake_shape = spec_params['am_uptake'], 
+                                   uptake_shape = am_uptake, 
                                    Nform_abbr = "am", 
                                    spec_params = spec_params)
     up_Am[i]        <- pmin(up_Am[i], Am_conc[i])
     
     up_Ni[i]        <- Q_rel(Q_int(Nf[i], Ns[i], spec_params), spec_params) * (B_dw.mg[i]/1000) * 
                         get_uptake(conc = Ni_conc[i], 
-                                   uptake_shape = spec_params['ni_uptake'], 
+                                   uptake_shape = ni_uptake, 
                                    Nform_abbr = "ni", 
                                    spec_params = spec_params)
     up_Ni[i]        <- pmin(up_Ni[i], Ni_conc[i])
