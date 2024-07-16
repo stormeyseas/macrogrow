@@ -11,9 +11,6 @@
 #' @param nitrate 
 #' @param ammonium 
 #' @param other_N 
-#' @param uptake_nitrate 
-#' @param uptake_ammonium 
-#' @param uptake_other 
 #' @param site_params 
 #' @param spec_params 
 #' @param other_constants 
@@ -38,10 +35,7 @@ grow_macroalgae <- function(start,
                             nitrate,
                             ammonium,
                             other_N,
-                            # model does not yet have parameters for uptake rate of other_N
-                            uptake_nitrate = "MM",
-                            uptake_ammonium = "MM",
-                            uptake_other = "MM",
+                            # model does not yet have proper parameters for uptake rate of other_N
                             site_params,
                             spec_params,
                             other_constants = c(rL = 0.2, Rd = 0.1),
@@ -56,7 +50,7 @@ grow_macroalgae <- function(start,
   } else if (is.character(start)) {
     start_date <- lubridate::ymd(start)
   }
-  
+
   # Populate start and end dates and ts
   end_date <- start_date + lubridate::duration(grow_days, "days")
   start_t <- lubridate::yday(start_date)
@@ -174,14 +168,14 @@ grow_macroalgae <- function(start,
     
     up_Am[i]        <- Q_rel(Q_int(Nf[i], Ns[i], spec_params), spec_params) * (B_dw.mg[i]/1000) * 
                         get_uptake(conc = Am_conc[i], 
-                                   uptake_shape = uptake_ammonium, 
+                                   uptake_shape = spec_params['am_uptake'], 
                                    Nform_abbr = "am", 
                                    spec_params = spec_params)
     up_Am[i]        <- pmin(up_Am[i], Am_conc[i])
     
     up_Ni[i]        <- Q_rel(Q_int(Nf[i], Ns[i], spec_params), spec_params) * (B_dw.mg[i]/1000) * 
                         get_uptake(conc = Ni_conc[i], 
-                                   uptake_shape = uptake_nitrate, 
+                                   uptake_shape = spec_params['ni_uptake'], 
                                    Nform_abbr = "ni", 
                                    spec_params = spec_params)
     up_Ni[i]        <- pmin(up_Ni[i], Ni_conc[i])
