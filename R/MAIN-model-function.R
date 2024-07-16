@@ -30,15 +30,29 @@
 #' @export 
 #'
 #' @examples "see here" link?
-grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitrate, ammonium, other_N, # model does not yet have parameters for uptake rate of other_N
-                            uptake_nitrate = "MM", uptake_ammonium = "MM", uptake_other = "MM", site_params, spec_params, other_constants = c(rL = 0.2, Rd = 0.1), initials) {
-
+grow_macroalgae <- function(start,
+                            grow_days,
+                            temperature,
+                            light,
+                            velocity,
+                            nitrate,
+                            ammonium,
+                            other_N,
+                            # model does not yet have parameters for uptake rate of other_N
+                            uptake_nitrate = "MM",
+                            uptake_ammonium = "MM",
+                            uptake_other = "MM",
+                            site_params,
+                            spec_params,
+                            other_constants = c(rL = 0.2, Rd = 0.1),
+                            initials) {
+  
   # Parse start date
   if (lubridate::is.Date(start)) {
     start_date <- start
   } else if (is.integer(start) | is.numeric(start)) {
     if (missing(start_year)) {start_year <- 2000}
-    start_date <- (parse_date_time(x = paste(start_year, start), orders = "yj")) # - duration(1, "days")
+    start_date <- parse_date_time(x = paste(start_year, start), orders = "yj") # - duration(1, "days")
   } else if (is.character(start)) {
     start_date <- lubridate::ymd(start)
   }
@@ -113,7 +127,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
   
   # Macroalgae starting state
   Nf[1] <- unname(initials['Nf'])  # Fixed nitrogen
-  Ns[1] <- unname(Nf[1]*(unname(initials['Q_int'])/spec_params['Q_min'] - 1))          # Stored nitrogen
+  Ns[1] <- Nf[1]*(unname(initials['Q_int'])/spec_params['Q_min'] - 1)          # Stored nitrogen
   det[1] <- 10
   
   for (i in 1:length(t)) {
