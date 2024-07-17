@@ -8,10 +8,11 @@
 #' @param Nf Fixed nitrogen (mg m\eqn{^{-3}})
 #' @param Ns Stored nitrogen (mg m\eqn{^{-3}})
 #' @param spec_params A vector of named numbers. Must include:
-#'    * \eqn{Q_{min}}, the minimum internal nutrient quotient
+#'  * `Q_min`, the minimum internal nutrient quotient
 #'
 #' @return the non-dimensionalised internal nutrient quotient
 #' @export
+#' @seealso [N_int(), N_rel(), Q_rel()]
 #'
 #' @examples examples
 Q_int <- function(Nf, Ns, spec_params) {

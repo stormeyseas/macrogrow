@@ -16,12 +16,13 @@
 #' @inheritParams Q_int
 #' @param I the surface irradiance, PAR (\eqn{\mu}mol photons m\eqn{^{-2}} s\eqn{^{-1}})
 #' @param spec_params a vector of named numbers. Must include:
-#'    * \eqn{a_{cs}}, the carbon-specific self-shading constant
-#'    * \eqn{I_o}, the light saturation parameter
-#'    * \eqn{h_a}, \eqn{h_b} and \eqn{h_c}, parameters governing height change with \eqn{N_f}
+#' * `a_cs`, the carbon-specific self-shading constant
+#' * `I_o`, the light saturation parameter
+#' * `h_a`, `h_b` and `h_c`, parameters governing height change with `N_f`
+#' * `h_max`, maximum species height
 #' @param site_params A vector of named numbers. Must include:
-#'    * \eqn{d_{top}} the below-surface  depth (m) of the top of the macroalgae culture
-#'    * \eqn{kW} the light-attenuation coefficient of open water
+#' * \eqn{d_{top}} the below-surface  depth (m) of the top of the macroalgae culture
+#' * \eqn{kW} the light-attenuation coefficient of open water
 #'
 #' @return a scalar of relative light limitation on growth (between 0 and 1)
 #' @export
@@ -38,11 +39,11 @@ I_lim <- function(Nf, I, spec_params, site_params) {
   if (is.na(spec_params['h_a'])) {abort_missing_parameter(param = "h_a", place = "spec_params")}
   if (is.na(spec_params['h_b'])) {
     h_b <- 1
-    rlang::inform(message = "h_b not supplied, defaulting to 1")
+    # rlang::inform(message = "h_b not supplied, defaulting to 1")
   }
   if (is.na(spec_params['h_c'])) {
     h_c <- 0
-    rlang::inform(message = "h_c not supplied, defaulting to 0")
+    # rlang::inform(message = "h_c not supplied, defaulting to 0")
   }
   
   I_top <- I * exp(-(site_params['kW']*site_params['d_top']))

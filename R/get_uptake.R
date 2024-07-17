@@ -2,10 +2,14 @@
 #'
 #' @param conc 
 #' @param uptake_shape 
-#' @param Nform_abbr 
-#' @param spec_params 
+#' @param spec_params a vector of named numbers. Must include:
+#' * `M` and `C` for linear uptake, OR
+#' * `V` and `K` for Michaelis-Menton uptake
+#' * `uptake_shape` of "linear" or "MM" (or "Michaelis-Menton"). Not required if only one set of the above parameters are provided.
+#' @param Nform_abbr the abbreviation used in spec_params for the relevant nitrogen form. E.g. if Nform_abbr = "ni" the function will look for `M_ni` and `C_ni` or `V_ni` and `K_ni` in spec_params.
 #'
 #' @export
+#' @seealso [lin_uptake(), MM_uptake()]
 #' 
 get_uptake <- function(conc, uptake_shape, Nform_abbr, spec_params) {
   

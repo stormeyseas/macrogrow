@@ -12,7 +12,7 @@
 #' @param ammonium 
 #' @param other_N 
 #' @param site_params 
-#' @param spec_params 
+#' @param spec_params see details
 #' @param other_constants 
 #' @param initials 
 #'
@@ -25,6 +25,9 @@
 #' 
 #' @return dataframe of outputs
 #' @export 
+#' 
+#' @details
+#' Example csv with all the spec_params required? 
 #'
 #' @examples "see here" link?
 grow_macroalgae <- function(start,

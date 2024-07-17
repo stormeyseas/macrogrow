@@ -20,7 +20,7 @@
 #' @author David LeBauer
 #' @param solarMJ MJ per day
 #' 
-#' @return PPFD umol /m2 / s
+#' @return PPFD umol m-2 s-1
 #' @export
 #' 
 solarMJ2ppfd <- function(solarMJ) {

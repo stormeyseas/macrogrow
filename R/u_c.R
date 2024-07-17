@@ -4,13 +4,23 @@
 #' A short description...
 #'
 #' @param U0 incoming incident water velocity (m/s)
-#' @param macro_state vector of named numbers in the form c(biomass, hm) defining macroalgae wet weight (g) and height (m)
 #' @param SA_WW conversion of wet weight to surface area (default is 0.5*0.5*0.0306 for \textit{Macrocystis pyrifera})
-#' @param site_params vector of named numbers in the form c(hz, hc, site_params['d_top']) defining total water depth (m), vertical water column occupied by the canopy (m), and depth of the top of the canopy beneath the water surface (m)
-#' @param constants vector of named numbers in the form c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025) defining extra constants for the attenuation submodel
+#' @param macro_state vector of named numbers. Must include:
+#'  * `biomass`, macroalgae wet weight (g)
+#'  * `hm`, algae height (m)
+#' @param site_params vector of named numbers. Must include:
+#'  * `hz`, total water depth (m)
+#'  * `hc`, vertical water column occupied by the canopy (m)
+#'  * `d_top`, depth of the top of the canopy beneath the water surface (m)
+#' @param constants vector of named numbers defining extra constants for the attenuation submodel. Must include:
+#'  * `s` = 0.0045
+#'  * `gam` = 1.13
+#'  * `a2` = 0.2^2
+#'  * `Cb` = 0.0025
 #'
 #' @return the relative water attenuation coefficient (u_c)
 #' @export
+#' @seealso [algae_height(), u_b(), C_t()]
 #' 
 u_c <- function(U0, 
                 macro_state = c(biomass, hm), 

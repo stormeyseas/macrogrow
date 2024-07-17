@@ -7,9 +7,9 @@
 #' 
 #' @param Tc temperature to evaluate
 #' @param spec_params a vector of named numbers. Must include:
-#'    * \eqn{T_{opt}} the optimum temperature for macroalgae growth
-#'    * \eqn{T_{min}} the minimum temperature for macroalgae growth (when \eqn{T_c < T_{min}}, growth = 0)
-#'    * \eqn{T_{max}} the maximum temperature for macroalgae growth (when \eqn{T_c > T_{max}}, growth = 0)
+#'  * `T_opt` the optimum temperature for macroalgae growth
+#'  * `T_min` the minimum temperature for macroalgae growth (when `T_c` < `T_min`, growth = 0)
+#'  * `T_max` the maximum temperature for macroalgae growth (when `T_c` > `T_max`, growth = 0)
 #'
 #' @return a scalar of relative temperature limitation on growth (between 0 and 1)
 #' @export

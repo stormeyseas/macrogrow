@@ -7,12 +7,16 @@
 #' \end{array}}
 #' 
 #' @inheritParams Q_int
-#' @inheritParams Q_rel
+#' @param spec_params a vector of named numbers. Must include:
+#'  * `Q_min`, the minimum nutrient quotient
+#'  * `Q_max`, the maximum nutrient quotient
+#'  * `K_c`, the half-saturation growth constant
 #' 
 #' @return a scalar of relative limitation from internal nutrient reserves on growth (between 0 and 1)
 #' @export
 #' 
 #' @examples examples
+#' @seealso [N_int(), N_rel(), Q_int(), Q_rel()]
 #' 
 Q_lim <- function(Nf, Ns, spec_params) {
   Q_int <- Q_int(Nf, Ns, spec_params)
