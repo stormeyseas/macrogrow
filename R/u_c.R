@@ -4,10 +4,10 @@
 #' A short description...
 #'
 #' @param U0 incoming incident water velocity (m/s)
-#' @param SA_WW conversion of wet weight to surface area (default is 0.5*0.5*0.0306 for \textit{Macrocystis pyrifera})
 #' @param macro_state vector of named numbers. Must include:
 #'  * `biomass`, macroalgae wet weight (g)
 #'  * `hm`, algae height (m)
+#' @param SA_WW conversion of wet weight to surface area (default is 0.5$\times$0.5$\times$0.0306, based on *Macrocystis pyrifera*)
 #' @param site_params vector of named numbers. Must include:
 #'  * `hz`, total water depth (m)
 #'  * `hc`, vertical water column occupied by the canopy (m)
