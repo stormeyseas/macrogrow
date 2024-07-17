@@ -13,9 +13,9 @@ grow_macroalgae(
   nitrate,
   ammonium,
   other_N,
-  uptake_nitrate = "MM",
-  uptake_ammonium = "MM",
-  uptake_other = "MM",
+  ni_uptake,
+  am_uptake,
+  ot_uptake,
   site_params,
   spec_params,
   other_constants = c(rL = 0.2, Rd = 0.1),
@@ -39,15 +39,9 @@ grow_macroalgae(
 
 \item{other_N}{}
 
-\item{uptake_nitrate}{}
-
-\item{uptake_ammonium}{}
-
-\item{uptake_other}{}
-
 \item{site_params}{}
 
-\item{spec_params}{}
+\item{spec_params}{see details}
 
 \item{other_constants}{}
 
@@ -58,6 +52,9 @@ dataframe of outputs
 }
 \description{
 The main deal
+}
+\details{
+Example csv with all the spec_params required?
 }
 \examples{
 "see here" link?

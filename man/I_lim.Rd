@@ -13,9 +13,10 @@ I_lim(Nf, I, spec_params, site_params)
 
 \item{spec_params}{a vector of named numbers. Must include:
 \itemize{
-\item \eqn{a_{cs}}, the carbon-specific self-shading constant
-\item \eqn{I_o}, the light saturation parameter
-\item \eqn{h_a}, \eqn{h_b} and \eqn{h_c}, parameters governing height change with \eqn{N_f}
+\item \code{a_cs}, the carbon-specific self-shading constant
+\item \code{I_o}, the light saturation parameter
+\item \code{h_a}, \code{h_b} and \code{h_c}, parameters governing height change with \code{N_f}
+\item \code{h_max}, maximum species height
 }}
 
 \item{site_params}{A vector of named numbers. Must include:

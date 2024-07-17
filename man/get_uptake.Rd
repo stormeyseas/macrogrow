@@ -11,10 +11,18 @@ get_uptake(conc, uptake_shape, Nform_abbr, spec_params)
 
 \item{uptake_shape}{}
 
-\item{Nform_abbr}{}
+\item{Nform_abbr}{the abbreviation used in spec_params for the relevant nitrogen form. E.g. if Nform_abbr = "ni" the function will look for \code{M_ni} and \code{C_ni} or \code{V_ni} and \code{K_ni} in spec_params.}
 
-\item{spec_params}{}
+\item{spec_params}{a vector of named numbers. Must include:
+\itemize{
+\item \code{M} and \code{C} for linear uptake, OR
+\item \code{V} and \code{K} for Michaelis-Menton uptake
+\item \code{uptake_shape} of "linear" or "MM" (or "Michaelis-Menton"). Not required if only one set of the above parameters are provided.
+}}
 }
 \description{
 Get the correct uptake rate
+}
+\seealso{
+\code{\link[=lin_uptake(), MM_uptake]{lin_uptake(), MM_uptake()}}
 }

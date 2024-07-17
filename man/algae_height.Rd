@@ -11,7 +11,8 @@ algae_height(Nf, spec_params)
 
 \item{spec_params}{A vector of named numbers. Must include the parameters:
 \itemize{
-\item \eqn{h_a}, \eqn{h_b} and \eqn{h_c}, parameters governing height change with \eqn{N_f}
+\item \code{h_a}, \code{h_b} and \code{h_c}, parameters governing height change with \code{N_f}
+\item \code{h_max}, maximum species height
 }}
 }
 \value{

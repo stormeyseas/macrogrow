@@ -15,13 +15,28 @@ u_c(
 \arguments{
 \item{U0}{incoming incident water velocity (m/s)}
 
-\item{macro_state}{vector of named numbers in the form c(biomass, hm) defining macroalgae wet weight (g) and height (m)}
+\item{macro_state}{vector of named numbers. Must include:
+\itemize{
+\item \code{biomass}, macroalgae wet weight (g)
+\item \code{hm}, algae height (m)
+}}
 
-\item{SA_WW}{conversion of wet weight to surface area (default is 0.5\emph{0.5}0.0306 for \textit{Macrocystis pyrifera})}
+\item{SA_WW}{conversion of wet weight to surface area (default is 0.5$\times$0.5$\times$0.0306, based on \emph{Macrocystis pyrifera})}
 
-\item{site_params}{vector of named numbers in the form c(hz, hc, site_params\link{'d_top'}) defining total water depth (m), vertical water column occupied by the canopy (m), and depth of the top of the canopy beneath the water surface (m)}
+\item{site_params}{vector of named numbers. Must include:
+\itemize{
+\item \code{hz}, total water depth (m)
+\item \code{hc}, vertical water column occupied by the canopy (m)
+\item \code{d_top}, depth of the top of the canopy beneath the water surface (m)
+}}
 
-\item{constants}{vector of named numbers in the form c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025) defining extra constants for the attenuation submodel}
+\item{constants}{vector of named numbers defining extra constants for the attenuation submodel. Must include:
+\itemize{
+\item \code{s} = 0.0045
+\item \code{gam} = 1.13
+\item \code{a2} = 0.2^2
+\item \code{Cb} = 0.0025
+}}
 }
 \value{
 the relative water attenuation coefficient (u_c)
@@ -29,4 +44,7 @@ the relative water attenuation coefficient (u_c)
 \description{
 #' @description
 A short description...
+}
+\seealso{
+\code{\link[=algae_height(), u_b(), C_t]{algae_height(), u_b(), C_t()}}
 }

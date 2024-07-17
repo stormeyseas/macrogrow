@@ -10,7 +10,7 @@ solarMJ2ppfd(solarMJ)
 \item{solarMJ}{MJ per day}
 }
 \value{
-PPFD umol /m2 / s
+PPFD umol m-2 s-1
 }
 \description{
 Solar Radiation to PPFD

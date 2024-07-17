@@ -11,9 +11,9 @@ plot_T_range(T_range = seq(-10, 35, 0.25), spec_params)
 
 \item{spec_params}{a vector of named numbers. Must include:
 \itemize{
-\item \eqn{T_{opt}} the optimum temperature for macroalgae growth
-\item \eqn{T_{min}} the minimum temperature for macroalgae growth (when \eqn{T_c < T_{min}}, growth = 0)
-\item \eqn{T_{max}} the maximum temperature for macroalgae growth (when \eqn{T_c > T_{max}}, growth = 0)
+\item \code{T_opt} the optimum temperature for macroalgae growth
+\item \code{T_min} the minimum temperature for macroalgae growth (when \code{T_c} < \code{T_min}, growth = 0)
+\item \code{T_max} the maximum temperature for macroalgae growth (when \code{T_c} > \code{T_max}, growth = 0)
 }}
 }
 \value{

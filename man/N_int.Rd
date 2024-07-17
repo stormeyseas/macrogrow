@@ -12,10 +12,10 @@ Only one is needed; if both are supplied only \eqn{Q_{rel}} is used.}
 
 \item{spec_params}{a vector of named numbers. Must include:
 \itemize{
-\item \eqn{N_{min}}, the minimum internal nitrogen concentration
-\item \eqn{N_{max}}, the maximum internal nitrogen concentration
-\item \eqn{Q_{min}}, the minimum nutrient quotient (if \eqn{Q_{rel}} is not supplied)
-\item \eqn{Q_{max}}, the maximum nutrient quotient (if \eqn{Q_{rel}} is not supplied)
+\item \code{N_min}, the minimum internal nitrogen concentration
+\item \code{N_max}, the maximum internal nitrogen concentration
+\item \code{Q_min}, the minimum nutrient quotient (if \code{Q_rel} is not supplied)
+\item \code{Q_max}, the maximum nutrient quotient (if \code{Q_rel} is not supplied)
 }}
 }
 \value{
@@ -23,4 +23,7 @@ the internal nitrogen concentration (percentage, as decimal)
 }
 \description{
 Internal nitrogen concentration
+}
+\seealso{
+\code{\link[=Q_int(), N_rel(), Q_rel]{Q_int(), N_rel(), Q_rel()}}
 }

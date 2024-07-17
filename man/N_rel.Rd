@@ -11,8 +11,8 @@ N_rel(N_int, spec_params)
 
 \item{spec_params}{a vector of named numbers. Must include:
 \itemize{
-\item \eqn{N_{min}}, the minimum internal nitrogen concentration
-\item \eqn{N_{max}}, the maximum internal nitrogen concentration
+\item \code{N_min}, the minimum internal nitrogen concentration
+\item \code{N_max}, the maximum internal nitrogen concentration
 }}
 }
 \value{
@@ -20,4 +20,7 @@ relative internal nitrogen quotient
 }
 \description{
 Relative internal nitrogen quotient
+}
+\seealso{
+\code{\link[=N_int(), Q_rel(), Q_int]{N_int(), Q_rel(), Q_int()}}
 }

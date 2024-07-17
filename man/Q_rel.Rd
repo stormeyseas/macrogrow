@@ -11,8 +11,8 @@ Q_rel(Q_int, spec_params)
 
 \item{spec_params}{A vector of named numbers. Must include:
 \itemize{
-\item Q_min, the minimum internal nutrient quotient
-\item Q_max, the maximum internal nutrient quotient
+\item \code{Q_min}, the minimum internal nutrient quotient
+\item \code{Q_max}, the maximum internal nutrient quotient
 }}
 }
 \value{

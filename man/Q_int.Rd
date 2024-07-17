@@ -13,7 +13,7 @@ Q_int(Nf, Ns, spec_params)
 
 \item{spec_params}{A vector of named numbers. Must include:
 \itemize{
-\item \eqn{Q_{min}}, the minimum internal nutrient quotient
+\item \code{Q_min}, the minimum internal nutrient quotient
 }}
 }
 \value{
@@ -27,4 +27,7 @@ Q &=& Q_{min} \left(1 + \frac{N_s}{N_f}\right)
 }
 \examples{
 examples
+}
+\seealso{
+\code{\link[=N_int(), N_rel(), Q_rel]{N_int(), N_rel(), Q_rel()}}
 }

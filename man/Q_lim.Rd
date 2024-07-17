@@ -11,9 +11,11 @@ Q_lim(Nf, Ns, spec_params)
 
 \item{Ns}{Stored nitrogen (mg m\eqn{^{-3}})}
 
-\item{spec_params}{A vector of named numbers. Must include:
+\item{spec_params}{a vector of named numbers. Must include:
 \itemize{
-\item \eqn{Q_{min}}, the minimum internal nutrient quotient
+\item \code{Q_min}, the minimum nutrient quotient
+\item \code{Q_max}, the maximum nutrient quotient
+\item \code{K_c}, the half-saturation growth constant
 }}
 }
 \value{
@@ -28,5 +30,7 @@ Q_{lim} &=& \frac{Q_{int} - Q_{min}}{Q_{int} - K_c}
 }
 \examples{
 examples
-
+}
+\seealso{
+\code{\link[=N_int(), N_rel(), Q_int(), Q_rel]{N_int(), N_rel(), Q_int(), Q_rel()}}
 }
