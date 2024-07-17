@@ -30,22 +30,7 @@
 #' Example csv with all the spec_params required? 
 #'
 #' @examples "see here" link?
-grow_macroalgae <- function(start,
-                            grow_days,
-                            temperature,
-                            light,
-                            velocity,
-                            nitrate,
-                            ammonium,
-                            other_N,
-                            ni_uptake,
-                            am_uptake,
-                            ot_uptake,
-                            # model does not yet have proper parameters for uptake rate of other_N
-                            site_params,
-                            spec_params,
-                            other_constants = c(rL = 0.2, Rd = 0.1),
-                            initials) {
+grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitrate, ammonium, other_N, ni_uptake, am_uptake, ot_uptake, site_params, spec_params, other_constants = c(rL = 0.2, Rd = 0.1), initials) {
   
   # Parse start date
   if (lubridate::is.Date(start)) {
@@ -104,21 +89,14 @@ grow_macroalgae <- function(start,
   Ni_add <- nitrate
   Am_add <- ammonium
   U <- velocity
-  u_c <- I_top <- Ni_conc <- Am_conc <- det <- Nf <- Ns <- N_int <- N_rel <- B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- other_conc <- 
-    Q_int <- Q_rel <- T_lim <- Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- red_Am <- remin <- other_add <- up_Am <- up_Ni <- 
+  u_c <- I_top <- Ni_conc <- Am_conc <- det <- Nf <- Ns <- N_int <- N_rel <- B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- other_conc <- Q_int <- Q_rel <- T_lim <- Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- red_Am <- remin <- other_add <- up_Am <- up_Ni <- 
     numeric(length = length(t))
 
   # For adding other_N (e.g. urea, amino acids)
-  if (!missing(other_N) | length(other_N) == 0) {
-    other_add[1] <- 0
+  if (!missing(other_N) | length(other_N) == 0) {other_add[1] <- 0
   } else if (length(other_N) != length(t)) {
-    rlang::abort(message = glue::glue(
-      "Error: other_N vector has length {obs} but timespan vector has length {exp}",
-      obs = length(other_N),
-      exp = length(t)))
-  } else {
-    other_add[1] <- other_N[1]
-  }
+    rlang::abort(message = glue::glue("Error: other_N vector has length {obs} but timespan vector has length {exp}", obs = length(other_N), exp = length(t)))
+  } else {other_add[1] <- other_N[1]}
   
   # External starting state
   Am_conc[1]      <- Am_add[1]
@@ -141,14 +119,16 @@ grow_macroalgae <- function(start,
     
     # Environmental state (incoming)
     u_c[i]      <- suppressWarnings(
-                      u_c(U0 = U[i],
-                          macro_state = c(biomass = B_ww.mg[i]/1000, hm[i]),
-                          SA_WW = 0.5 * (0.0306 / 2),
-                          site_params,
-                          constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
-                      ))
-    lambda[i]   <- (u_c[i] * U[i]*60*60*24)/farmV 
-    lambda_0[i] <- (U[i]*60*60*24)/farmV 
+      u_c(U0 = U[i],
+          macro_state = c(biomass = B_ww.mg[i]/1000, hm[i]),
+          SA_WW = 0.5 * (0.0306 / 2),
+          site_params,
+          constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)))
+    
+    U_0 <- set_units(U[i], "m s-1")
+    U_0 <- set_units(U_0, "m d-1")
+    lambda[i]   <- (u_c[i] * U_0)/farmV 
+    lambda_0[i] <- U_0/farmV 
   
     # Temperature limitation on growth
     T_lim[i]    <- T_lim(Tc[i], spec_params)

@@ -7,7 +7,7 @@
 #' @param macro_state vector of named numbers. Must include:
 #'  * `biomass`, macroalgae wet weight (g)
 #'  * `hm`, algae height (m)
-#' @param SA_WW conversion of wet weight to surface area (default is 0.5$\times$0.5$\times$0.0306, based on *Macrocystis pyrifera*)
+#' @param SA_WW conversion of wet weight to surface area (default is 0.5\eqn{\times}0.5\eqn{\times}0.0306, based on *Macrocystis pyrifera*)
 #' @param site_params vector of named numbers. Must include:
 #'  * `hz`, total water depth (m)
 #'  * `hc`, vertical water column occupied by the canopy (m)
@@ -22,11 +22,7 @@
 #' @export
 #' @seealso [algae_height(), u_b(), C_t()]
 #' 
-u_c <- function(U0, 
-                macro_state = c(biomass, hm), 
-                SA_WW = 0.5 * (0.0306/2), 
-                site_params, 
-                constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)){
+u_c <- function(U0, macro_state = c(biomass, hm), SA_WW = 0.5 * (0.0306/2), site_params, constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)){
   
   D <- SA_WW * min(macro_state['hm']/site_params['hc'], 1) * macro_state['biomass']
   Kd <- 0.5 * site_params['hz'] * D * constants['s'] * U0^(constants['gam'] - 2)
