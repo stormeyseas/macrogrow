@@ -2,7 +2,8 @@
 #'
 #' @param Nf 
 #' @param spec_params A vector of named numbers. Must include the parameters:
-#' * \eqn{h_a}, \eqn{h_b} and \eqn{h_c}, parameters governing height change with \eqn{N_f}
+#' * `h_a`, `h_b` and `h_c`, parameters governing height change with `N_f`
+#' * `h_max`, maximum species height
 #'
 #' @return a scalar of macroalgae height (m)
 #' @export
@@ -21,5 +22,9 @@ algae_height <- function(Nf, spec_params) {
   } else {h_c <- spec_params['h_c']}
   
   hm <- (Nf/spec_params['h_a'])^h_b + h_c
+  
+  if (!is.na(spec_params['h_max'])) {
+    hm <- pmin(hm, spec_params['h_max'])
+  }
   return(unname(hm))
 }
