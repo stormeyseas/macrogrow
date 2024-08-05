@@ -21,7 +21,7 @@
 #' @import magrittr
 #' @import dplyr
 #' @import rlang
-#' @importFrom units set_units
+#' @importFrom units set_units drop_units
 #' 
 #' @return dataframe of outputs
 #' @export 
@@ -145,7 +145,8 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
     other_conc[i]   <- other_add[i] * lambda_0[i]/lambda[i]
     
     # Biomass loss
-    D_m             <- loss(U0 = U0, turbulence = NA, spec_params = spec_params)
+    U_0             <- drop_units(set_units(U_0, "m s-1"))
+    D_m             <- loss(U0 = , turbulence = NA, spec_params = spec_params)
     
     # Nitrogen pool changes
     growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * Q_lim[i])
