@@ -36,15 +36,6 @@ I_lim <- function(Nf, I, spec_params, site_params) {
   if (is.na(site_params['d_top'])) {abort_missing_parameter(param = "d_top", place = "site_params")}
   if (is.na(spec_params['a_cs'])) {abort_missing_parameter(param = "a_cs", place = "spec_params")}
   if (is.na(spec_params['I_o'])) {abort_missing_parameter(param = "I_o", place = "spec_params")}
-  if (is.na(spec_params['h_a'])) {abort_missing_parameter(param = "h_a", place = "spec_params")}
-  if (is.na(spec_params['h_b'])) {
-    h_b <- 1
-    # rlang::inform(message = "h_b not supplied, defaulting to 1")
-  }
-  if (is.na(spec_params['h_c'])) {
-    h_c <- 0
-    # rlang::inform(message = "h_c not supplied, defaulting to 0")
-  }
   
   I_top <- I * exp(-(site_params['kW']*site_params['d_top']))
   
