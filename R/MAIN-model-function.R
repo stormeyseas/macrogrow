@@ -146,7 +146,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
     
     # Biomass loss
     U_0             <- drop_units(set_units(U_0, "m s-1"))
-    D_m             <- loss(U0 = , turbulence = NA, spec_params = spec_params)
+    D_m             <- loss(U0 = U_0, turbulence = NA, spec_params = spec_params)
     
     # Nitrogen pool changes
     growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * Q_lim[i])
