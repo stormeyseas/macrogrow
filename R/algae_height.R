@@ -59,6 +59,7 @@ algae_height <- function(Nf, spec_params) {
     } else {h_c <- spec_params['h_c']}
     
     hm <- (Nf/h_a)^h_b + h_c
+
   }
   
   return(unname(hm))
