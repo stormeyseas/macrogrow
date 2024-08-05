@@ -41,7 +41,7 @@ I_lim <- function(Nf, I, spec_params, site_params) {
   I_top <- I * exp(-(site_params['kW']*site_params['d_top']))
   
   h_m <- algae_height(Nf, spec_params)
-  k_ma <-  drop_units(Nf * h_m * spec_params['a_cs'] * pmax(h_m/site_params['d_top'], 1) * 1/(pmin(h_m, site_params['d_top'])))
+  k_ma <-  Nf * h_m * spec_params['a_cs'] * pmax(h_m/site_params['d_top'], 1) * 1/(pmin(h_m, site_params['d_top']))
   K <- k_ma + site_params['kW']
   
   Ilim <- exp(1)/(K*h_m) *
