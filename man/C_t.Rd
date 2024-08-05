@@ -20,7 +20,7 @@ C_t(
 \item \code{hm}, algae height (m)
 }}
 
-\item{SA_WW}{conversion of wet weight to surface area (default is 0.5$\times$0.5$\times$0.0306, based on \emph{Macrocystis pyrifera})}
+\item{SA_WW}{conversion of wet weight to surface area (default is 0.5\eqn{\times}0.5\eqn{\times}0.0306, based on \emph{Macrocystis pyrifera})}
 
 \item{site_params}{vector of named numbers. Must include:
 \itemize{
