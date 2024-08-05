@@ -21,9 +21,9 @@ a scalar of relative temperature limitation on growth (between 0 and 1)
 }
 \description{
 Given species parameters, returns the relative limitation on growth rate according to a CTMI curve:
-\begin{equation}
-T_{lim}=\frac{(T_c-T_{max})(T_c-T_{min})^2}{(T_{opt}-T_{min})\link{(T_{opt}-T_{min})(T_c-T_{opt})-(T_{opt}-T_{max})(T_{opt}+T_{min}-2T_c)}}
-\end{equation}
+\deqn{\begin{array}[ccc] 
+     T_{lim} &=& \frac{(T_c-T_{max})(T_c-T_{min})^2}{(T_{opt}-T_{min})[(T_{opt}-T_{min})(T_c-T_{opt})-(T_{opt}-T_{max})(T_{opt}+T_{min}-2T_c)]}
+\end{array}}
 }
 \examples{
 my_seaweed <- c(T_opt = 20, T_min = 5, T_max = 30)

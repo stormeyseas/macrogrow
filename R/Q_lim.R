@@ -2,7 +2,7 @@
 #'
 #' @description Calculates the internal nutrient quotient \eqn{Q_{int}} and its relative effect on growth rate \eqn{Q_{lim}} via:
 #' \deqn{\begin{array}[ccc] 
-#' Q_{int} &=& Q_{min} \left(1 + \frac{N_s}{N_f}\right)
+#' Q_{int} &=& Q_{min} \left(1 + \frac{N_s}{N_f}\right) \\
 #' Q_{lim} &=& \frac{Q_{int} - Q_{min}}{Q_{int} - K_c}
 #' \end{array}}
 #' 
