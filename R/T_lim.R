@@ -1,9 +1,9 @@
 #' Temperature limitation on growth
 #' 
 #' Given species parameters, returns the relative limitation on growth rate according to a CTMI curve:
-#' \deqn{\begin{array}[ccc] 
+#' \begin{equation} 
 #' T_{lim}=\frac{(T_c-T_{max})(T_c-T_{min})^2}{(T_{opt}-T_{min})[(T_{opt}-T_{min})(T_c-T_{opt})-(T_{opt}-T_{max})(T_{opt}+T_{min}-2T_c)]}
-#' \end{array}}
+#' \end{equation}
 #' 
 #' @param Tc temperature to evaluate
 #' @param spec_params a vector of named numbers. Must include:
