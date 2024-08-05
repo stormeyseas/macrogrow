@@ -142,7 +142,7 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
     
     Am_conc[i]      <- Am_add[i] * lambda_0[i]/lambda[i]
     Ni_conc[i]      <- Ni_add[i] * lambda_0[i]/lambda[i]
-    other_conc[i]    <- other_add[i] * lambda_0[i]/lambda[i]
+    other_conc[i]   <- other_add[i] * lambda_0[i]/lambda[i]
     
     # Nitrogen pool changes
     growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * Q_lim[i])
