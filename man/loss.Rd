@@ -4,7 +4,7 @@
 \alias{loss}
 \title{Loss through fragmentation}
 \usage{
-loss(U0 = 0, turbulence = NA, spec_params)
+loss(U0 = 0, turbulence = 0, spec_params)
 }
 \arguments{
 \item{U0}{incoming incident water velocity (m/s)}
@@ -15,10 +15,10 @@ loss(U0 = 0, turbulence = NA, spec_params)
 \itemize{
 \item \code{D_m}, a constant (base) loss rate
 \item \code{D_ve}, the linear coefficient of loss with laminar velocity
-\item \code{D_st}, the loss rate in static water (turbulence = "none" or "static")
-\item \code{D_lo}, the loss rate in turbulent water (turbulence = "low")
-\item \code{D_mi}, the loss rate in turbulent water (turbulence = "medium")
-\item \code{D_hi}, the loss rate in turbulent water (turbulence = "high")
+\item \code{D_st}, the loss rate in static water (turbulence = 0, "none" or "static")
+\item \code{D_lo}, the loss rate in turbulent water (turbulence = 1 or "low")
+\item \code{D_mi}, the loss rate in turbulent water (turbulence = 2 or "medium")
+\item \code{D_hi}, the loss rate in turbulent water (turbulence = 3 or "high")
 }}
 }
 \value{
