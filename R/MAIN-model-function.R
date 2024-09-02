@@ -11,9 +11,8 @@
 #' @param nitrate 
 #' @param ammonium 
 #' @param other_N 
-#' @param site_params 
+#' @param site_params see details
 #' @param spec_params see details
-#' @param other_constants 
 #' @param initials 
 #'
 #' @importFrom lubridate is.Date ymd duration yday
@@ -27,10 +26,23 @@
 #' @export 
 #' 
 #' @details
-#' Example csv with all the spec_params required? 
+#' Example csv with all the spec_params & site_params required? 
 #'
 #' @examples "see here" link?
-grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitrate, ammonium, other_N, ni_uptake, am_uptake, ot_uptake, site_params, spec_params, other_constants = c(rL = 0.2, Rd = 0.1), initials) {
+grow_macroalgae <- function(start, 
+                            grow_days, 
+                            temperature, 
+                            light, 
+                            velocity, 
+                            nitrate, 
+                            ammonium, 
+                            other_N, 
+                            ni_uptake, 
+                            am_uptake, 
+                            ot_uptake, 
+                            site_params, 
+                            spec_params, 
+                            initials) {
   
   # Parse start date
   if (lubridate::is.Date(start)) {
@@ -153,8 +165,8 @@ grow_macroalgae <- function(start, grow_days, temperature, light, velocity, nitr
     Ns_to_Nf[i]     <- pmin(growth_rate[i] * Ns[i], Ns[i]) # cannot convert more Ns than available
     Ns_loss[i]      <- unname(D_m * Ns[i])
     Nf_loss[i]      <- unname(D_m * Nf[i])
-    red_Am[i]       <- unname(other_constants['Rd'] * Am_conc[i]) # Reduction of ammonium (to nitrate)
-    remin[i]        <- unname(other_constants['rL'] * det[i]) # Remineralisation of detritus (to ammonium)
+    red_Am[i]       <- unname(site_params['Rd'] * Am_conc[i]) # Reduction of ammonium (to nitrate)
+    remin[i]        <- unname(site_params['rL'] * det[i]) # Remineralisation of detritus (to ammonium)
     
     up_Am[i]        <- Q_rel(Q_int(Nf[i], Ns[i], spec_params), spec_params) * (B_dw.mg[i]/1000) * 
                         get_uptake(conc = Am_conc[i], 
