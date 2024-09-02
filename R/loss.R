@@ -14,7 +14,7 @@
 #' @param spec_params a vector of named numbers. All default to 0 if not supplied. Can include:
 #'  * `D_m`, a constant (base) loss rate
 #'  * `D_ve`, the linear coefficient of loss with laminar velocity
-#'  * `D_st`, the loss rate in static water (turbulence = "none")
+#'  * `D_st`, the loss rate in static water (turbulence = "none" or "static")
 #'  * `D_lo`, the loss rate in turbulent water (turbulence = "low")
 #'  * `D_mi`, the loss rate in turbulent water (turbulence = "medium")
 #'  * `D_hi`, the loss rate in turbulent water (turbulence = "high")
