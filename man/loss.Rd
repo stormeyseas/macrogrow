@@ -15,7 +15,7 @@ loss(U0 = 0, turbulence = NA, spec_params)
 \itemize{
 \item \code{D_m}, a constant (base) loss rate
 \item \code{D_ve}, the linear coefficient of loss with laminar velocity
-\item \code{D_st}, the loss rate in static water (turbulence = "none")
+\item \code{D_st}, the loss rate in static water (turbulence = "none" or "static")
 \item \code{D_lo}, the loss rate in turbulent water (turbulence = "low")
 \item \code{D_mi}, the loss rate in turbulent water (turbulence = "medium")
 \item \code{D_hi}, the loss rate in turbulent water (turbulence = "high")

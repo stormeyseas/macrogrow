@@ -18,7 +18,6 @@ grow_macroalgae(
   ot_uptake,
   site_params,
   spec_params,
-  other_constants = c(rL = 0.2, Rd = 0.1),
   initials
 )
 }
@@ -39,11 +38,9 @@ grow_macroalgae(
 
 \item{other_N}{}
 
-\item{site_params}{}
+\item{site_params}{see details}
 
 \item{spec_params}{see details}
-
-\item{other_constants}{}
 
 \item{initials}{}
 }
@@ -54,7 +51,7 @@ dataframe of outputs
 The main deal
 }
 \details{
-Example csv with all the spec_params required?
+Example csv with all the spec_params & site_params required?
 }
 \examples{
 "see here" link?
