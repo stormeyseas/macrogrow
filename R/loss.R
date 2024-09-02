@@ -14,17 +14,17 @@
 #' @param spec_params a vector of named numbers. All default to 0 if not supplied. Can include:
 #'  * `D_m`, a constant (base) loss rate
 #'  * `D_ve`, the linear coefficient of loss with laminar velocity
-#'  * `D_st`, the loss rate in static water (turbulence = "none" or "static")
-#'  * `D_lo`, the loss rate in turbulent water (turbulence = "low")
-#'  * `D_mi`, the loss rate in turbulent water (turbulence = "medium")
-#'  * `D_hi`, the loss rate in turbulent water (turbulence = "high")
+#'  * `D_st`, the loss rate in static water (turbulence = 0, "none" or "static")
+#'  * `D_lo`, the loss rate in turbulent water (turbulence = 1 or "low")
+#'  * `D_mi`, the loss rate in turbulent water (turbulence = 2 or "medium")
+#'  * `D_hi`, the loss rate in turbulent water (turbulence = 3 or "high")
 #'
 #' @return a scalar for macroalgae loss (% d-1)
 #' @export
 #'
 #' @examples examples
 #' 
-loss <- function(U0 = 0, turbulence = NA, spec_params) {
+loss <- function(U0 = 0, turbulence = 0, spec_params) {
   
   if (!is.na(spec_params['D_m'])) {
     D_base <- spec_params['D_m']
@@ -40,13 +40,13 @@ loss <- function(U0 = 0, turbulence = NA, spec_params) {
   }
     
   if (!is.na(turbulence)) {
-    if (turbulence == "none" | turbulence == "static" & !is.na(spec_params['D_st'])) {
+    if (turbulence == 0 | turbulence == "none" | turbulence == "static" & !is.na(spec_params['D_st'])) {
       D_turbulence <- spec_params['D_st']
-    } else if (turbulence == "low" & !is.na(spec_params['D_lo'])) {
+    } else if (turbulence == 1 | turbulence == "low" & !is.na(spec_params['D_lo'])) {
       D_turbulence <- spec_params['D_low']
-    } else if (turbulence == "medium" | turbulence == "mid" & !is.na(spec_params['D_mi'])) {
+    } else if (turbulence == 2 | turbulence == "medium" | turbulence == "mid" & !is.na(spec_params['D_mi'])) {
       D_turbulence <- spec_params['D_mi']
-    } else if (turbulence == "high" & !is.na(spec_params['D_hi'])) {
+    } else if (turbulence == 3 | turbulence == "high" & !is.na(spec_params['D_hi'])) {
       D_turbulence <- spec_params['D_hi']
     } else {
       rlang::abort(glue::glue("Turbulence is `{turbulence}` but corresponding loss parameter not provided"), class = "error_bad_parameter")
