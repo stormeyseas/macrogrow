@@ -48,7 +48,7 @@ grow_macroalgae(
 dataframe of outputs
 }
 \description{
-The main deal
+The main dealio
 }
 \details{
 Example csv with all the spec_params & site_params required?

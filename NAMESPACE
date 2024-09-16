@@ -2,6 +2,7 @@
 
 export(C_t)
 export(I_lim)
+export(Kd_from_Secchi)
 export(MM_uptake)
 export(N_int)
 export(N_rel)

@@ -1,7 +1,7 @@
 #' Grow macroalgae
 #' 
 #' @description
-#' The main deal 
+#' The main dealio
 #'
 #' @param start 
 #' @param grow_days 
