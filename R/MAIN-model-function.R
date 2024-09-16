@@ -27,6 +27,7 @@
 #' 
 #' @details
 #' Example csv with all the spec_params & site_params required? 
+#' - Note that the final growth dataframe is inclusive of the start and end date, so the environmental vectors must be the same
 #'
 #' @examples "see here" link?
 grow_macroalgae <- function(start, 
