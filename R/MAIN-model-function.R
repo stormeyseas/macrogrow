@@ -1,23 +1,28 @@
 #' Grow macroalgae
 #' 
 #' @description
-#' The main dealio
+#' Initiate and grow macroalgae.
 #'
-#' @param start 
-#' @param grow_days 
-#' @param temperature 
-#' @param light 
-#' @param velocity 
-#' @param nitrate 
-#' @param ammonium 
-#' @param other_N 
-#' @param site_params see details
-#' @param spec_params see details
-#' @param initials 
+#' @param start date, start of the growth period, date of at-sea deployment
+#' @param grow_days integer, number of 
+#' @param temperature vector
+#' @param light vector
+#' @param velocity vector
+#' @param nitrate vector
+#' @param ammonium vector
+#' @param other_N vector 
+#' @param site_params a named vector of species-specific parameters - see details
+#' @param spec_params a named vector of site-specific parameters - see details
+#' @param initials a named vector of the macroalgae starting conditions
+#' @param other_constants a named vector of miscellaneous constants, including:
+#' * s = 0.0045, the experimentally-derived shape factor for macroalgae movement in water
+#' * gam = 1.13, the modified drag coefficient for macroalgae
+#' * a2 = 0.2^2, 
+#' * Cb = 0.0025, the bottom friction coefficient
 #'
 #' @importFrom lubridate is.Date ymd duration yday
 #' @importFrom glue glue
-#' @import magrittr
+#' @importFrom magrittr %>%
 #' @import dplyr
 #' @import rlang
 #' @importFrom units set_units drop_units
