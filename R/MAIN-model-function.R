@@ -133,6 +133,41 @@ grow_macroalgae <- function(start,
   # Main run, after starting state
   for (i in 1:length(t)) {
     
+  # Possibility of macroalgae dying
+    if (Nf <= 0) {
+      Nf[i] <- 0
+      Ns[i] <- 0
+      B_dw.mg[i] <- 0
+      B_ww.mg[i] <- 0
+      hm[i] <- 0
+      up_Am[i] <- 0
+      up_Ni[i] <- 0
+      up_Ot[i] <- 0
+      
+      Ns_to_Nf[i] <- 0
+      Ns_loss[i] <- 0
+      Nf_loss[i] <- 0
+      N_int[i] <- NA
+      N_rel[i] <- NA
+      Q_int[i] <- NA
+      Q_rel[i] <- NA
+      Q_lim[i] <- NA
+      growth_rate[i] <- NA
+
+      Ni_conc[i] <- Ni_add[i]
+      Am_conc[i] <- Am_add[i]
+      other_N[i] <- other_add[i]
+      T_lim[i] <- NA
+      I_top[i] <- NA
+      I_lim[i] <- NA
+      u_c[i] <- NA
+      lambda[i] <- NA
+      lambda_0[i] <- NA
+
+      red_Am[i] <- unname(site_params['Rd'] * Am_conc[i])
+      remin[i] <- unname(site_params['rL'] * det[i])
+      
+    } else {
       Q_int[i]       <- Q_int(Nf[i], Ns[i], spec_params)
       Q_rel[i]       <- Q_rel(Q_int[i], spec_params)
       N_int[i]       <- N_int(Q_rel = Q_rel[i], Q_int = NA, spec_params)
@@ -191,6 +226,7 @@ grow_macroalgae <- function(start,
                                      Nform_abbr = "ni", 
                                      spec_params = spec_params)
       up_Ni[i]       <- pmin(up_Ni[i], Ni_conc[i])
+    }
     
     if (i < length(t)) {
       # Changes in external state
@@ -244,5 +280,6 @@ grow_macroalgae <- function(start,
       remin = remin
     )
     return(df)
-  }
+}
+
 
