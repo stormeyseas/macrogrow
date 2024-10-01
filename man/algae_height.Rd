@@ -11,7 +11,7 @@ algae_height(Nf, spec_params)
 
 \item{spec_params}{A vector of named numbers. Must include the parameters:
 \itemize{
-\item \code{h_max}, maximum species height. If only \code{h_max} is supplied then algae height = \code{h_max}
+\item \code{h_max}, maximum species height. If only \code{h_max} is supplied then algae height == \code{h_max}
 \item \code{h_a}, \code{h_b} and \code{h_c}, parameters governing height change with \code{N_f}
 }}
 }
@@ -22,7 +22,10 @@ a scalar of macroalgae height (m)
 Macroalgae height
 }
 \details{
-\code{h_a}, \code{h_b} and \code{h_c} default to 1000, 1 and 0 if not supplied. Algae height therefore defaults to \code{Nf/1000} if no parameters are supplied.
+\code{h_a}, \code{h_b} and \code{h_c} default to 1000, 1 and 0 respectively if not supplied. Algae height therefore defaults to \code{Nf/1000} if no parameters are supplied.
+\deqn{
+   \left(\frac{N_f}{h_a}\right)^h_b + h_c
+}
 }
 \examples{
 examples

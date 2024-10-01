@@ -2,12 +2,14 @@
 #'
 #' @param Nf 
 #' @param spec_params A vector of named numbers. Must include the parameters:
-#' * `h_max`, maximum species height. If only `h_max` is supplied then algae height = `h_max`
+#' * `h_max`, maximum species height. If only `h_max` is supplied then algae height == `h_max`
 #' * `h_a`, `h_b` and `h_c`, parameters governing height change with `N_f`
 #'
 #' @details
-#' `h_a`, `h_b` and `h_c` default to 1000, 1 and 0 if not supplied. Algae height therefore defaults to `Nf/1000` if no parameters are supplied.
-#' 
+#' `h_a`, `h_b` and `h_c` default to 1000, 1 and 0 respectively if not supplied. Algae height therefore defaults to `Nf/1000` if no parameters are supplied.
+#' \deqn{
+#'    \left(\frac{N_f}{h_a}\right)^h_b + h_c
+#' }
 #'
 #' @return a scalar of macroalgae height (m)
 #' @export
@@ -15,13 +17,13 @@
 #' @examples examples
 algae_height <- function(Nf, spec_params) {
   # Check which parameters are supplied
-  
+
+  # Maximum height supplied
   if (!is.na(spec_params['h_max'])) {
+    
+    # No other parameters supplied
     if (is.na(spec_params['h_a']) & is.na(spec_params['h_b']) & is.na(spec_params['h_c'])) {
-      
-      # h_max is present and all other variables are missing
       hm <- spec_params['h_max']
-      
     } else {
       
       # h_max is present and at least one other variable is present

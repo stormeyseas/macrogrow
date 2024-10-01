@@ -18,37 +18,46 @@ grow_macroalgae(
   ot_uptake,
   site_params,
   spec_params,
-  initials
+  initials,
+  other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
 )
 }
 \arguments{
-\item{start}{}
+\item{start}{date, start of the growth period, date of at-sea deployment}
 
-\item{grow_days}{}
+\item{grow_days}{integer, number of}
 
-\item{temperature}{}
+\item{temperature}{vector}
 
-\item{light}{}
+\item{light}{vector}
 
-\item{velocity}{}
+\item{velocity}{vector}
 
-\item{nitrate}{}
+\item{nitrate}{vector}
 
-\item{ammonium}{}
+\item{ammonium}{vector}
 
-\item{other_N}{}
+\item{other_N}{vector}
 
-\item{site_params}{see details}
+\item{site_params}{a named vector of species-specific parameters - see details}
 
-\item{spec_params}{see details}
+\item{spec_params}{a named vector of site-specific parameters - see details}
 
-\item{initials}{}
+\item{initials}{a named vector of the macroalgae starting conditions}
+
+\item{other_constants}{a named vector of miscellaneous constants, including:
+\itemize{
+\item s = 0.0045, the experimentally-derived shape factor for macroalgae movement in water
+\item gam = 1.13, the modified drag coefficient for macroalgae
+\item a2 = 0.2^2,
+\item Cb = 0.0025, the bottom friction coefficient
+}}
 }
 \value{
 dataframe of outputs
 }
 \description{
-The main dealio
+Initiate and grow macroalgae.
 }
 \details{
 Example csv with all the spec_params & site_params required?
