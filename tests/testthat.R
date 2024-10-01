@@ -9,4 +9,4 @@
 library(testthat)
 library(macrogrow)
 
-test_check("macrogrow")
+test_package("macrogrow", test_dir(path = "tests/testthat/"))
