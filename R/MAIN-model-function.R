@@ -48,7 +48,8 @@ grow_macroalgae <- function(start,
                             ot_uptake, 
                             site_params, 
                             spec_params, 
-                            initials) {
+                            initials,
+                            other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)) {
   
   # Parse start date
   if (lubridate::is.Date(start)) {
@@ -136,12 +137,6 @@ grow_macroalgae <- function(start,
     hm[i]       <- algae_height(Nf[i], spec_params)
     
     # Environmental state (incoming)
-    u_c[i]      <- suppressWarnings(
-      u_c(U0 = U[i],
-          macro_state = c(biomass = B_ww.mg[i]/1000, hm[i]),
-          SA_WW = 0.5 * (0.0306 / 2),
-          site_params,
-          constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)))
     
     U_0 <- set_units(U[i], "m s-1")
     U_0 <- set_units(U_0, "m d-1")
@@ -180,6 +175,11 @@ grow_macroalgae <- function(start,
                                    Nform_abbr = "am", 
                                    spec_params = spec_params)
     up_Am[i]        <- pmin(up_Am[i], Am_conc[i])
+      u_c[i]         <- suppressWarnings(u_c(U0 = U[i],
+                                             macro_state = c(biomass = B_ww.mg[i]/1000, hm[i]),
+                                             SA_WW = spec_params['SA_WW'],
+                                             site_params = site_params,
+                                             constants = other_constants))
     
     up_Ni[i]        <- Q_rel(Q_int(Nf[i], Ns[i], spec_params), spec_params) * (B_dw.mg[i]/1000) * 
                         get_uptake(conc = Ni_conc[i], 
