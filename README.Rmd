@@ -20,7 +20,7 @@ library(knitr)
 
 # Introduction
 
-This package intends to formalise and disseminate the macroalgae growth model originally developed by [Hadley et. al. (2015)](http://doi.org/10.1007/s10811-014-0370-y/) and modified in subsequent works.
+This package intends to formalise and disseminate the macroalgae growth model originally developed by @hadley_modeling_2015 and modified in subsequent works.
 
 # Usage
 
