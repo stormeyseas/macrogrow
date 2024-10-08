@@ -20,12 +20,12 @@ loss(U, turbulence = 0, spec_params)
 }}
 }
 \value{
-a scalar for macroalgae loss (\% d-1)
+a scalar for macroalgae loss (d-1)
 }
 \description{
-The macroalgae fragmentation rate ($D$) is calculated as:
+The macroalgae fragmentation rate (\eqn{D}) is calculated as:
 \deqn{D = D_{ve} \times U_0 + D_{tu} + D_{m}}
-where \eqn{D_{ve}} is the linear coefficient of loss with laminar velocity (\equ{U_0}),
+where \eqn{D_{ve}} is the linear coefficient of loss with laminar velocity (\eqn{U_0}),
 \eqn{D_{tu}} is the loss rate at the specified level of turbulence (static, low, medium, or high), and
 \eqn{D_{m}} is the base loss rate.
 }
