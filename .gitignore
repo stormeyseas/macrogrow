@@ -40,7 +40,7 @@ vignettes/*.pdf
 .Renviron
 
 # pkgdown site
-docs/
+# docs/
 
 # translation temp files
 po/*~
@@ -52,5 +52,3 @@ rsconnect/
 # From example R project
 inst/doc
 .DS_Store
-
-docs
