@@ -2,16 +2,13 @@
 #' 
 #' @description
 #' Calculates the relative limitation on growth rate due to light availability, via:
-#' \deqn{\begin{array}[ccc] 
-#' I_{lim} &=& \frac{e}{K d_{top}} \times \Biggl[e^{-\frac{I_z e^{-K d_{top}}}{I_o}} - e^{-\frac{I_z}{I_o}} \Biggr]
-#' \end{array}}
-#' where \eqn{$I_{z}=I e^{-k_W \cdot d_{top}}$} is the irradiance at the cultivation depth,
-#' and \eqn{K=k_{m}+kW} is the total attenuation coefficient.
+#' \deqn{I_{lim} = \frac{e}{K \cdot d_{top}} \times \Biggl[e^{-\frac{I_z e^{-K \cdot d_{top}}}{I_o}} - e^{-\frac{I_z}{I_o}} \Biggr]}
+#' where \eqn{I_{z}=I e^{-k_W \cdot d_{top}}} is the irradiance at the cultivation depth 
+#' and \eqn{K=k_{m}+kW} is the total attenuation coefficient. 
+#' 
 #' \eqn{k_{m}} is the additional attenuation coefficient from macroalgae biomass, calculated as:
-#' \deqn{\begin{array}[ccc] 
-#' k_{m} &=& a_{cs} \times N_f \times \text{max} \Biggl( \frac{h_{m}}{d_{top}}, 1 \Biggr) \times \frac{1}{\text{min}(h_{m}, d_{top})}
-#' \end{array}}
-#' where \eqn{h_{m}} is the macroalgae height.
+#' \deqn{k_{m} = a_{cs} \times N_f \times \text{max} \Biggl( \frac{h_{m}}{d_{top}}, 1 \Biggr) \times \frac{1}{\text{min}(h_{m}, d_{top})}}
+#' where \eqn{h_m} is the macroalgae height. 
 #' 
 #' @inheritParams Q_int
 #' @param I the surface irradiance, PAR (\eqn{\mu}mol photons m\eqn{^{-2}} s\eqn{^{-1}})
@@ -27,7 +24,7 @@
 #' @return a scalar of relative light limitation on growth (between 0 and 1)
 #' @export
 #'
-#' @examples examples
+#' @examples examples TBD
 #' 
 #' @seealso [algae_height()]
 #' 

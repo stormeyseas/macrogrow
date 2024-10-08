@@ -22,11 +22,13 @@ a scalar of macroalgae height (m)
 Macroalgae height
 }
 \details{
-\code{h_a}, \code{h_b} and \code{h_c} default to 1000, 1 and 0 respectively if not supplied. Algae height therefore defaults to \code{Nf/1000} if no parameters are supplied.
-\deqn{
-   \left(\frac{N_f}{h_a}\right)^h_b + h_c
-}
+Calculates macroalgae height as:
+\deqn{h_m = \left(\frac{N_f}{h_a}\right)^{h_b} + h_c}
+up to a maximum of \verb{h_\{max\}}.
+
+Defaults are \eqn{h_a=1000}, \eqn{h_b=1} and \eqn{h_c=0}.
+Algae height therefore defaults to \eqn{N_f \times 10^{-3}} if no parameters are supplied.
 }
 \examples{
-examples
+Examples TBD
 }

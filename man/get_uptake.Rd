@@ -7,11 +7,11 @@
 get_uptake(conc, uptake_shape, Nform_abbr, spec_params)
 }
 \arguments{
-\item{conc}{}
+\item{conc}{substrate concentration}
 
-\item{uptake_shape}{}
+\item{uptake_shape}{kinetic shape for substrate uptake. One of "linear" or "Michaelis-Menton" (or "MM"). Defaults to Michaelis-Menton.}
 
-\item{Nform_abbr}{the abbreviation used in spec_params for the relevant nitrogen form. E.g. if Nform_abbr = "ni" the function will look for \code{M_ni} and \code{C_ni} or \code{V_ni} and \code{K_ni} in spec_params.}
+\item{Nform_abbr}{the abbreviation used in spec_params for the relevant nitrogen form. See details.}
 
 \item{spec_params}{a vector of named numbers. Must include:
 \itemize{
@@ -22,6 +22,13 @@ get_uptake(conc, uptake_shape, Nform_abbr, spec_params)
 }
 \description{
 Get the correct uptake rate
+}
+\details{
+Gives the substrate uptake rate based on the shape and species-specific parameters supplied.
+If no shape is supplied, attempts to infer the correct shape from supplied parameters.
+
+\code{Nform_abbr} allows the function to link species parameters with concentration.
+E.g. if \code{Nform_abbr} = "amm" (for ammonium) the function will look for \code{M_amm} and \code{C_amm} or \code{V_amm} and \code{K_amm} in spec_params and will ignore other uptake parameters which may be included for other substrates.
 }
 \seealso{
 \code{\link[=lin_uptake(), MM_uptake]{lin_uptake(), MM_uptake()}}

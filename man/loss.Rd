@@ -4,12 +4,10 @@
 \alias{loss}
 \title{Loss through fragmentation}
 \usage{
-loss(U0 = 0, turbulence = 0, spec_params)
+loss(U, turbulence = 0, spec_params)
 }
 \arguments{
-\item{U0}{incoming incident water velocity (m/s)}
-
-\item{turbulence}{optional level of turbulence. Options are "none" (or "static"), "low", "medium" (or "mid"), and "high".}
+\item{turbulence}{optional level of turbulence. Options are "none"/"static", "low", "medium"/"mid", and "high".}
 
 \item{spec_params}{a vector of named numbers. All default to 0 if not supplied. Can include:
 \itemize{
@@ -25,13 +23,15 @@ loss(U0 = 0, turbulence = 0, spec_params)
 a scalar for macroalgae loss (\% d-1)
 }
 \description{
-The macroalgae fragmentation rate is calculated as:
-\begin{equation}
-D_m = D_{velocity} \times U_0 + D_{turbulence} + D_{base}
-\end{equation}
-where $D_{velocity}$ is the linear coefficient of loss with laminar velocity,
-$D_{turbulence}$ is the loss rate at the specified level of turbulence (static, low, medium, or high), and
-$D_{base}$ is the base loss rate.
+The macroalgae fragmentation rate ($D$) is calculated as:
+\deqn{D = D_{ve} \times U_0 + D_{tu} + D_{m}}
+where \eqn{D_{ve}} is the linear coefficient of loss with laminar velocity (\equ{U_0}),
+\eqn{D_{tu}} is the loss rate at the specified level of turbulence (static, low, medium, or high), and
+\eqn{D_{m}} is the base loss rate.
+}
+\details{
+Note that parameter \code{U0} has no default.
+If one is not supplied, loss due to velocity will default to 0 regardless of the value of \code{D_ve} supplied.
 }
 \examples{
 examples

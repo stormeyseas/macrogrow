@@ -5,7 +5,6 @@
 #'
 #' @import ggplot2
 #' @return a ggplot object of growth response over the specified temperature range
-#' @export
 #'
 #' @examples examples
 #' @seealso [T_lim()]
@@ -28,7 +27,6 @@ plot_T_range = function(T_range = seq(-10,35,0.25), spec_params){
 #' @param nf 
 #'
 #' @return a ggplot object of growth response over the specified range of surface irradience values
-#' @export
 #'
 #' @examples examples
 #' @seealso [I_lim() algae_height()]
@@ -77,7 +75,6 @@ plot_I_range = function(I_range = seq(1, 2500, 1), I_top = c(1, 2, 5), spec_para
 #' @param spec_params 
 #'
 #' @return a ggplot object of growth response over the specified range of fixed-N values
-#' @export
 #'
 #' @examples examples
 plot_h = function(Nf = seq(1, 4500, 1), spec_params){
@@ -103,7 +100,6 @@ plot_h = function(Nf = seq(1, 4500, 1), spec_params){
 #' @param shape one of "Michaelis-Menton" (or "MM", default), "linear", or "both".
 #'
 #' @return a ggplot object of nitrogen uptake rates
-#' @export
 #'
 #' @examples examples
 plot_N_uptake = function(conc = seq(0, 50, 0.25), spec_params){

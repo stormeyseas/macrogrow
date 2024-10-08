@@ -3,7 +3,6 @@
 #' @inheritParams u_c
 #' 
 #' @return The total drag coefficient C_t
-#' @export
 #' 
 C_t <- function(u_c, u_b, macro_state = c(biomass, hm), SA_WW = 0.5 * (0.0306/2), site_params, constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)) {
   D <- SA_WW * min(macro_state['hm']/site_params['hc'], 1) * macro_state['biomass']
