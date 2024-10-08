@@ -1,25 +1,13 @@
 ---
-title: "Example vignette"
+title: "Grow macroalgae"
 author: "Tormey Reimer"
 date: "`r Sys.Date()`"
 ---
 
-The data contained in the exampleRPackage R package was analyzed exactly like detailed in this document.
-
-First, because the data is contained in a package, we can easily call it from R
+This space will be used to detail how to use the main model function, `grow_macroalgae()`.
 
 ```{r}
 library(macrogrow)
 ```
 
-We used the `T_lim()` function:
-
-```{r}
-my_seaweed <- c(T_opt = 20, T_min = 5, T_max = 30)
-
-T_lim(Tc = 22, spec_params = my_seaweed)
-
-T_range <- 1:30
-sapply(T_range, T_lim, spec_params = my_seaweed)
-```
 
