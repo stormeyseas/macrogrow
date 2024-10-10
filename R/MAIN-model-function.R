@@ -134,7 +134,7 @@ grow_macroalgae <- function(start,
   for (i in 1:length(t)) {
     
   # Possibility of macroalgae dying
-    if (Nf <= 0) {
+    if (Nf[i-1] <= 0) {
       Nf[i] <- 0
       Ns[i] <- 0
       B_dw.mg[i] <- 0
