@@ -2,11 +2,10 @@ Type: Package
 Package: macrogrow
 Title: Grow macroalgae
 Description: A macroalgae growth and bioremediation model
-Version: 1.1
+Version: 1.0
 Date: 2024-07-12
 Authors@R: c(
-    person("Tormey", "Reimer", email = "tormey.reimer@utas.edu.au", role = c("aut", "cre"), comment = c(ORCID = "0000-0000-0000-0000")),
-    person("Scott", "Hadley", email = "scott-hadley@utas.edu.au", role = c("aut"), comment = c(ORCID = "0000-0000-0000-0000"))
+    person("Tormey", "Reimer", email = "tormey.reimer@utas.edu.au", role = c("aut", "cre"), comment = c(ORCID = "0000-0000-0000-0000"))
     )
 License: MIT + file LICENSE
 Depends: 
