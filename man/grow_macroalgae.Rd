@@ -15,7 +15,6 @@ grow_macroalgae(
   other_N,
   ni_uptake,
   am_uptake,
-  ot_uptake,
   site_params,
   spec_params,
   initials,

@@ -20,7 +20,7 @@
 #' * a2 = 0.2^2, 
 #' * Cb = 0.0025, the bottom friction coefficient
 #'
-#' @importFrom lubridate is.Date ymd duration yday
+#' @importFrom lubridate is.Date ymd duration yday parse_date_time
 #' @importFrom glue glue
 #' @importFrom magrittr %>%
 #' @import dplyr
@@ -45,7 +45,7 @@ grow_macroalgae <- function(start,
                             other_N, 
                             ni_uptake, 
                             am_uptake, 
-                            ot_uptake, 
+                            # ot_uptake, 
                             site_params, 
                             spec_params, 
                             initials,
@@ -55,10 +55,23 @@ grow_macroalgae <- function(start,
   if (lubridate::is.Date(start)) {
     start_date <- start
   } else if (is.integer(start) | is.numeric(start)) {
-    if (missing(start_year)) {start_year <- 2000}
-    start_date <- parse_date_time(x = paste(start_year, start), orders = "yj") # - duration(1, "days")
+    start_date <- tryCatch(
+      expr = lubridate::parse_date_time(x = paste(2015, start), orders = c("yj", "m-d")),
+      warning = function(cond) {
+        rlang::inform("Provided 'start' value could not be coerced into a date! Here's the warning from lubridate::parse_date_time():")
+        rlang::abort(message = conditionMessage(cond))
+        }
+      )
   } else if (is.character(start)) {
-    start_date <- lubridate::ymd(start)
+    start_date <- tryCatch(
+      expr = lubridate::parse_date_time(x = start, orders = c("Y-m-d", "d-m-Y")),
+      warning = function(cond) {
+        rlang::inform("Provided 'start' value could not be coerced into a date! Here's the warning from lubridate::parse_date_time():")
+        rlang::abort(message = conditionMessage(cond))
+      }
+    )
+  } else {
+    rlang::abort("'start' must be defined as a date, a character coercible to a date, or a day number")
   }
 
   # Populate start and end dates to create ts
@@ -108,7 +121,7 @@ grow_macroalgae <- function(start,
   # Placeholder vectors
   u_c <- I_top <- conc_nitrate <- conc_ammonium <- det <- Nf <- Ns <- N_int <- N_rel <- B_dw.mg <- B_ww.mg <- hm <- 
     lambda <- lambda_0 <- conc_other <- Q_int <- Q_rel <- T_lim <- Q_lim <- I_lim <- growth_rate <- 
-    Ns_to_Nf <- Ns_loss <- Nf_loss <- red_Am <- remin <- up_Am <- up_Ni <- 
+    Ns_to_Nf <- Ns_loss <- Nf_loss <- red_Am <- remin <- up_Am <- up_Ni <- up_Ot <- 
     as.numeric(rep(NA, length.out = length(t)))
 
   add_ammonium     <- ammonium
@@ -199,14 +212,14 @@ grow_macroalgae <- function(start,
                                        spec_params = spec_params)
                         )
     
-    up_Ot[i]        <-  pmin(
-                          conc_other[i],
-                          Q_rel(Q_int(Nf[i], Ns[i], spec_params), spec_params) * (B_dw.mg[i]/1000) * 
-                            get_uptake(conc = conc_other[i], 
-                                       uptake_shape = ot_uptake, 
-                                       Nform_abbr = "ot", 
-                                       spec_params = spec_params)
-                        )
+    # up_Ot[i]        <-  pmin(
+    #                       conc_other[i],
+    #                       Q_rel(Q_int(Nf[i], Ns[i], spec_params), spec_params) * (B_dw.mg[i]/1000) * 
+    #                         get_uptake(conc = conc_other[i], 
+    #                                    uptake_shape = ot_uptake, 
+    #                                    Nform_abbr = "ot", 
+    #                                    spec_params = spec_params)
+    #                     )
     
     # If you're not at the final day
     if (i < length(t)) {
@@ -285,7 +298,7 @@ grow_macroalgae <- function(start,
     other_N = other_N,
     up_Am = up_Am,
     up_Ni = up_Ni,
-    up_Ot = NA,
+    up_Ot = up_Ot,
     temperature = temperature,
     T_lim = T_lim,
     light = light,

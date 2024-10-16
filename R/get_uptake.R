@@ -20,39 +20,42 @@
 #' 
 get_uptake <- function(conc, uptake_shape, Nform_abbr, spec_params) {
   
-  spec_params['M'] <- spec_params[paste0("M", "_", Nform_abbr)]
-  spec_params['C'] <- spec_params[paste0("C", "_", Nform_abbr)]
-  spec_params['V'] <- spec_params[paste0("V", "_", Nform_abbr)]
-  spec_params['K'] <- spec_params[paste0("K", "_", Nform_abbr)]
-  
-  if (missing(uptake_shape) | is.na(uptake_shape)) {
-    if (!is.na(spec_params['V']) & !is.na(spec_params['K'])) {
-      rlang::inform(message = glue::glue("Uptake shape for '{form}' not specified, using Michaelis-Menton kinetics", form = Nform_abbr))
-      MM_uptake(conc = conc, V = spec_params['V'], K = spec_params['K'])
-      
-    } else if (!is.na(spec_params['M']) & !is.na(spec_params['C'])) {
-      rlang::inform(message = glue::glue("Uptake shape for '{form}' not specified, using linear kinetics", form = Nform_abbr))
-      lin_uptake(conc = conc, M = spec_params['M'], C = spec_params['C'])
-      
-    } else {
-      rlang::abort(glue::glue("Error! You haven't provided any uptake parameters for '{form}'!", form = Nform_abbr))
-    }
+  if (is.na(conc)) {
+    rlang::abort("Concentration cannot be NA", class = "error_bad_parameter")
   }
   
-  else if (uptake_shape == "linear") {
-    if(is.na(spec_params['M']) | is.na(spec_params['C'])) {
-      abort_missing_parameter(param = "M and C", place = "spec_params for linear uptake")
-    } else {
-      lin_uptake(conc = conc, M = spec_params['M'], C = spec_params['C'])
-    }
-  } 
+  M <- spec_params[paste0("M", "_", Nform_abbr)]
+  C <- spec_params[paste0("C", "_", Nform_abbr)]
+  V <- spec_params[paste0("V", "_", Nform_abbr)]
+  K <- spec_params[paste0("K", "_", Nform_abbr)]
   
-  # uptake_shape == "MM" | uptake_shape == "Michaelis-Menton"
-  else {
-    if(is.na(spec_params['V']) | is.na(spec_params['K'])) {
-      abort_missing_parameter(param = "V and K", place = "spec_params for linear uptake")
+  if (missing(uptake_shape) | is.na(uptake_shape)) {
+    rlang::inform(message = glue::glue("Uptake shape for '{form}' not specified, determining based on parameters provided", form = Nform_abbr))
+    if (!is.na(V) & !is.na(K)) {
+      up <- MM_uptake(conc = conc, V = V, K = K)
+    } else if (!is.na(M) & !is.na(C)) {
+      up <- lin_uptake(conc = conc, M = M, C = C)
     } else {
-      MM_uptake(conc = conc, V = spec_params['V'], K = spec_params['K'])
+      rlang::abort(glue::glue("Error! You haven't provided the correct uptake parameters for '{form}'!", form = Nform_abbr))
     }
-  } 
+  } else if (uptake_shape == "linear") {
+    if(is.na(M)) {
+      abort_missing_parameter(param = paste0("M", "_", Nform_abbr), place = "spec_params for linear uptake")
+    } else if(is.na(C)) {
+      abort_missing_parameter(param = paste0("C", "_", Nform_abbr), place = "spec_params for linear uptake")
+    } else {
+      up <- lin_uptake(conc = conc, M = M, C = C)
+    }
+  } else if (uptake_shape == "MM" | uptake_shape == "Michaelis-Menton") {
+    if(is.na(V)) {
+      abort_missing_parameter(param = paste0("V", "_", Nform_abbr), place = "spec_params for Michaelis-Menton uptake")
+    } else if(is.na(K)) {
+      abort_missing_parameter(param = paste0("K", "_", Nform_abbr), place = "spec_params for linear uptake")
+    } else {
+      up <- MM_uptake(conc = conc, V = V, K = K)
+    }
+    } else {
+      rlang::abort(glue::glue("Uptake shape `{uptake_shape}` is not recognised in FORT KICKASS"), class = "error_bad_parameter")
+    }
+  return(up)
 }

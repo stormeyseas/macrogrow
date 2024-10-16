@@ -10,7 +10,8 @@ abort_missing_parameter <- function(param, place) {
     msg <- glue::glue("`{param}` must be defined in {place}")
   }
   
-  rlang::abort("error_missing_parameter", 
+  rlang::abort(
+    class = "error_missing_parameter", 
         message = msg, 
         param = param, 
         place = place

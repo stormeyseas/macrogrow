@@ -23,10 +23,10 @@ test_that("Message on missing h_c", {
     )
 })
 
-test_that("If only h_max supplied, height = h_max" {
+test_that("If only h_max supplied, height = h_max", {
   expect_equal(
     object = algae_height(Nf = 100, spec_params = c(h_max = 20.05)),
     expected = 20.05
     )
-  })
+})
 
