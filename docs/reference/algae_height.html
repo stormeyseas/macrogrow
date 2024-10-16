@@ -50,11 +50,11 @@
 
 
 <dl><dt id="arg-nf">Nf<a class="anchor" aria-label="anchor" href="#arg-nf"></a></dt>
-<dd></dd>
+<dd><p>Fixed nitrogen (mg m\(^{-3}\))</p></dd>
 
 
 <dt id="arg-spec-params">spec_params<a class="anchor" aria-label="anchor" href="#arg-spec-params"></a></dt>
-<dd><p>A vector of named numbers. Must include the parameters:</p><ul><li><p><code>h_max</code>, maximum species height. If only <code>h_max</code> is supplied then algae height == <code>h_max</code></p></li>
+<dd><p>A vector of named numbers. Must include the parameters:</p><ul><li><p><code>h_max</code>, maximum species height. Can be <code>NA</code>. If only <code>h_max</code> is supplied then algae height = <code>h_max</code></p></li>
 <li><p><code>h_a</code>, <code>h_b</code> and <code>h_c</code>, parameters governing height change with <code>N_f</code></p></li>
 </ul></dd>
 
@@ -65,10 +65,8 @@
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Calculates macroalgae height as:
-$$h_m = \left(\frac{N_f}{h_a}\right)^{h_b} + h_c$$
-up to a maximum of <code>h_{max}</code>.</p>
-<p>Defaults are \(h_a=1000\), \(h_b=1\) and \(h_c=0\).
+    <p>Calculates macroalgae height as \(h_m = \left(\frac{N_f}{h_a}\right)^{h_b} + h_c\) up to a maximum of <code>h_{max}</code>.
+#' Defaults are \(h_a=1000\), \(h_b=1\) and \(h_c=0\).
 Algae height therefore defaults to \(N_f \times 10^{-3}\) if no parameters are supplied.</p>
     </div>
 

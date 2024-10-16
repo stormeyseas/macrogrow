@@ -25,19 +25,19 @@ grow_macroalgae(
 \arguments{
 \item{start}{date, start of the growth period, date of at-sea deployment}
 
-\item{grow_days}{integer, number of}
+\item{grow_days}{integer, number of day in growing period - if missing will take the length of the temperature vector}
 
-\item{temperature}{vector}
+\item{temperature}{a vector of daily temperatures (C)}
 
-\item{light}{vector}
+\item{light}{a vector of incoming light (umol m-2 s-1)}
 
-\item{velocity}{vector}
+\item{velocity}{a vector of water velocities (m s-1)}
 
-\item{nitrate}{vector}
+\item{nitrate}{a vector of nitrate concentrations (mg m-3)}
 
-\item{ammonium}{vector}
+\item{ammonium}{a vector of ammonium concentrations (mg m-3)}
 
-\item{other_N}{vector}
+\item{other_N}{a vector of other nitrogen concentrations (mg N m-3)}
 
 \item{site_params}{a named vector of species-specific parameters - see details}
 

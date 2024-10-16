@@ -4,9 +4,11 @@
 \alias{loss}
 \title{Loss through fragmentation}
 \usage{
-loss(U, turbulence = 0, spec_params)
+loss(U0, turbulence = 0, spec_params)
 }
 \arguments{
+\item{U0}{incoming incident water velocity (m/s)}
+
 \item{turbulence}{optional level of turbulence. Options are "none"/"static", "low", "medium"/"mid", and "high".}
 
 \item{spec_params}{a vector of named numbers. All default to 0 if not supplied. Can include:

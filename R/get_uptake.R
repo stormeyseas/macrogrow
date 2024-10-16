@@ -25,7 +25,7 @@ get_uptake <- function(conc, uptake_shape, Nform_abbr, spec_params) {
   spec_params['V'] <- spec_params[paste0("V", "_", Nform_abbr)]
   spec_params['K'] <- spec_params[paste0("K", "_", Nform_abbr)]
   
-  if (missing(uptake_shape)) {
+  if (missing(uptake_shape) | is.na(uptake_shape)) {
     if (!is.na(spec_params['V']) & !is.na(spec_params['K'])) {
       rlang::inform(message = glue::glue("Uptake shape for '{form}' not specified, using Michaelis-Menton kinetics", form = Nform_abbr))
       MM_uptake(conc = conc, V = spec_params['V'], K = spec_params['K'])

@@ -7,11 +7,11 @@
 algae_height(Nf, spec_params)
 }
 \arguments{
-\item{Nf}{}
+\item{Nf}{Fixed nitrogen (mg m\eqn{^{-3}})}
 
 \item{spec_params}{A vector of named numbers. Must include the parameters:
 \itemize{
-\item \code{h_max}, maximum species height. If only \code{h_max} is supplied then algae height == \code{h_max}
+\item \code{h_max}, maximum species height. Can be \code{NA}. If only \code{h_max} is supplied then algae height = \code{h_max}
 \item \code{h_a}, \code{h_b} and \code{h_c}, parameters governing height change with \code{N_f}
 }}
 }
@@ -22,11 +22,8 @@ a scalar of macroalgae height (m)
 Macroalgae height
 }
 \details{
-Calculates macroalgae height as:
-\deqn{h_m = \left(\frac{N_f}{h_a}\right)^{h_b} + h_c}
-up to a maximum of \verb{h_\{max\}}.
-
-Defaults are \eqn{h_a=1000}, \eqn{h_b=1} and \eqn{h_c=0}.
+Calculates macroalgae height as \eqn{h_m = \left(\frac{N_f}{h_a}\right)^{h_b} + h_c} up to a maximum of \verb{h_\{max\}}.
+#' Defaults are \eqn{h_a=1000}, \eqn{h_b=1} and \eqn{h_c=0}.
 Algae height therefore defaults to \eqn{N_f \times 10^{-3}} if no parameters are supplied.
 }
 \examples{
