@@ -276,7 +276,7 @@ grow_macroalgae <- function(start,
   # Put all the data together for outputs 
   df <- data.frame(
     t = t, 
-    date = ,
+    date = dates,
     Nf = Nf,
     Ns = Ns,
     growth_rate = growth_rate,
