@@ -191,8 +191,8 @@ grow_macroalgae <- function(start,
     # PUT SALINITY LIMITATION HERE
     
     # Biomass loss - CHECK THIS WORKS WHEN PARAMETERS ARE MISSING
-    U_0            <- drop_units(set_units(U_0, "m s-1"))
-    D_m            <- loss(U0 = U_0, turbulence = site_params['turbulence'], spec_params = spec_params)
+    U_c            <- velocity[i] * u_c[i]
+    D_m            <- loss(U0 = U_c, turbulence = site_params['turbulence'], spec_params = spec_params)
     
     # Nitrogen pool changes
     growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * S_lim[i] * Q_lim[i])
@@ -243,41 +243,6 @@ grow_macroalgae <- function(start,
       # IF MACROALGAE DIES
       if (Nf[i+1] <= 0) break
     }
-    
-    # if (Nf[i-1] <= 0) {
-    #   Nf[i] <- 0
-    #   Ns[i] <- 0
-    #   B_dw.mg[i] <- 0
-    #   B_ww.mg[i] <- 0
-    #   hm[i] <- 0
-    #   up_Am[i] <- 0
-    #   up_Ni[i] <- 0
-    #   up_Ot[i] <- 0
-    #   
-    #   Ns_to_Nf[i] <- 0
-    #   Ns_loss[i] <- 0
-    #   Nf_loss[i] <- 0
-    #   N_int[i] <- NA
-    #   N_rel[i] <- NA
-    #   Q_int[i] <- NA
-    #   Q_rel[i] <- NA
-    #   Q_lim[i] <- NA
-    #   growth_rate[i] <- NA
-    # 
-    #   conc_nitrate[i] <- add_nitrate[i]
-    #   conc_ammonium[i] <- add_ammonium[i]
-    #   other_N[i] <- add_other[i]
-    #   T_lim[i] <- NA
-    #   I_top[i] <- NA
-    #   I_lim[i] <- NA
-    #   u_c[i] <- NA
-    #   lambda[i] <- NA
-    #   lambda_0[i] <- NA
-    # 
-    #   red_Am[i] <- unname(site_params['Rd'] * conc_ammonium[i])
-    #   remin[i] <- unname(site_params['rL'] * det[i])
-    # }
-    
   # End of main model run
   }
    
