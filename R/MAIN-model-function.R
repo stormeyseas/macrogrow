@@ -38,6 +38,7 @@
 grow_macroalgae <- function(start, 
                             grow_days, 
                             temperature, 
+                            salinity,
                             light, 
                             velocity, 
                             nitrate, 
@@ -90,6 +91,12 @@ grow_macroalgae <- function(start,
       obs = length(temperature),
       exp = length(t)))
   }
+  if (length(salinity) != length(t)) {
+    rlang::abort(message = glue::glue(
+      "Error: salinity vector has length {obs} but timespan vector has length {exp}",
+      obs = length(salinity),
+      exp = length(t)))
+  }
   if (length(light) != length(t)) {
     rlang::abort(message = glue::glue(
       "Error: light vector has length {obs} but timespan vector has length {exp}",
@@ -120,7 +127,7 @@ grow_macroalgae <- function(start,
   
   # Placeholder vectors
   u_c <- I_top <- conc_nitrate <- conc_ammonium <- det <- Nf <- Ns <- N_int <- N_rel <- B_dw.mg <- B_ww.mg <- hm <- 
-    lambda <- lambda_0 <- conc_other <- Q_int <- Q_rel <- T_lim <- Q_lim <- I_lim <- growth_rate <- 
+    lambda <- lambda_0 <- conc_other <- Q_int <- Q_rel <- T_lim <- S_lim <- Q_lim <- I_lim <- growth_rate <- 
     Ns_to_Nf <- Ns_loss <- Nf_loss <- red_Am <- remin <- up_Am <- up_Ni <- up_Ot <- 
     as.numeric(rep(NA, length.out = length(t)))
 
@@ -177,6 +184,7 @@ grow_macroalgae <- function(start,
     
     # Environmental limitation on growth
     T_lim[i]       <- T_lim(temperature[i], spec_params)
+    S_lim[i]       <- S_lim(salinity[i], spec_params)
     Q_lim[i]       <- Q_lim(Nf[i], Ns[i], spec_params)
     I_top[i]       <- unname(light[i] * exp(-site_params['kW'] * site_params['d_top']))
     I_lim[i]       <- I_lim(Nf[i], I_top[i], spec_params, site_params)
@@ -187,7 +195,7 @@ grow_macroalgae <- function(start,
     D_m            <- loss(U0 = U_0, turbulence = site_params['turbulence'], spec_params = spec_params)
     
     # Nitrogen pool changes
-    growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * Q_lim[i])
+    growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * S_lim[i] * Q_lim[i])
     Ns_to_Nf[i]     <- pmin(growth_rate[i] * Ns[i], Ns[i]) # cannot convert more Ns than available
     Ns_loss[i]      <- unname(D_m * Ns[i])
     Nf_loss[i]      <- unname(D_m * Nf[i])
@@ -301,6 +309,8 @@ grow_macroalgae <- function(start,
     up_Ot = up_Ot,
     temperature = temperature,
     T_lim = T_lim,
+    salinity = salinity,
+    S_lim = S_lim,
     light = light,
     I_top = I_top,
     hm = hm,
