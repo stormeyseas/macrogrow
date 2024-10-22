@@ -8,6 +8,7 @@ grow_macroalgae(
   start,
   grow_days,
   temperature,
+  salinity,
   light,
   velocity,
   nitrate,

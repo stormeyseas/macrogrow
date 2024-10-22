@@ -48,8 +48,8 @@ A short description...</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">u_c</span><span class="op">(</span></span>
 <span>  <span class="va">U0</span>,</span>
 <span>  macro_state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">biomass</span>, <span class="va">hm</span><span class="op">)</span>,</span>
-<span>  SA_WW <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="op">(</span><span class="fl">0.0306</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>,</span>
 <span>  <span class="va">site_params</span>,</span>
+<span>  <span class="va">spec_params</span>,</span>
 <span>  constants <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>s <span class="op">=</span> <span class="fl">0.0045</span>, gam <span class="op">=</span> <span class="fl">1.13</span>, a2 <span class="op">=</span> <span class="fl">0.2</span><span class="op">^</span><span class="fl">2</span>, Cb <span class="op">=</span> <span class="fl">0.0025</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -68,14 +68,15 @@ A short description...</p>
 </ul></dd>
 
 
-<dt id="arg-sa-ww">SA_WW<a class="anchor" aria-label="anchor" href="#arg-sa-ww"></a></dt>
-<dd><p>conversion of wet weight to surface area (default is 0.5\(\times\)0.5\(\times\)0.0306, based on <em>Macrocystis pyrifera</em>)</p></dd>
-
-
 <dt id="arg-site-params">site_params<a class="anchor" aria-label="anchor" href="#arg-site-params"></a></dt>
 <dd><p>vector of named numbers. Must include:</p><ul><li><p><code>hz</code>, total water depth (m)</p></li>
 <li><p><code>hc</code>, vertical water column occupied by the canopy (m)</p></li>
 <li><p><code>d_top</code>, depth of the top of the canopy beneath the water surface (m)</p></li>
+</ul></dd>
+
+
+<dt id="arg-spec-params">spec_params<a class="anchor" aria-label="anchor" href="#arg-spec-params"></a></dt>
+<dd><p>vector of named numbers. Must include:</p><ul><li><p><code>SA_WW</code>, conversion of wet weight to surface area</p></li>
 </ul></dd>
 
 
@@ -101,7 +102,7 @@ A short description...</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Tormey Reimer.</p>
+  <p>Developed by Tormey E. Reimer.</p>
 </div>
 
 <div class="pkgdown-footer-right">

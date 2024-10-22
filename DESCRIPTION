@@ -5,7 +5,7 @@ Description: A macroalgae growth and bioremediation model
 Version: 1.0
 Date: 2024-07-12
 Authors@R: c(
-    person("Tormey", "Reimer", email = "tormey.reimer@utas.edu.au", role = c("aut", "cre"), comment = c(ORCID = "0000-0000-0000-0000"))
+    person("Tormey E.", "Reimer", email = "tormey.reimer@utas.edu.au", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-5983-2798"))
     )
 License: MIT + file LICENSE
 Depends: 
@@ -24,5 +24,5 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
-URL: github.com/stormeyseas/NR-model-package
-BugReports: github.com/stormeyseas/NR-model-package/issues
+URL: github.com/stormeyseas/macrogrow
+BugReports: github.com/stormeyseas/macrogrow/issues

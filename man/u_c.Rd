@@ -7,8 +7,8 @@
 u_c(
   U0,
   macro_state = c(biomass, hm),
-  SA_WW = 0.5 * (0.0306/2),
   site_params,
+  spec_params,
   constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
 )
 }
@@ -21,13 +21,16 @@ u_c(
 \item \code{hm}, algae height (m)
 }}
 
-\item{SA_WW}{conversion of wet weight to surface area (default is 0.5\eqn{\times}0.5\eqn{\times}0.0306, based on \emph{Macrocystis pyrifera})}
-
 \item{site_params}{vector of named numbers. Must include:
 \itemize{
 \item \code{hz}, total water depth (m)
 \item \code{hc}, vertical water column occupied by the canopy (m)
 \item \code{d_top}, depth of the top of the canopy beneath the water surface (m)
+}}
+
+\item{spec_params}{vector of named numbers. Must include:
+\itemize{
+\item \code{SA_WW}, conversion of wet weight to surface area
 }}
 
 \item{constants}{vector of named numbers defining extra constants for the attenuation submodel. Must include:
