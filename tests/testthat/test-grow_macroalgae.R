@@ -40,11 +40,9 @@ readUrl <- function(url) {
     },
     finally = {
       # NOTE:
-      # Here goes everything that should be executed at the end,
-      # regardless of success or error.
-      # If you want more than one expression to be executed, then you
-      # need to wrap them in curly brackets ({...}); otherwise you could
-      # just have written 'finally = <expression>' 
+      # Here goes everything that should be executed at the end, regardless of success or error.
+      # If you want more than one expression to be executed, then you need to wrap them in curly brackets ({...}); 
+      # otherwise you could just have written 'finally = <expression>' 
       message(paste("Processed URL:", url))
       message("Some other message at the end")
     }
