@@ -19,6 +19,7 @@ grow_macroalgae(
   site_params,
   spec_params,
   initials,
+  sparse_output = T,
   other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
 )
 }
@@ -47,6 +48,8 @@ grow_macroalgae(
 
 \item{initials}{a named vector of the macroalgae starting conditions}
 
+\item{sparse_output}{logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)}
+
 \item{other_constants}{a named vector of miscellaneous constants, including:
 \itemize{
 \item s = 0.0045, the experimentally-derived shape factor for macroalgae movement in water
@@ -54,8 +57,6 @@ grow_macroalgae(
 \item a2 = 0.2^2,
 \item Cb = 0.0025, the bottom friction coefficient
 }}
-
-\item{sparse_output}{logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)}
 }
 \value{
 dataframe of outputs
