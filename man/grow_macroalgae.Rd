@@ -29,6 +29,8 @@ grow_macroalgae(
 
 \item{temperature}{a vector of daily temperatures (C)}
 
+\item{salinity}{a vector of daily salt concentrations (g L-1)}
+
 \item{light}{a vector of incoming light (umol m-2 s-1)}
 
 \item{velocity}{a vector of water velocities (m s-1)}
@@ -52,6 +54,8 @@ grow_macroalgae(
 \item a2 = 0.2^2,
 \item Cb = 0.0025, the bottom friction coefficient
 }}
+
+\item{sparse_output}{logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)}
 }
 \value{
 dataframe of outputs

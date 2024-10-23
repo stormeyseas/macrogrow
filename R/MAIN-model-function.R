@@ -6,6 +6,7 @@
 #' @param start date, start of the growth period, date of at-sea deployment
 #' @param grow_days integer, number of day in growing period - if missing will take the length of the temperature vector
 #' @param temperature a vector of daily temperatures (C)
+#' @param salinity a vector of daily salt concentrations (g L-1)
 #' @param light a vector of incoming light (umol m-2 s-1)
 #' @param velocity a vector of water velocities (m s-1)
 #' @param nitrate a vector of nitrate concentrations (mg m-3)
@@ -14,6 +15,7 @@
 #' @param site_params a named vector of species-specific parameters - see details
 #' @param spec_params a named vector of site-specific parameters - see details
 #' @param initials a named vector of the macroalgae starting conditions
+#' @param sparse_output logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)
 #' @param other_constants a named vector of miscellaneous constants, including:
 #' * s = 0.0045, the experimentally-derived shape factor for macroalgae movement in water
 #' * gam = 1.13, the modified drag coefficient for macroalgae
@@ -50,6 +52,7 @@ grow_macroalgae <- function(start,
                             site_params, 
                             spec_params, 
                             initials,
+                            sparse_output = T,
                             other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)) {
   
   # Parse start date
@@ -247,47 +250,74 @@ grow_macroalgae <- function(start,
   }
    
   # Put all the data together for outputs 
-  df <- data.frame(
-    t = t, 
-    date = dates,
-    Nf = Nf,
-    Ns = Ns,
-    growth_rate = growth_rate,
-    Ns_to_Nf = Ns_to_Nf,
-    Ns_loss = Ns_loss,
-    Nf_loss = Nf_loss,
-    N_int = N_int,
-    N_rel = N_rel,
-    Q_int = Q_int,
-    Q_rel = Q_rel,
-    Q_lim = Q_lim,
-    B_dw.mg = B_dw.mg,
-    B_ww.mg = B_ww.mg,
-    add_nitrate = nitrate,
-    add_ammonium = ammonium,
-    add_other = add_other,
-    conc_nitrate = conc_nitrate,
-    conc_ammonium = conc_ammonium,
-    other_N = other_N,
-    up_Am = up_Am,
-    up_Ni = up_Ni,
-    up_Ot = up_Ot,
-    temperature = temperature,
-    T_lim = T_lim,
-    salinity = salinity,
-    S_lim = S_lim,
-    light = light,
-    I_top = I_top,
-    hm = hm,
-    I_lim = I_lim,
-    velocity = velocity,
-    u_c = u_c,
-    lambda = lambda,
-    lambda_0 = lambda_0,
-    det = det,
-    red_Am = red_Am,
-    remin = remin
-  )
+  if (sparse_output == F) {
+    df <- data.frame(
+      t = t, 
+      date = dates,
+      Nf = Nf,
+      Ns = Ns,
+      growth_rate = growth_rate,
+      Ns_to_Nf = Ns_to_Nf,
+      Ns_loss = Ns_loss,
+      Nf_loss = Nf_loss,
+      N_int = N_int,
+      N_rel = N_rel,
+      Q_int = Q_int,
+      Q_rel = Q_rel,
+      Q_lim = Q_lim,
+      B_dw.mg = B_dw.mg,
+      B_ww.mg = B_ww.mg,
+      hm = hm,
+      add_nitrate = nitrate,
+      conc_nitrate = conc_nitrate,
+      up_Ni = up_Ni,
+      add_ammonium = ammonium,
+      conc_ammonium = conc_ammonium,
+      up_Am = up_Am,
+      add_other = add_other,
+      conc_other_N = other_N,
+      up_Ot = up_Ot,
+      temperature = temperature,
+      T_lim = T_lim,
+      salinity = salinity,
+      S_lim = S_lim,
+      light = light,
+      I_top = I_top,
+      I_lim = I_lim,
+      velocity = velocity,
+      u_c = u_c,
+      lambda = lambda,
+    )
+  } else {
+    df <- data.frame(
+      date = dates,
+      Nf = Nf,
+      Ns = Ns,
+      growth_rate = growth_rate,
+      Ns_to_Nf = Ns_to_Nf,
+      Ns_loss = Ns_loss,
+      Nf_loss = Nf_loss,
+      N_int = N_int,
+      N_rel = N_rel,
+      Q_int = Q_int,
+      Q_rel = Q_rel,
+      Q_lim = Q_lim,
+      B_dw.mg = B_dw.mg,
+      B_ww.mg = B_ww.mg,
+      hm = hm,
+      conc_nitrate = conc_nitrate,
+      up_Ni = up_Ni,
+      conc_ammonium = conc_ammonium,
+      up_Am = up_Am,
+      up_Ot = up_Ot,
+      T_lim = T_lim,
+      S_lim = S_lim,
+      I_top = I_top,
+      I_lim = I_lim,
+      u_c = u_c
+    )
+  }
+  
   return(df)
 }
 
