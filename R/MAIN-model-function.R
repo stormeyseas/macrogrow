@@ -131,7 +131,7 @@ grow_macroalgae <- function(start,
   # Placeholder vectors
   u_c <- I_top <- conc_nitrate <- conc_ammonium <- det <- Nf <- Ns <- N_int <- N_rel <- B_dw.mg <- B_ww.mg <- hm <- 
     lambda <- lambda_0 <- conc_other <- Q_int <- Q_rel <- T_lim <- S_lim <- Q_lim <- I_lim <- growth_rate <- 
-    Ns_to_Nf <- Ns_loss <- Nf_loss <- red_Am <- remin <- up_Am <- up_Ni <- up_Ot <- 
+    Ns_to_Nf <- Ns_loss <- Nf_loss <- up_Am <- up_Ni <- up_Ot <- # red_Am <- remin <- 
     as.numeric(rep(NA, length.out = length(t)))
 
   add_ammonium     <- ammonium
