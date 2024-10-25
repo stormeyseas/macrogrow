@@ -10,4 +10,11 @@ This space will be used to detail how to use the main model function, `grow_macr
 library(macrogrow)
 ```
 
+# Environmental vectors
+
+```{r datafile}
+df <- read.csv("../data-raw/environmental-vectors.csv")
+```
+
+
 
