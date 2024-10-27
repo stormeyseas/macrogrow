@@ -4,7 +4,7 @@
 \alias{biomass_to_Nf}
 \title{Convert biomass to Nf (and Ns)}
 \usage{
-biomass_to_Nf(biomass, N_int, spec_params, dry = T)
+biomass_to_Nf(biomass, N_int, Q_rel = 0.35, spec_params, dry = T)
 }
 \arguments{
 \item{biomass}{wet (or dry) biomass, mg m-3}
@@ -29,5 +29,5 @@ Convert biomass to Nf (and Ns)
 examples
 }
 \seealso{
-\link{N_int(), Nf_to_biomass}
+\link{N_int(), Nf_to_biomass(), }
 }
