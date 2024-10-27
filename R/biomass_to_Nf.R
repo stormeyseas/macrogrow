@@ -10,6 +10,7 @@
 #' @param biomass wet (or dry) biomass, mg m-3
 #'
 #' @return a vector of c(Nf, Ns)
+#' @export
 #'
 #' @examples examples
 #' @seealso [N_int(), Nf_to_biomass(), ]
