@@ -1,6 +1,6 @@
 #' Internal nitrogen concentration
 #'
-#' @param Q_int,Q_rel the non-dimensionalised internal nutrient quotient (\eqn{Q}) or relative internal nutrient quotient (\eqn{Q_{rel}}). 
+#' @param Q_int, Q_rel the non-dimensionalised internal nutrient quotient (\eqn{Q}) or relative internal nutrient quotient (\eqn{Q_{rel}}). 
 #' Only one is needed; if both are supplied only \eqn{Q_{rel}} is used.
 #' @param spec_params a vector of named numbers. Must include:
 #'  * `N_min`, the minimum internal nitrogen concentration

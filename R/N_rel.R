@@ -4,6 +4,7 @@
 #' @param spec_params a vector of named numbers. Must include:
 #'  * `N_min`, the minimum internal nitrogen concentration
 #'  * `N_max`, the maximum internal nitrogen concentration
+#'  
 #'
 #' @return relative internal nitrogen quotient
 #' @export

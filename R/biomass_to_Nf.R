@@ -2,13 +2,18 @@
 #'
 #' @inheritParams Nf_to_biomass
 #' @inheritParams N_rel 
+#' @param Q_rel the non-dimensionalised relative internal nutrient quotient (\eqn{Q_{rel}})
+#' @param spec_params a vector of named numbers. Must include:
+#'  * `DWWW` (if dry = F), the conversion from dry weight to wet weight
+#'  * `Q_min`, the minimum internal nutrient quotient
+#'  * `Q_max`, the maximum internal nutrient quotient
 #' @param biomass wet (or dry) biomass, mg m-3
 #'
 #' @return a vector of c(Nf, Ns)
 #'
 #' @examples examples
 #' @seealso [N_int(), Nf_to_biomass(), ]
-biomass_to_Nf <- function(biomass, N_int, Q_rel = 0.35, spec_params, dry = T) {
+biomass_to_Nf <- function(biomass, N_int, Q_rel = 0.35, spec_params, dry = F) {
   if (N_int > 1) {
     N_int <- N_int/100
   }
