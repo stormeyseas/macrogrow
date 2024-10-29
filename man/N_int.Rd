@@ -7,7 +7,7 @@
 N_int(Q_int = NA, Q_rel = NA, spec_params)
 }
 \arguments{
-\item{Q_int, Q_rel}{the non-dimensionalised internal nutrient quotient (\eqn{Q}) or relative internal nutrient quotient (\eqn{Q_{rel}}).
+\item{Q_int, }{Q_rel the non-dimensionalised internal nutrient quotient (\eqn{Q}) or relative internal nutrient quotient (\eqn{Q_{rel}}).
 Only one is needed; if both are supplied only \eqn{Q_{rel}} is used.}
 
 \item{spec_params}{a vector of named numbers. Must include:

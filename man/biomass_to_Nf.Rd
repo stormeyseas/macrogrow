@@ -4,23 +4,26 @@
 \alias{biomass_to_Nf}
 \title{Convert biomass to Nf (and Ns)}
 \usage{
-biomass_to_Nf(biomass, N_int, Q_rel = 0.35, spec_params, dry = T)
+biomass_to_Nf(biomass, N_int, Q_rel = 0.5, spec_params, dry = F)
 }
 \arguments{
 \item{biomass}{wet (or dry) biomass, mg m-3}
 
 \item{N_int}{the internal nitrogen concentration (percentage, as decimal)}
 
+\item{Q_rel}{the non-dimensionalised relative internal nutrient quotient (\eqn{Q_{rel}})}
+
 \item{spec_params}{a vector of named numbers. Must include:
 \itemize{
-\item \code{N_min}, the minimum internal nitrogen concentration
-\item \code{N_max}, the maximum internal nitrogen concentration
+\item \code{DWWW} (if dry = F), the conversion from dry weight to wet weight
+\item \code{Q_min}, the minimum internal nutrient quotient
+\item \code{Q_max}, the maximum internal nutrient quotient
 }}
 
 \item{dry}{logical, return dry or wet biomass. If dry = F, spec_params\link{'DWWW'} must be provided}
 }
 \value{
-a vector of c(Nf, Ns)
+Nf, mg m-3
 }
 \description{
 Convert biomass to Nf (and Ns)

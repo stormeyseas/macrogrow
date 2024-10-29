@@ -4,7 +4,7 @@
 \alias{get_uptake}
 \title{Get the correct uptake rate}
 \usage{
-get_uptake(conc, uptake_shape, Nform_abbr, spec_params)
+get_uptake(conc, uptake_shape = NA, Nform_abbr, spec_params)
 }
 \arguments{
 \item{conc}{substrate concentration}

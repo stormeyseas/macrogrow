@@ -18,7 +18,7 @@
 #' @export
 #' @seealso [lin_uptake(), MM_uptake()]
 #' 
-get_uptake <- function(conc, uptake_shape, Nform_abbr, spec_params) {
+get_uptake <- function(conc, uptake_shape = NA, Nform_abbr, spec_params) {
   
   if (is.na(conc)) {
     rlang::abort("Concentration cannot be NA", class = "error_bad_parameter")
@@ -29,7 +29,7 @@ get_uptake <- function(conc, uptake_shape, Nform_abbr, spec_params) {
   V <- spec_params[paste0("V", "_", Nform_abbr)]
   K <- spec_params[paste0("K", "_", Nform_abbr)]
   
-  if (missing(uptake_shape) | is.na(uptake_shape)) {
+  if (is.na(uptake_shape)) {
     rlang::inform(message = glue::glue("Uptake shape for '{form}' not specified, determining based on parameters provided", form = Nform_abbr))
     if (!is.na(V) & !is.na(K)) {
       up <- MM_uptake(conc = conc, V = V, K = K)
