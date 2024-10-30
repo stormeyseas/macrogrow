@@ -4,7 +4,15 @@
 \alias{Q_rel}
 \title{Relative nutrient quotient}
 \usage{
-Q_rel(Q_int, spec_params)
+Q_rel(
+  Nf = NULL,
+  Ns = NULL,
+  Q_int = NULL,
+  N_int = NULL,
+  Q_rel = NULL,
+  N_rel = NULL,
+  spec_params
+)
 }
 \arguments{
 \item{Q_int}{Non-dimensionalised internal nutrient quotient}

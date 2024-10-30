@@ -4,7 +4,15 @@
 \alias{N_int}
 \title{Internal nitrogen concentration}
 \usage{
-N_int(Q_int = NA, Q_rel = NA, spec_params)
+N_int(
+  Nf = NULL,
+  Ns = NULL,
+  Q_int = NULL,
+  N_int = NULL,
+  Q_rel = NULL,
+  N_rel = NULL,
+  spec_params
+)
 }
 \arguments{
 \item{Q_int, }{Q_rel the non-dimensionalised internal nutrient quotient (\eqn{Q}) or relative internal nutrient quotient (\eqn{Q_{rel}}).

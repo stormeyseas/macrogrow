@@ -30,7 +30,7 @@ S_lim <- function(Sal, spec_params){
   if (is.na(spec_params['S_min'])) {abort_missing_parameter(param = "S_min", place = "spec_params")}
   if (is.na(spec_params['S_max'])) {abort_missing_parameter(param = "S_max", place = "spec_params")}
   
-  if (spec_params['S_opt'] < spec_params['S_min']) {rlang::abort("error_bad_parameter", message = "Minimum salinity is higher than optimum salinity")}
+  if (spec_params['S_opt'] < spec_params['S_min']) {rlang::abort("error_bad_parameter", message = "Error: Minimum salinity is higher than optimum salinity")}
   if (spec_params['S_opt'] > spec_params['S_max']) {rlang::abort("error_bad_parameter", message = "Error: maximum salinity is lower than optimum salinity")} 
   if (spec_params['S_opt']-spec_params['S_min'] <= spec_params['S_max']-spec_params['S_opt']) {rlang::abort("error_bad_parameter", message = "Species CTMI function not valid! Must satisfy S_opt-S_min > S_max-S_opt")}
   

@@ -4,7 +4,15 @@
 \alias{N_rel}
 \title{Relative internal nitrogen quotient}
 \usage{
-N_rel(N_int, spec_params)
+N_rel(
+  Nf = NULL,
+  Ns = NULL,
+  Q_int = NULL,
+  N_int = NULL,
+  Q_rel = NULL,
+  N_rel = NULL,
+  spec_params
+)
 }
 \arguments{
 \item{N_int}{the internal nitrogen concentration (percentage, as decimal)}

@@ -19,7 +19,7 @@
 #' @seealso [N_int(), N_rel(), Q_int(), Q_rel()]
 #' 
 Q_lim <- function(Nf, Ns, spec_params) {
-  Q_int <- Q_int(Nf, Ns, spec_params)
+  Q_int <- Q_int(Nf = Nf, Ns = Ns, spec_params = spec_params)
   if (spec_params['K_c'] >= spec_params['Q_min']) {rlang::abort("K_c must be less than Q_min", class = "error_bad_parameter")}
   if (Q_int < spec_params['Q_min']) {Q_int <- spec_params['Q_min']} 
   if (Q_int > spec_params['Q_max']) {Q_int <- spec_params['Q_max']}

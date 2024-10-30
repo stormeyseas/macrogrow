@@ -40,12 +40,12 @@
 grow_macroalgae <- function(start, 
                             grow_days, 
                             temperature, 
-                            salinity,
+                            salinity = NA,
                             light, 
                             velocity, 
                             nitrate, 
                             ammonium, 
-                            other_N, 
+                            other_N = NA, 
                             ni_uptake, 
                             am_uptake, 
                             # ot_uptake, 
@@ -160,10 +160,10 @@ grow_macroalgae <- function(start,
   for (i in 1:length(t)) {
     
     # Macroalgae state at start of day
-    Q_int[i]       <- Q_int(Nf[i], Ns[i], spec_params)
-    Q_rel[i]       <- Q_rel(Q_int[i], spec_params)
-    N_int[i]       <- N_int(Q_rel = Q_rel[i], Q_int = NA, spec_params)
-    N_rel[i]       <- N_rel(N_int[i], spec_params)
+    Q_int[i]       <- Q_int(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)
+    Q_rel[i]       <- Q_rel(Q_int = Q_int[i], spec_params = spec_params)
+    N_int[i]       <- N_int(Q_rel = Q_rel[i], spec_params = spec_params)
+    N_rel[i]       <- N_rel(N_int = N_int[i], spec_params = spec_params)
     B_dw.mg[i]     <- (Nf[i]+Ns[i]) / N_int[i]
     B_ww.mg[i]     <- B_dw.mg[i] * unname(spec_params['DWWW'])
     hm[i]          <- algae_height(Nf[i], spec_params)
@@ -205,32 +205,21 @@ grow_macroalgae <- function(start,
     # red_Am[i]       <- unname(site_params['Rd'] * conc_ammonium[i]) # Reduction of ammonium (to nitrate)
     # remin[i]        <- unname(site_params['rL'] * det[i]) # Remineralisation of detritus (to ammonium)
     
-    up_Am[i]        <-  pmin(
-                          conc_ammonium[i],
-                          Q_rel(Q_int(Nf[i], Ns[i], spec_params), spec_params) * (B_dw.mg[i]/1000) *
-                            get_uptake(conc = conc_ammonium[i],
-                                       uptake_shape = am_uptake,
-                                       Nform_abbr = "am",
-                                       spec_params = spec_params)
-                        )
+    up_Am[i]        <-  pmin(conc_ammonium[i],
+                             (1 - Q_rel(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)) * (B_dw.mg[i]/1000) *
+                               get_uptake(conc = conc_ammonium[i],
+                                          uptake_shape = am_uptake,
+                                          Nform_abbr = "am",
+                                          spec_params = spec_params)
+                             )
     
-    up_Ni[i]        <-  pmin(
-                          conc_nitrate[i],
-                          Q_rel(Q_int(Nf[i], Ns[i], spec_params), spec_params) * (B_dw.mg[i]/1000) * 
-                            get_uptake(conc = conc_nitrate[i], 
-                                       uptake_shape = ni_uptake, 
-                                       Nform_abbr = "ni", 
-                                       spec_params = spec_params)
-                        )
-    
-    # up_Ot[i]        <-  pmin(
-    #                       conc_other[i],
-    #                       Q_rel(Q_int(Nf[i], Ns[i], spec_params), spec_params) * (B_dw.mg[i]/1000) * 
-    #                         get_uptake(conc = conc_other[i], 
-    #                                    uptake_shape = ot_uptake, 
-    #                                    Nform_abbr = "ot", 
-    #                                    spec_params = spec_params)
-    #                     )
+    up_Ni[i]        <-  pmin(conc_nitrate[i],
+                             (1 - Q_rel(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)) * (B_dw.mg[i]/1000) * 
+                               get_uptake(conc = conc_nitrate[i], 
+                                          uptake_shape = ni_uptake, 
+                                          Nform_abbr = "ni", 
+                                          spec_params = spec_params)
+                             )
     
     # If you're not at the final day
     if (i < length(t)) {

@@ -12,16 +12,16 @@
 #' @export
 #' @seealso [Q_int(), N_rel(), Q_rel()]
 #'
-N_int <- function(Q_int = NA, Q_rel = NA, spec_params) {
-  if (is.na(spec_params['N_max'])) {abort_missing_parameter(param = "N_max", place = "spec_params")}
-  if (is.na(spec_params['N_min'])) {abort_missing_parameter(param = "N_min", place = "spec_params")}
-  
-  if (!is.na(Q_rel)) {
-    N_int <- spec_params['N_max'] - (spec_params['N_max'] - spec_params['N_min']) * Q_rel
-  } else if (!is.na(Q_int)) {
-    if (is.na(spec_params['Q_min'])) {abort_missing_parameter(param = "Q_min", place = "spec_params if Q_rel is not supplied")}
-    if (is.na(spec_params['Q_max'])) {abort_missing_parameter(param = "Q_max", place = "spec_params if Q_rel is not supplied")}
-    N_int <- spec_params['N_max'] - (spec_params['N_max'] - spec_params['N_min']) * Q_rel(Q = Q_int, spec_params = spec_params)
+N_int <- function(Nf = NULL, Ns = NULL, Q_int = NULL, N_int = NULL, Q_rel = NULL, N_rel = NULL, spec_params) {
+  if (!is.null(Nf) & !is.null(Ns)) {Q_int <- Q_int(Nf = Nf, Ns = Ns, spec_params = spec_params)}
+  if (!is.null(Q_int)) {Q_rel <- Q_rel(Q_int = Q_int, spec_params = spec_params)}
+  if (!is.null(Q_rel)) {N_rel <- N_rel(Q_rel = Q_rel, spec_params = spec_params)}
+  if (!is.null(N_rel)) {
+    N_int <- spec_params["N_max"] - (1 - N_rel)*(spec_params["N_max"] - spec_params["N_min"])
   }
   return(unname(N_int))
 }
+
+# if (is.na(spec_params['N_max'])) {abort_missing_parameter(param = "N_max", place = "spec_params if N_rel is supplied")}
+# if (is.na(spec_params['N_min'])) {abort_missing_parameter(param = "N_min", place = "spec_params if N_rel is supplied")}
+
