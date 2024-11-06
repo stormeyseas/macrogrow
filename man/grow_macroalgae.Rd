@@ -50,13 +50,7 @@ grow_macroalgae(
 
 \item{sparse_output}{logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)}
 
-\item{other_constants}{a named vector of miscellaneous constants, including:
-\itemize{
-\item s = 0.0045, the experimentally-derived shape factor for macroalgae movement in water
-\item gam = 1.13, the modified drag coefficient for macroalgae
-\item a2 = 0.2^2,
-\item Cb = 0.0025, the bottom friction coefficient
-}}
+\item{other_constants}{a named vector of miscellaneous constants (see u_c)}
 }
 \value{
 dataframe of outputs

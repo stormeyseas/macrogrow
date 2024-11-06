@@ -42,7 +42,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">biomass_to_Nf</span><span class="op">(</span><span class="va">biomass</span>, <span class="va">N_int</span>, Q_rel <span class="op">=</span> <span class="fl">0.5</span>, <span class="va">spec_params</span>, dry <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">biomass_to_Nf</span><span class="op">(</span><span class="va">biomass</span>, Q_int <span class="op">=</span> <span class="cn">NULL</span>, Q_rel <span class="op">=</span> <span class="fl">0.5</span>, <span class="va">spec_params</span>, dry <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -53,8 +53,8 @@
 <dd><p>wet (or dry) biomass, mg m-3</p></dd>
 
 
-<dt id="arg-n-int">N_int<a class="anchor" aria-label="anchor" href="#arg-n-int"></a></dt>
-<dd><p>the internal nitrogen concentration (percentage, as decimal)</p></dd>
+<dt id="arg-q-int">Q_int<a class="anchor" aria-label="anchor" href="#arg-q-int"></a></dt>
+<dd><p>Non-dimensionalised internal nutrient quotient</p></dd>
 
 
 <dt id="arg-q-rel">Q_rel<a class="anchor" aria-label="anchor" href="#arg-q-rel"></a></dt>
@@ -78,7 +78,7 @@
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>N_int(), Nf_to_biomass(),</p></div>
+    <div class="dont-index"><p><code>Nf_to_biomass(), Q_rel(), Q_int()</code></p></div>
     </div>
 
     <div class="section level2">

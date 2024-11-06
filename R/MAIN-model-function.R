@@ -16,16 +16,10 @@
 #' @param spec_params a named vector of site-specific parameters - see details
 #' @param initials a named vector of the macroalgae starting conditions
 #' @param sparse_output logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)
-#' @param other_constants a named vector of miscellaneous constants, including:
-#' * s = 0.0045, the experimentally-derived shape factor for macroalgae movement in water
-#' * gam = 1.13, the modified drag coefficient for macroalgae
-#' * a2 = 0.2^2, 
-#' * Cb = 0.0025, the bottom friction coefficient
+#' @param other_constants a named vector of miscellaneous constants (see u_c)
 #'
 #' @importFrom lubridate is.Date ymd duration yday parse_date_time
 #' @importFrom glue glue
-#' @importFrom magrittr %>%
-#' @import dplyr
 #' @import rlang
 #' @importFrom units set_units drop_units
 #' 
@@ -129,7 +123,7 @@ grow_macroalgae <- function(start,
   farmV <- unname(site_params['farmA'] * site_params['hc'])         # Volume of farm site
   
   # Placeholder vectors
-  u_c <- I_top <- conc_nitrate <- conc_ammonium <- Nf <- Ns <- # det <- N_int <- N_rel <- 
+  u_c <- I_top <- conc_nitrate <- conc_ammonium <- Nf <- Ns <- 
     B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- conc_other <- Q_int <- Q_rel <- T_lim <- S_lim <- 
     Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- up_Am <- up_Ni <- up_Ot <- # red_Am <- remin <- 
     as.numeric(rep(NA, length.out = length(t)))
@@ -162,8 +156,6 @@ grow_macroalgae <- function(start,
     # Macroalgae state at start of day
     Q_int[i]       <- Q_int(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)
     Q_rel[i]       <- Q_rel(Q_int = Q_int[i], spec_params = spec_params)
-    # N_int[i]       <- N_int(Q_rel = Q_rel[i], spec_params = spec_params)
-    # N_rel[i]       <- N_rel(N_int = N_int[i], spec_params = spec_params)
     B_dw.mg[i]     <- unname(10^3 * (Nf[i]+Ns[i]) / Q_int[i])
     B_ww.mg[i]     <- unname(B_dw.mg[i] * spec_params['DWWW'])
     hm[i]          <- algae_height(Nf[i], spec_params)
@@ -191,8 +183,7 @@ grow_macroalgae <- function(start,
     Q_lim[i]       <- Q_lim(Nf[i], Ns[i], spec_params)
     I_top[i]       <- unname(light[i] * exp(-site_params['kW'] * site_params['d_top']))
     I_lim[i]       <- I_lim(Nf[i], I_top[i], spec_params, site_params)
-    # PUT SALINITY LIMITATION HERE
-    
+
     # Biomass loss - CHECK THIS WORKS WHEN PARAMETERS ARE MISSING
     U_c            <- velocity[i] * u_c[i]
     D_m            <- loss(U0 = U_c, turbulence = site_params['turbulence'], spec_params = spec_params)
@@ -202,9 +193,7 @@ grow_macroalgae <- function(start,
     Ns_to_Nf[i]     <- pmin(growth_rate[i] * Ns[i], Ns[i]) # cannot convert more Ns than available
     Ns_loss[i]      <- unname(D_m * Ns[i])
     Nf_loss[i]      <- unname(D_m * Nf[i])
-    # red_Am[i]       <- unname(site_params['Rd'] * conc_ammonium[i]) # Reduction of ammonium (to nitrate)
-    # remin[i]        <- unname(site_params['rL'] * det[i]) # Remineralisation of detritus (to ammonium)
-    
+
     up_Am[i]        <-  pmin(conc_ammonium[i],
                              (1 - Q_rel(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)) * (B_dw.mg[i]/1000) *
                                get_uptake(conc = conc_ammonium[i],
@@ -224,9 +213,8 @@ grow_macroalgae <- function(start,
     # If you're not at the final day
     if (i < length(t)) {
       # Changes in external state
-      conc_ammonium[i+1] <- conc_ammonium[i] - up_Am[i] + Ns_loss[i] #- red_Am[i] + remin[i]
-      conc_nitrate[i+1] <- conc_nitrate[i] - up_Ni[i] #+ red_Am[i]
-      # det[i+1]     <- det[i] + Nf_loss[i] #- remin[i]
+      conc_ammonium[i+1] <- conc_ammonium[i] - up_Am[i] + Ns_loss[i]
+      conc_nitrate[i+1] <- conc_nitrate[i] - up_Ni[i] 
       
       # Change in algae state
       Nf[i+1]      <- Nf[i] + Ns_to_Nf[i] - Nf_loss[i]
@@ -249,8 +237,6 @@ grow_macroalgae <- function(start,
       Ns_to_Nf = Ns_to_Nf,
       Ns_loss = Ns_loss,
       Nf_loss = Nf_loss,
-      # N_int = N_int,
-      # N_rel = N_rel,
       Q_int = Q_int,
       Q_rel = Q_rel,
       Q_lim = Q_lim,
@@ -286,8 +272,6 @@ grow_macroalgae <- function(start,
       Ns_to_Nf = Ns_to_Nf,
       Ns_loss = Ns_loss,
       Nf_loss = Nf_loss,
-      # N_int = N_int,
-      # N_rel = N_rel,
       Q_int = Q_int,
       Q_rel = Q_rel,
       Q_lim = Q_lim,
