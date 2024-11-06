@@ -4,14 +4,19 @@
 \alias{Nf_to_biomass}
 \title{Convert Nf to biomass}
 \usage{
-Nf_to_biomass(Nf, Ns, N_int, dry = T, ...)
+Nf_to_biomass(Nf, Ns, Q_int = NULL, Q_rel = 0.5, spec_params, dry = T)
 }
 \arguments{
 \item{Nf}{Fixed nitrogen (mg m\eqn{^{-3}})}
 
 \item{Ns}{Stored nitrogen (mg m\eqn{^{-3}})}
 
-\item{N_int}{the internal nitrogen concentration (percentage, as decimal)}
+\item{Q_int}{Non-dimensionalised internal nutrient quotient}
+
+\item{spec_params}{A vector of named numbers. Must include:
+\itemize{
+\item \code{Q_min}, the minimum internal nutrient quotient
+}}
 
 \item{dry}{logical, return dry or wet biomass. If dry = F, spec_params\link{'DWWW'} must be provided}
 }
@@ -25,5 +30,5 @@ Convert Nf to biomass
 examples
 }
 \seealso{
-\link{N_int(), biomass_to_Nf}
+\code{\link[=biomass_to_Nf(), Q_rel(), Q_int]{biomass_to_Nf(), Q_rel(), Q_int()}}
 }

@@ -4,12 +4,12 @@
 \alias{biomass_to_Nf}
 \title{Convert biomass to Nf (and Ns)}
 \usage{
-biomass_to_Nf(biomass, N_int, Q_rel = 0.5, spec_params, dry = F)
+biomass_to_Nf(biomass, Q_int = NULL, Q_rel = 0.5, spec_params, dry = T)
 }
 \arguments{
 \item{biomass}{wet (or dry) biomass, mg m-3}
 
-\item{N_int}{the internal nitrogen concentration (percentage, as decimal)}
+\item{Q_int}{Non-dimensionalised internal nutrient quotient}
 
 \item{Q_rel}{the non-dimensionalised relative internal nutrient quotient (\eqn{Q_{rel}})}
 
@@ -32,5 +32,5 @@ Convert biomass to Nf (and Ns)
 examples
 }
 \seealso{
-\link{N_int(), Nf_to_biomass(), }
+\code{\link[=Nf_to_biomass(), Q_rel(), Q_int]{Nf_to_biomass(), Q_rel(), Q_int()}}
 }

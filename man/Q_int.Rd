@@ -4,15 +4,7 @@
 \alias{Q_int}
 \title{Non-dimensionalised internal nutrient quotient}
 \usage{
-Q_int(
-  Nf = NULL,
-  Ns = NULL,
-  Q_int = NULL,
-  N_int = NULL,
-  Q_rel = NULL,
-  N_rel = NULL,
-  spec_params
-)
+Q_int(Nf = NULL, Ns = NULL, Q_rel = NULL, spec_params)
 }
 \arguments{
 \item{Nf}{Fixed nitrogen (mg m\eqn{^{-3}})}
@@ -37,5 +29,5 @@ Q &=& Q_{min} \left(1 + \frac{N_s}{N_f}\right)
 examples
 }
 \seealso{
-\code{\link[=N_int(), N_rel(), Q_rel]{N_int(), N_rel(), Q_rel()}}
+\code{\link[=Q_rel]{Q_rel()}}
 }

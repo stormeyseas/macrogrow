@@ -3,8 +3,6 @@
 export(I_lim)
 export(Kd_from_Secchi)
 export(MM_uptake)
-export(N_int)
-export(N_rel)
 export(Nf_to_biomass)
 export(Q_int)
 export(Q_lim)
