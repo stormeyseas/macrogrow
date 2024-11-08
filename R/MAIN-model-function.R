@@ -146,6 +146,9 @@ grow_macroalgae <- function(start,
   conc_other[1]    <- add_other[1]
   
   # Macroalgae starting state
+  if (is.na(initials['Q_int'])) {
+    initials['Q_int'] <- Q_int(Nf = initials['Nf'], Q_rel = initials['Q_rel'], spec_params = spec_params)
+  }
   Nf[1]            <- unname(initials['Nf'])  # Fixed nitrogen
   Ns[1]            <- unname(Nf[1]*(initials['Q_int']/spec_params['Q_min'] - 1))          # Stored nitrogen
   # det[1]           <- 10
@@ -261,7 +264,7 @@ grow_macroalgae <- function(start,
       I_lim = I_lim,
       velocity = velocity,
       u_c = u_c,
-      lambda = lambda,
+      lambda = lambda
     )
   } else {
     df <- data.frame(
