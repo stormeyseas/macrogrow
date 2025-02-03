@@ -31,24 +31,10 @@
 #' - Note that the final growth dataframe is inclusive of the start and end date, so the environmental vectors must be the same
 #'
 #' @examples "see here" link?
-check_grow <- function(start, 
-                       grow_days, 
-                       temperature, 
-                            salinity,
-                            light, 
-                            velocity, 
-                            nitrate, 
-                            ammonium, 
-                            other_N = NA, 
-                            ni_uptake, 
-                            am_uptake, 
-                            # ot_uptake, 
-                            site_params, 
-                            spec_params, 
-                            initials,
-                            sparse_output = T,
-                            other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)) {
-  
+check_grow <- function(
+    start, grow_days, temperature, salinity, light, velocity, nitrate, ammonium, 
+    other_N = NA, ni_uptake, am_uptake, # ot_uptake, 
+    site_params, spec_params, initials, sparse_output = T, other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)) {
   # Start date
   if (!lubridate::is.Date(start)) {
     rlang::inform("Variable 'start' is not a date. Convert to date using lubridate::parse_date_time() or similar.")
@@ -87,182 +73,66 @@ check_grow <- function(start,
     rlang::inform("Variable 'grow_days' is the same as.")
   }
 
-  # # Site parameters
-  # farmV <- unname(site_params['farmA'] * site_params['hc'])         # Volume of farm site
-  # 
-  # # Placeholder vectors
-  # u_c <- I_top <- conc_nitrate <- conc_ammonium <- Nf <- Ns <- 
-  #   B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- conc_other <- Q_int <- Q_rel <- T_lim <- S_lim <- 
-  #   Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- up_Am <- up_Ni <- up_Ot <- # red_Am <- remin <- 
-  #   as.numeric(rep(NA, length.out = length(t)))
-  # 
-  # add_ammonium     <- ammonium
-  # add_nitrate      <- nitrate
-  # 
-  # # For adding other_N (e.g. urea, amino acids) - currently does nothing
-  # if (!missing(other_N) | length(other_N) == 0 | is.na(other_N)) {
-  #   add_other <- numeric(length = length(t))
-  # } else if (length(other_N) != length(t)) {
-  #   rlang::abort(message = glue::glue("Error: other_N vector has length {obs} but timespan vector has length {exp}", obs = length(other_N), exp = length(t)))
-  # } else {
-  #   add_other <- other_N
-  # }
-  # 
-  # # External starting state
-  # conc_ammonium[1] <- add_ammonium[1]
-  # conc_nitrate[1]  <- add_nitrate[1]
-  # conc_other[1]    <- add_other[1]
-  # 
-  # # Macroalgae starting state
-  # if (is.na(initials['Q_int'])) {
-  #   initials['Q_int'] <- Q_int(Nf = initials['Nf'], Q_rel = initials['Q_rel'], spec_params = spec_params)
-  # }
-  # Nf[1]            <- unname(initials['Nf'])  # Fixed nitrogen
-  # Ns[1]            <- unname(Nf[1]*(initials['Q_int']/spec_params['Q_min'] - 1))          # Stored nitrogen
-  # # det[1]           <- 10
-  # 
-  # # Main run, after starting state
-  # for (i in 1:length(t)) {
-  #   
-  #   # Macroalgae state at start of day
-  #   Q_int[i]       <- Q_int(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)
-  #   Q_rel[i]       <- Q_rel(Q_int = Q_int[i], spec_params = spec_params)
-  #   B_dw.mg[i]     <- unname(10^3 * (Nf[i]+Ns[i]) / Q_int[i])
-  #   B_ww.mg[i]     <- unname(B_dw.mg[i] * spec_params['DWWW'])
-  #   hm[i]          <- algae_height(Nf[i], spec_params)
-  #   
-  #   # Environmental state (incoming)
-  #   u_c[i]         <- suppressWarnings(
-  #                       u_c(U0 = velocity[i], 
-  #                           macro_state = c(biomass = B_ww.mg[i]/1000, hm[i]),
-  #                           site_params = site_params,
-  #                           spec_params = spec_params,
-  #                           constants = other_constants
-  #                       ))
-  #   U_0            <- set_units(set_units(velocity[i], "m s-1"), "m d-1")
-  #   lambda[i]      <- (u_c[i] * U_0)/farmV 
-  #   lambda_0[i]    <- U_0/farmV 
-  #   
-  #   # Nutrient delivery
-  #   conc_ammonium[i]     <- add_ammonium[i] * lambda_0[i]/lambda[i]
-  #   conc_nitrate[i]      <- add_nitrate[i]  * lambda_0[i]/lambda[i]
-  #   conc_other[i]        <- add_other[i]    * lambda_0[i]/lambda[i]
-  #   
-  #   # Environmental limitation on growth
-  #   T_lim[i]       <- T_lim(temperature[i], spec_params)
-  #   S_lim[i]       <- S_lim(salinity[i], spec_params)
-  #   Q_lim[i]       <- Q_lim(Nf[i], Ns[i], spec_params)
-  #   I_top[i]       <- unname(light[i] * exp(-site_params['kW'] * site_params['d_top']))
-  #   I_lim[i]       <- I_lim(Nf[i], I_top[i], spec_params, site_params)
-  # 
-  #   # Biomass loss - CHECK THIS WORKS WHEN PARAMETERS ARE MISSING
-  #   U_c            <- velocity[i] * u_c[i]
-  #   D_m            <- loss(U0 = U_c, turbulence = site_params['turbulence'], spec_params = spec_params)
-  #   
-  #   # Nitrogen pool changes
-  #   growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * S_lim[i] * Q_lim[i])
-  #   Ns_to_Nf[i]     <- pmin(growth_rate[i] * Ns[i], Ns[i]) # cannot convert more Ns than available
-  #   Ns_loss[i]      <- unname(D_m * Ns[i])
-  #   Nf_loss[i]      <- unname(D_m * Nf[i])
-  # 
-  #   up_Am[i]        <-  pmin(conc_ammonium[i],
-  #                            (1 - Q_rel(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)) * (B_dw.mg[i]/1000) *
-  #                              get_uptake(conc = conc_ammonium[i],
-  #                                         uptake_shape = am_uptake,
-  #                                         Nform_abbr = "am",
-  #                                         spec_params = spec_params)
-  #                            )
-  #   
-  #   up_Ni[i]        <-  pmin(conc_nitrate[i],
-  #                            (1 - Q_rel(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)) * (B_dw.mg[i]/1000) * 
-  #                              get_uptake(conc = conc_nitrate[i], 
-  #                                         uptake_shape = ni_uptake, 
-  #                                         Nform_abbr = "ni", 
-  #                                         spec_params = spec_params)
-  #                            )
-  #   
-  #   # If you're not at the final day
-  #   if (i < length(t)) {
-  #     # Changes in external state
-  #     conc_ammonium[i+1] <- conc_ammonium[i] - up_Am[i] + Ns_loss[i]
-  #     conc_nitrate[i+1] <- conc_nitrate[i] - up_Ni[i] 
-  #     
-  #     # Change in algae state
-  #     Nf[i+1]      <- Nf[i] + Ns_to_Nf[i] - Nf_loss[i]
-  #     Ns[i+1]      <- Ns[i] + up_Am[i] + up_Ni[i] - Ns_to_Nf[i] - Ns_loss[i]
-  #     
-  #     # IF MACROALGAE DIES
-  #     if (Nf[i+1] <= 0) break
-  #   }
-  # # End of main model run
-  # }
-  #  
-  # # Put all the data together for outputs 
-  # if (sparse_output == F) {
-  #   df <- data.frame(
-  #     t = t, 
-  #     date = dates,
-  #     Nf = Nf,
-  #     Ns = Ns,
-  #     growth_rate = growth_rate,
-  #     Ns_to_Nf = Ns_to_Nf,
-  #     Ns_loss = Ns_loss,
-  #     Nf_loss = Nf_loss,
-  #     Q_int = Q_int,
-  #     Q_rel = Q_rel,
-  #     Q_lim = Q_lim,
-  #     B_dw.mg = B_dw.mg,
-  #     B_ww.mg = B_ww.mg,
-  #     hm = hm,
-  #     add_nitrate = nitrate,
-  #     conc_nitrate = conc_nitrate,
-  #     up_Ni = up_Ni,
-  #     add_ammonium = ammonium,
-  #     conc_ammonium = conc_ammonium,
-  #     up_Am = up_Am,
-  #     add_other = add_other,
-  #     conc_other_N = other_N,
-  #     up_Ot = up_Ot,
-  #     temperature = temperature,
-  #     T_lim = T_lim,
-  #     salinity = salinity,
-  #     S_lim = S_lim,
-  #     light = light,
-  #     I_top = I_top,
-  #     I_lim = I_lim,
-  #     velocity = velocity,
-  #     u_c = u_c,
-  #     lambda = lambda
-  #   )
-  # } else {
-  #   df <- data.frame(
-  #     date = dates,
-  #     Nf = Nf,
-  #     Ns = Ns,
-  #     growth_rate = growth_rate,
-  #     Ns_to_Nf = Ns_to_Nf,
-  #     Ns_loss = Ns_loss,
-  #     Nf_loss = Nf_loss,
-  #     Q_int = Q_int,
-  #     Q_rel = Q_rel,
-  #     Q_lim = Q_lim,
-  #     B_dw.mg = B_dw.mg,
-  #     B_ww.mg = B_ww.mg,
-  #     hm = hm,
-  #     conc_nitrate = conc_nitrate,
-  #     up_Ni = up_Ni,
-  #     conc_ammonium = conc_ammonium,
-  #     up_Am = up_Am,
-  #     up_Ot = up_Ot,
-  #     T_lim = T_lim,
-  #     S_lim = S_lim,
-  #     I_top = I_top,
-  #     I_lim = I_lim,
-  #     u_c = u_c
-  #   )
-  # }
+  if (is.na(site_params['farmA'])) {rlang::inform("FATAL: Parameter 'farmA' is missing from site_params.")}  
+  if (is.na(site_params['hc'])) {rlang::inform("FATAL: Parameter 'hc' is missing from site_params.")}  
+  if (is.na(site_params['kW'])) {rlang::inform("FATAL: Parameter 'kW' is missing from site_params.")}  
+  if (is.na(site_params['d_top'])) {rlang::inform("FATAL: Parameter 'd_top' is missing from site_params.")}  
+  if (is.na(site_params['turbulence'])) {rlang::inform("WARN: Parameter 'turbulence' is missing from site_params. Turbulence loss will not work.")}
   
-  return(df)
+  if (is.na(initials['Nf'])) {rlang::inform("FATAL: Parameter 'Nf' is missing from initials.")}  
+  if (is.na(initials['Q_int']) & is.na(initials['Q_rel'])) {rlang::inform("FATAL: Parameters 'Q_int' and 'Q_rel' are missing from initials. Must provide one of them to get macroalgae initial state.")}
+  
+  # "V_am"
+  # "K_am"
+  # "M_am"
+  # "C_am"
+  # "V_ni"
+  # "K_ni"
+  # "M_ni"
+  # "C_ni"
+  # "V_ot"
+  # "K_ot"
+  # "M_ot"
+  # "C_ot"
+  if (is.na(spec_params['Q_min'])) {rlang::inform("FATAL: Parameter 'Q_min' is missing from spec_params")}
+  if (is.na(spec_params['Q_max'])) {rlang::inform("FATAL: Parameter 'Q_max' is missing from spec_params")}
+  if (is.na(spec_params['K_c'])) {rlang::inform("FATAL: Parameter 'K_c' is missing from spec_params")}
+  if (is.na(spec_params['mu'])) {rlang::inform("FATAL: Parameter 'mu' is missing from spec_params")}
+  # "D_m"
+  # "D_ve"
+  # "D_lo"
+  # "D_mi"
+  # "D_hi"
+  if (is.na(spec_params['a_cs'])) {rlang::inform("FATAL: Parameter 'a_cs' is missing from spec_params")}
+  if (is.na(spec_params['I_o'])) {rlang::inform("FATAL: Parameter 'I_o' is missing from spec_params")}
+  if (is.na(spec_params['T_opt'])) {rlang::inform("FATAL: Parameter 'T_opt' is missing from spec_params")}
+  if (is.na(spec_params['T_min'])) {rlang::inform("FATAL: Parameter 'T_min' is missing from spec_params")}
+  if (is.na(spec_params['T_max'])) {rlang::inform("FATAL: Parameter 'T_max' is missing from spec_params")}
+  if (is.na(spec_params['S_opt'])) {rlang::inform("FATAL: Parameter 'S_opt' is missing from spec_params")}
+  if (is.na(spec_params['S_min'])) {rlang::inform("FATAL: Parameter 'S_min' is missing from spec_params")}
+  if (is.na(spec_params['S_max'])) {rlang::inform("FATAL: Parameter 'S_max' is missing from spec_params")}
+  # "h_a"
+  # "h_b"
+  # "h_c"
+  # "h_max"
+  if (is.na(spec_params['DWWW'])) {rlang::inform("FATAL: Parameter 'DWWW' is missing from spec_params")}
+  
+  # Get checks and warnings from algae_height()
+  # Get checks and warnings from u_c()
+  # Get checks and warnings from T_lim()
+  # Get checks and warnings from S_lim()
+  # Get checks and warnings from Q_lim()
+  # Get checks and warnings from I_lim()
+  # Get checks and warnings from loss()
+  # Get checks and warnings from get_uptake()
+  
+  if(!is.logical(sparse_output)) {
+    rlang::inform("FATAL: sparse_output is not logical - must be 'T' (default) or 'F'.")
+  } else if (sparse_output == F) {
+    rlang::inform("INFORM: sparse_output is 'F', full outputs will be given.")
+  } else {
+    rlang::inform("INFORM: sparse_output is 'T', truncated outputs will be given.")
+  }
 }
 
 
