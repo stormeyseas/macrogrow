@@ -14,7 +14,8 @@ Imports: dplyr,
     magrittr,
     rlang,
     glue,
-    units
+    units,
+    lubridate
 Suggests: ggplot2,
     rmarkdown,
     testthat (>= 3.0.0),

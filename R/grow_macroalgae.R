@@ -31,48 +31,12 @@
 #' - Note that the final growth dataframe is inclusive of the start and end date, so the environmental vectors must be the same
 #'
 #' @examples "see here" link?
-grow_macroalgae <- function(start, 
-                            grow_days, 
-                            temperature, 
-                            salinity = NA,
-                            light, 
-                            velocity, 
-                            nitrate, 
-                            ammonium, 
-                            other_N = NA, 
-                            ni_uptake, 
-                            am_uptake, 
-                            # ot_uptake, 
-                            site_params, 
-                            spec_params, 
-                            initials,
-                            sparse_output = T,
-                            other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)) {
+grow_macroalgae <- function(
+    start, grow_days, temperature, salinity, light, velocity, nitrate, ammonium, 
+    other_N = NA, ni_uptake, am_uptake, # ot_uptake, 
+    site_params, spec_params, initials, sparse_output = T, other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)) {
   
-  # Parse start date
-  if (lubridate::is.Date(start)) {
-    start_date <- start
-  } else if (is.integer(start) | is.numeric(start)) {
-    start_date <- tryCatch(
-      expr = lubridate::parse_date_time(x = paste(2015, start), orders = c("yj", "m-d")),
-      warning = function(cond) {
-        rlang::inform("Provided 'start' value could not be coerced into a date! Here's the warning from lubridate::parse_date_time():")
-        rlang::abort(message = conditionMessage(cond))
-        }
-      )
-  } else if (is.character(start)) {
-    start_date <- tryCatch(
-      expr = lubridate::parse_date_time(x = start, orders = c("Y-m-d", "d-m-Y")),
-      warning = function(cond) {
-        rlang::inform("Provided 'start' value could not be coerced into a date! Here's the warning from lubridate::parse_date_time():")
-        rlang::abort(message = conditionMessage(cond))
-      }
-    )
-  } else {
-    rlang::abort("'start' must be defined as a date, a character coercible to a date, or a day number")
-  }
-
-  # Populate start and end dates to create ts
+  start_date <- start
   if (missing(grow_days)) {
     grow_days <- length(temperature)-1
   } else if (grow_days == length(temperature)) {
@@ -81,46 +45,8 @@ grow_macroalgae <- function(start,
   t <- seq(lubridate::yday(start_date), lubridate::yday(start_date)+grow_days, 1)
   dates <- seq(start_date, start_date + lubridate::duration(grow_days, "days"), by = 'days')
   
-  # Light, temperature and nutrient levels are passed to the function as vectors - check length
-  if (length(temperature) != length(t)) {
-    rlang::abort(message = glue::glue(
-      "Error: temperature vector has length {obs} but timespan vector has length {exp}",
-      obs = length(temperature),
-      exp = length(t)))
-  }
-  if (length(salinity) != length(t)) {
-    rlang::abort(message = glue::glue(
-      "Error: salinity vector has length {obs} but timespan vector has length {exp}",
-      obs = length(salinity),
-      exp = length(t)))
-  }
-  if (length(light) != length(t)) {
-    rlang::abort(message = glue::glue(
-      "Error: light vector has length {obs} but timespan vector has length {exp}",
-      obs = length(light),
-      exp = length(t)))
-  }
-  if (length(nitrate) != length(t)) {
-    rlang::abort(message = glue::glue(
-      "Error: nitrate vector has length {obs} but timespan vector has length {exp}",
-      obs = length(nitrate),
-      exp = length(t)))
-  }
-  if (length(ammonium) != length(t)) {
-    rlang::abort(message = glue::glue(
-      "Error: ammonium vector has length {obs} but timespan vector has length {exp}",
-      obs = length(ammonium),
-      exp = length(t)))
-  }
-  if (length(velocity) != length(t)) {
-    rlang::abort(message = glue::glue(
-      "Error: velocity vector has length {obs} but timespan vector has length {exp}",
-      obs = length(velocity),
-      exp = length(t)))
-  }
-  
   # Site parameters
-  farmV <- unname(site_params['farmA'] * site_params['hc'])         # Volume of farm site
+  farmV <- unname(site_params['farmA'] * site_params['hc']) 
   
   # Placeholder vectors
   u_c <- I_top <- conc_nitrate <- conc_ammonium <- Nf <- Ns <- 
@@ -132,10 +58,8 @@ grow_macroalgae <- function(start,
   add_nitrate      <- nitrate
   
   # For adding other_N (e.g. urea, amino acids) - currently does nothing
-  if (!missing(other_N) | length(other_N) == 0 | is.na(other_N)) {
+  if (length(other_N) == 0 | is.na(other_N)) {
     add_other <- numeric(length = length(t))
-  } else if (length(other_N) != length(t)) {
-    rlang::abort(message = glue::glue("Error: other_N vector has length {obs} but timespan vector has length {exp}", obs = length(other_N), exp = length(t)))
   } else {
     add_other <- other_N
   }
@@ -189,7 +113,9 @@ grow_macroalgae <- function(start,
 
     # Biomass loss - CHECK THIS WORKS WHEN PARAMETERS ARE MISSING
     U_c            <- velocity[i] * u_c[i]
-    D_m            <- loss(U0 = U_c, turbulence = site_params['turbulence'], spec_params = spec_params)
+    D_m            <- suppressMessages(
+      loss(U0 = U_c, turbulence = site_params['turbulence'], spec_params = spec_params)
+    )
     
     # Nitrogen pool changes
     growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * S_lim[i] * Q_lim[i])
@@ -293,7 +219,6 @@ grow_macroalgae <- function(start,
       u_c = u_c
     )
   }
-  
   return(df)
 }
 

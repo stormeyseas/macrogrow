@@ -28,11 +28,6 @@
 #' 
 loss <- function(U0, turbulence = 0, spec_params) {
   
-  # If no base rate, assign base rate of 0.003
-  if (is.na(spec_params['D_m'])) {
-    spec_params['D_m'] <- 0.003
-  }
-    
   # If loss with velocity is missing...
   if (is.na(spec_params['D_ve'])) {
     if (missing(U0) | is.na(U0)) {
@@ -81,6 +76,10 @@ loss <- function(U0, turbulence = 0, spec_params) {
     } else {
       rlang::inform("Your turbulence level is not recognised in FORT KICKASS")
     }
+  }
+  
+  if (is.na(spec_params['D_m'])) {
+    spec_params['D_m'] <- 0
   }
 
   # Actual loss calculation
