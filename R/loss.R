@@ -43,40 +43,39 @@ loss <- function(U0, turbulence = 0, spec_params) {
     }
   }
 
-  if (is.na(turbulence) | missing(turbulence)) {
+  # if (is.na(turbulence)) {
     D_turbulence <- 0
-    if (!is.na(spec_params['D_st']) | !is.na(spec_params['D_st']) | !is.na(spec_params['D_st']) | !is.na(spec_params['D_st'])) {
-      rlang::inform("Warning: turbulence loss parameter(s) provided but turbulence level = NA.")
-    }
-  } else {
-    if (turbulence == 0 | turbulence == "none" | turbulence == "static") {
-      if (!is.na(spec_params['D_st'])) {
-        D_turbulence <- spec_params['D_st']
-      } else {
-        rlang::abort(glue::glue("Turbulence is `{turbulence}` but 'D_st' parameter not provided"), class = "error_bad_parameter")
-      }
-    } else if (turbulence == 1 | turbulence == "low") {
-      if (!is.na(spec_params['D_low'])) {
-        D_turbulence <- spec_params['D_low']
-      } else {
-        rlang::abort(glue::glue("Turbulence is `{turbulence}` but 'D_low' parameter not provided"), class = "error_bad_parameter")
-      }
-    } else if (turbulence == 2 | turbulence == "medium" | turbulence == "mid") {
-      if (!is.na(spec_params['D_mi'])) {
-        D_turbulence <- spec_params['D_mi']
-      } else {
-        rlang::abort(glue::glue("Turbulence is `{turbulence}` but 'D_mi' parameter not provided"), class = "error_bad_parameter")
-      }
-    } else if (turbulence == 3 | turbulence == "high") {
-      if (!is.na(spec_params['D_hi'])) {
-        D_turbulence <- spec_params['D_hi']
-      } else {
-        rlang::abort(glue::glue("Turbulence is `{turbulence}` but 'D_hi' parameter not provided"), class = "error_bad_parameter")
-      }
-    } else {
-      rlang::inform("Your turbulence level is not recognised in FORT KICKASS")
-    }
-  }
+  #   if (!is.na(spec_params['D_st'])) {rlang::inform("Warning: turbulence loss parameter(s) provided but turbulence level = NA.")}
+  #   
+  # } else {
+  #   if (turbulence == 0 | turbulence == "none" | turbulence == "static") {
+  #     if (!is.na(spec_params['D_st'])) {
+  #       D_turbulence <- spec_params['D_st']
+  #     } else {
+  #       rlang::abort(glue::glue("Turbulence is `{turbulence}` but 'D_st' parameter not provided"), class = "error_bad_parameter")
+  #     }
+  #   } else if (turbulence == 1 | turbulence == "low") {
+  #     if (!is.na(spec_params['D_low'])) {
+  #       D_turbulence <- spec_params['D_low']
+  #     } else {
+  #       rlang::abort(glue::glue("Turbulence is `{turbulence}` but 'D_low' parameter not provided"), class = "error_bad_parameter")
+  #     }
+  #   } else if (turbulence == 2 | turbulence == "medium" | turbulence == "mid") {
+  #     if (!is.na(spec_params['D_mi'])) {
+  #       D_turbulence <- spec_params['D_mi']
+  #     } else {
+  #       rlang::abort(glue::glue("Turbulence is `{turbulence}` but 'D_mi' parameter not provided"), class = "error_bad_parameter")
+  #     }
+  #   } else if (turbulence == 3 | turbulence == "high") {
+  #     if (!is.na(spec_params['D_hi'])) {
+  #       D_turbulence <- spec_params['D_hi']
+  #     } else {
+  #       rlang::abort(glue::glue("Turbulence is `{turbulence}` but 'D_hi' parameter not provided"), class = "error_bad_parameter")
+  #     }
+  #   } else {
+  #     rlang::inform("Your turbulence level is not recognised in FORT KICKASS")
+  #   }
+  # }
   
   if (is.na(spec_params['D_m'])) {
     spec_params['D_m'] <- 0
