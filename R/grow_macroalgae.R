@@ -58,8 +58,8 @@ grow_macroalgae <- function(
   add_nitrate      <- nitrate
   
   # For adding other_N (e.g. urea, amino acids) - currently does nothing
-  if (length(other_N) == 0 | is.na(other_N)) {
-    add_other <- numeric(length = length(t))
+  if (length(other_N) == 0 | any(is.na(other_N))) {
+    add_other <- rep(0, length(t))
   } else {
     add_other <- other_N
   }
