@@ -31,27 +31,17 @@
 #' - Note that the final growth dataframe is inclusive of the start and end date, so the environmental vectors must be the same
 #'
 #' @examples "see here" link?
-grow_macroalgae <- function(
-    start, grow_days, temperature, salinity, light, velocity, nitrate, ammonium, 
-    other_N = NA, ni_uptake, am_uptake, # ot_uptake, 
-    site_params, spec_params, initials, sparse_output = T, other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)) {
+#' @seealso [check_grow()]
+grow_macroalgae <- function(start, grow_days, temperature, salinity, light, velocity, nitrate, ammonium, other_N = NA, ni_uptake, am_uptake, ot_uptake = NA, site_params, spec_params, initials, sparse_output = T, other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)) {
   
-  start_date <- start
-  if (missing(grow_days)) {
-    grow_days <- length(temperature)-1
-  } else if (grow_days == length(temperature)) {
-    grow_days <- grow_days-1
-  }
-  t <- seq(lubridate::yday(start_date), lubridate::yday(start_date)+grow_days, 1)
-  dates <- seq(start_date, start_date + lubridate::duration(grow_days, "days"), by = 'days')
+  t <- seq(lubridate::yday(start), lubridate::yday(start)+grow_days, 1)
+  dates <- seq(start, start + lubridate::duration(grow_days, "days"), by = 'days')
   
   # Site parameters
-  farmV <- unname(site_params['farmA'] * site_params['hc']) 
+  farmV <- unname(site_params['farmA'] * site_params['hc'])
   
   # Placeholder vectors
-  u_c <- I_top <- conc_nitrate <- conc_ammonium <- Nf <- Ns <- 
-    B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- conc_other <- Q_int <- Q_rel <- T_lim <- S_lim <- 
-    Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- up_Am <- up_Ni <- up_Ot <- # red_Am <- remin <- 
+  u_c <- I_top <- conc_nitrate <- conc_ammonium <- Nf <- Ns <- B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- conc_other <- Q_int <- Q_rel <- T_lim <- S_lim <- Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- up_Am <- up_Ni <- up_Ot <- # red_Am <- remin <- 
     as.numeric(rep(NA, length.out = length(t)))
 
   add_ammonium     <- ammonium

@@ -13,7 +13,7 @@ library(macrogrow)
 # Environmental vectors
 
 ```{r datafile}
-df <- read.csv("../data-raw/environmental-vectors.csv")
+# df <- read.csv("../data-raw/environmental-vectors.csv")
 ```
 
 

@@ -12,7 +12,8 @@
 #' @return Nf, mg m-3
 #' @export
 #'
-#' @examples examples
+#' @examples 
+#' Examples TBD
 #' @seealso [Nf_to_biomass(), Q_rel(), Q_int()]
 biomass_to_Nf <- function(biomass, Q_int = NULL, Q_rel = 0.5, spec_params, dry = T) {
   if (is.null(Q_int)) {

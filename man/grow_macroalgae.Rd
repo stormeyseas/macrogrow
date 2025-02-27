@@ -16,6 +16,7 @@ grow_macroalgae(
   other_N = NA,
   ni_uptake,
   am_uptake,
+  ot_uptake = NA,
   site_params,
   spec_params,
   initials,
@@ -66,4 +67,7 @@ Example csv with all the spec_params & site_params required?
 }
 \examples{
 "see here" link?
+}
+\seealso{
+\code{\link[=check_grow]{check_grow()}}
 }

@@ -3,8 +3,6 @@ output: github_document
 bibliography: "references.bib"
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -22,16 +20,23 @@ library(knitr)
 
 This package intends to formalise and disseminate the macroalgae growth model originally developed by @hadley_modeling_2015 and modified in subsequent works. 
 
-# Usage
+# Getting started
 
 Install the package with:
 
-```{r eval = FALSE}
+```{r eval=F, include=T}
 devtools::install_github("https://github.com/stormeyseas/macrogrow.git")
 ```
 
-The model requires daily input vectors of temperature, surface irradience, salinity, and water velocity, along with a named vector of species-specific parameters to run. You can find a full use case in the [Grow macroalgae](vignettes/grow-macroalgae.Rmd) article, and a template for the required species parameters has been included within the package as asparagopsis_armata.csv. 
+The main function to grow macroaglae is `grow_macroalgae()`. A simple case is shown below, and you can find a full use case in the [Grow macroalgae](vignettes/grow-macroalgae.Rmd) article.
 
-<!-- # Updates and changes  -->
+The model requires three basic sets of data to run:
+
+* daily input vectors of temperature, surface irradience, salinity, and water velocity, 
+* a named vector of species-specific parameters, and
+* a named vector of site-specific parameters
+
+
+<!-- # Updates and changes -->
 
 # References

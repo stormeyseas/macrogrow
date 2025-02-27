@@ -29,7 +29,7 @@ Nf, mg m-3
 Convert biomass to Nf (and Ns)
 }
 \examples{
-examples
+Examples TBD
 }
 \seealso{
 \code{\link[=Nf_to_biomass(), Q_rel(), Q_int]{Nf_to_biomass(), Q_rel(), Q_int()}}

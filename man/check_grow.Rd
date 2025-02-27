@@ -16,6 +16,7 @@ check_grow(
   other_N = NA,
   ni_uptake,
   am_uptake,
+  ot_uptake = NA,
   site_params,
   spec_params,
   initials,
@@ -56,13 +57,10 @@ check_grow(
 dataframe of outputs
 }
 \description{
-Check that all parameters, inputs and settings are correct for the \code{grow_macroalgae()} function. Gives a report on what needs to be included. This is to avoid the main function giving endless warnings and messages.
+Check that all parameters, inputs and settings are correct for the \code{grow_macroalgae()} function. Gives a report on what needs to be included. This is to avoid the main function slowing down to give endless warnings and messages.
 }
 \details{
 Example csv with all the spec_params & site_params required?
-\itemize{
-\item Note that the final growth dataframe is inclusive of the start and end date, so the environmental vectors must be the same
-}
 }
 \examples{
 "see here" link?
