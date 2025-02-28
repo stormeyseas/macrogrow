@@ -96,7 +96,6 @@ grow_macroalgae <- function(start, grow_days, temperature, salinity, light, velo
     
     # Environmental limitation on growth
     T_lim[i]       <- T_lim(temperature[i], spec_params)
-    S_lim[i]       <- S_lim(salinity[i], spec_params)
     Q_lim[i]       <- Q_lim(Nf[i], Ns[i], spec_params)
     I_top[i]       <- unname(light[i] * exp(-site_params['kW'] * site_params['d_top']))
     I_lim[i]       <- I_lim(Nf[i], I_top[i], spec_params, site_params)
@@ -107,8 +106,14 @@ grow_macroalgae <- function(start, grow_days, temperature, salinity, light, velo
       loss(U0 = U_c, turbulence = site_params['turbulence'], spec_params = spec_params)
     )
     
+    if (is.na(salinity[i])) {
+      growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * Q_lim[i])
+    } else {
+      S_lim[i]       <- S_lim(salinity[i], spec_params)
+      growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * S_lim[i] * Q_lim[i])
+    }
+    
     # Nitrogen pool changes
-    growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * S_lim[i] * Q_lim[i])
     Ns_to_Nf[i]     <- pmin(growth_rate[i] * Ns[i], Ns[i]) # cannot convert more Ns than available
     Ns_loss[i]      <- unname(D_m * Ns[i])
     Nf_loss[i]      <- unname(D_m * Nf[i])
