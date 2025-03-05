@@ -47,12 +47,9 @@ grow_macroalgae <- function(start, grow_days, temperature, salinity, light, velo
   add_ammonium     <- ammonium
   add_nitrate      <- nitrate
   
-  # For adding other_N (e.g. urea, amino acids) - currently does nothing
-  if (length(other_N) == 0 | any(is.na(other_N))) {
-    add_other <- rep(0, length(t))
-  } else {
-    add_other <- other_N
-  }
+  # Which external factors are we using?
+  use_Slim  <- ifelse(any(is.na(salinity)), yes = F, no = T)
+  add_other <- ifelse(any(is.na(other_N)), yes = rep(0, length(t)), no = other_N)
   
   # External starting state
   conc_ammonium[1] <- add_ammonium[1]
@@ -63,10 +60,9 @@ grow_macroalgae <- function(start, grow_days, temperature, salinity, light, velo
   if (is.na(initials['Q_int'])) {
     initials['Q_int'] <- Q_int(Nf = initials['Nf'], Q_rel = initials['Q_rel'], spec_params = spec_params)
   }
-  Nf[1]            <- unname(initials['Nf'])  # Fixed nitrogen
-  Ns[1]            <- unname(Nf[1]*(initials['Q_int']/spec_params['Q_min'] - 1))          # Stored nitrogen
-  # det[1]           <- 10
-  
+  Nf[1]              <- unname(initials['Nf'])
+  Ns[1]              <- unname(Nf[1]*(initials['Q_int']/spec_params['Q_min'] - 1))
+
   # Main run, after starting state
   for (i in 1:length(t)) {
     
@@ -99,19 +95,15 @@ grow_macroalgae <- function(start, grow_days, temperature, salinity, light, velo
     Q_lim[i]       <- Q_lim(Nf[i], Ns[i], spec_params)
     I_top[i]       <- unname(light[i] * exp(-site_params['kW'] * site_params['d_top']))
     I_lim[i]       <- I_lim(Nf[i], I_top[i], spec_params, site_params)
-
+    S_lim[i]       <- ifelse(use_Slim == T, yes = S_lim(salinity[i], spec_params), no = 1)
+    
     # Biomass loss - CHECK THIS WORKS WHEN PARAMETERS ARE MISSING
     U_c            <- velocity[i] * u_c[i]
     D_m            <- suppressMessages(
       loss(U0 = U_c, turbulence = site_params['turbulence'], spec_params = spec_params)
     )
     
-    if (is.na(salinity[i])) {
-      growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * Q_lim[i])
-    } else {
-      S_lim[i]       <- S_lim(salinity[i], spec_params)
-      growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * S_lim[i] * Q_lim[i])
-    }
+    growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * S_lim[i] * Q_lim[i])
     
     # Nitrogen pool changes
     Ns_to_Nf[i]     <- pmin(growth_rate[i] * Ns[i], Ns[i]) # cannot convert more Ns than available
