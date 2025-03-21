@@ -54,7 +54,7 @@ check_grow(
 \item{other_constants}{a named vector of miscellaneous constants (see u_c)}
 }
 \value{
-dataframe of outputs
+printout of potential errors with main function
 }
 \description{
 Check that all parameters, inputs and settings are correct for the \code{grow_macroalgae()} function. Gives a report on what needs to be included. This is to avoid the main function slowing down to give endless warnings and messages.

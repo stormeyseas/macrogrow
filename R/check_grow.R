@@ -23,7 +23,7 @@
 #' @import rlang
 #' @importFrom units set_units drop_units
 #' 
-#' @return dataframe of outputs
+#' @return printout of potential errors with main function
 #' @export 
 #' 
 #' @details

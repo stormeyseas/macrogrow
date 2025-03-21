@@ -23,7 +23,7 @@
 #' @import rlang
 #' @importFrom units set_units drop_units
 #' 
-#' @return dataframe of outputs
+#' @return matrix of outputs
 #' @export 
 #' 
 #' @details
@@ -141,70 +141,18 @@ grow_macroalgae <- function(start, grow_days, temperature, salinity, light, velo
     }
   # End of main model run
   }
-   
+  
+  # Some quick renaming
+  date <- dates
+  add_nitrate <- nitrate
+  add_ammonium <- ammonium
+  conc_other_N <- other_N
+  
   # Put all the data together for outputs 
   if (sparse_output == F) {
-    df <- data.frame(
-      t = t, 
-      date = dates,
-      Nf = Nf,
-      Ns = Ns,
-      growth_rate = growth_rate,
-      Ns_to_Nf = Ns_to_Nf,
-      Ns_loss = Ns_loss,
-      Nf_loss = Nf_loss,
-      Q_int = Q_int,
-      Q_rel = Q_rel,
-      Q_lim = Q_lim,
-      B_dw.mg = B_dw.mg,
-      B_ww.mg = B_ww.mg,
-      hm = hm,
-      add_nitrate = nitrate,
-      conc_nitrate = conc_nitrate,
-      up_Ni = up_Ni,
-      add_ammonium = ammonium,
-      conc_ammonium = conc_ammonium,
-      up_Am = up_Am,
-      add_other = add_other,
-      conc_other_N = other_N,
-      up_Ot = up_Ot,
-      temperature = temperature,
-      T_lim = T_lim,
-      salinity = salinity,
-      S_lim = S_lim,
-      light = light,
-      I_top = I_top,
-      I_lim = I_lim,
-      velocity = velocity,
-      u_c = u_c,
-      lambda = lambda
-    )
+    df <- cbind(t, date, Nf, Ns, growth_rate, Ns_to_Nf, Ns_loss, Nf_loss, Q_int, Q_rel, Q_lim, B_dw.mg, B_ww.mg, hm, add_nitrate, conc_nitrate, up_Ni, add_ammonium, conc_ammonium, up_Am, add_other, conc_other_N, up_Ot, temperature, T_lim, salinity, S_lim, light, I_top, I_lim, velocity, u_c, lambda)
   } else {
-    df <- data.frame(
-      date = dates,
-      Nf = Nf,
-      Ns = Ns,
-      growth_rate = growth_rate,
-      Ns_to_Nf = Ns_to_Nf,
-      Ns_loss = Ns_loss,
-      Nf_loss = Nf_loss,
-      Q_int = Q_int,
-      Q_rel = Q_rel,
-      Q_lim = Q_lim,
-      B_dw.mg = B_dw.mg,
-      B_ww.mg = B_ww.mg,
-      hm = hm,
-      conc_nitrate = conc_nitrate,
-      up_Ni = up_Ni,
-      conc_ammonium = conc_ammonium,
-      up_Am = up_Am,
-      up_Ot = up_Ot,
-      T_lim = T_lim,
-      S_lim = S_lim,
-      I_top = I_top,
-      I_lim = I_lim,
-      u_c = u_c
-    )
+    df <- cbind(date, Nf, Ns, growth_rate, Ns_to_Nf, Ns_loss, Nf_loss, Q_int, Q_rel, Q_lim, B_dw.mg, B_ww.mg, hm, conc_nitrate, up_Ni, conc_ammonium, up_Am, up_Ot, T_lim, S_lim, I_top, I_lim, u_c)
   }
   return(df)
 }

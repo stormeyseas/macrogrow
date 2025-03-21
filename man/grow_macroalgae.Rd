@@ -54,7 +54,7 @@ grow_macroalgae(
 \item{other_constants}{a named vector of miscellaneous constants (see u_c)}
 }
 \value{
-dataframe of outputs
+matrix of outputs
 }
 \description{
 Initiate and grow macroalgae.
