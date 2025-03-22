@@ -101,7 +101,7 @@ grow_macroalgae <- function(start, grow_days, temperature, salinity, light, velo
       loss(U0 = U_c, turbulence = site_params['turbulence'], spec_params = spec_params)
     )
     
-    growth_rate[i]  <- unname(spec_params['mu'] * T_lim[i] * min(I_lim[i], S_lim[i]) * Q_lim[i])
+    growth_rate[i]  <- unname(spec_params['mu'] * min(T_lim[i], I_lim[i], S_lim[i]) * Q_lim[i])
     
     # Nitrogen pool changes
     Ns_to_Nf[i]     <- pmin(growth_rate[i] * Ns[i], Ns[i]) # cannot convert more Ns than available

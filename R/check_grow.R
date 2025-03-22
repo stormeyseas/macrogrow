@@ -51,7 +51,7 @@ check_grow <- function(start, grow_days, temperature, salinity, light, velocity,
   if (!is.numeric(nitrate)) {rlang::inform("FATAL: Variable 'nitrate' must be a numeric vector.")}
   if (!is.numeric(ammonium)) {rlang::inform("FATAL: Variable 'ammonium' must be a numeric vector.")}
   
-  if (!is.na(other_N)) {
+  if (is.na(other_N)) {
     use_other_N <- F
     check_length <- c(length(temperature), length(salinity), length(light), length(velocity), length(nitrate), length(ammonium))
   } else if (!is.numeric(other_N)) {
