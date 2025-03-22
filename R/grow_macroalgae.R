@@ -42,14 +42,12 @@ grow_macroalgae <- function(start, grow_days, temperature, salinity, light, velo
   
   # Placeholder vectors
   u_c <- I_top <- conc_nitrate <- conc_ammonium <- Nf <- Ns <- B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- conc_other <- Q_int <- Q_rel <- T_lim <- S_lim <- Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- up_Am <- up_Ni <- up_Ot <- # red_Am <- remin <- 
-    as.numeric(rep(NA, length.out = length(t)))
+    as.numeric(rep(NA, length(t)))
 
   add_ammonium     <- ammonium
   add_nitrate      <- nitrate
-  
-  # Which external factors are we using?
-  use_Slim  <- ifelse(any(is.na(salinity)), yes = F, no = T)
   add_other <- ifelse(any(is.na(other_N)), yes = rep(0, length(t)), no = other_N)
+  use_Slim  <- ifelse(any(is.na(salinity)), yes = F, no = T)
   
   # External starting state
   conc_ammonium[1] <- add_ammonium[1]
@@ -103,7 +101,7 @@ grow_macroalgae <- function(start, grow_days, temperature, salinity, light, velo
       loss(U0 = U_c, turbulence = site_params['turbulence'], spec_params = spec_params)
     )
     
-    growth_rate[i]  <- unname(spec_params['mu'] * I_lim[i] * T_lim[i] * S_lim[i] * Q_lim[i])
+    growth_rate[i]  <- unname(spec_params['mu'] * T_lim[i] * min(I_lim[i], S_lim[i]) * Q_lim[i])
     
     # Nitrogen pool changes
     Ns_to_Nf[i]     <- pmin(growth_rate[i] * Ns[i], Ns[i]) # cannot convert more Ns than available

@@ -35,12 +35,12 @@ check_grow <- function(start, grow_days, temperature, salinity, light, velocity,
   
   # Start date
   if (!lubridate::is.Date(start)) {
-    rlang::inform("Variable 'start' is not a date. Convert to date using lubridate::parse_date_time() or similar.")
+    rlang::inform("FATAL: Variable 'start' is not a date. Convert to date using lubridate::parse_date_time() or similar.")
   }
   if (is.na(grow_days) | missing(grow_days)) {
-    rlang::inform("Variable 'grow_days' not provided. Length of input variable 'temperature' will be used to populate timeseries.")
+    rlang::inform("WARN: Variable 'grow_days' not provided. Length of input variable 'temperature' will be used to populate timeseries.")
   } else if (!is.integer(grow_days) | grow_days <= 0) {
-    rlang::inform("Variable 'grow_days' must be a positive integer. Only whole days can be used.")
+    rlang::inform("FATAL: Variable 'grow_days' must be a positive integer. Only whole days can be used.")
   }
   
   # Check that input variables are present
@@ -56,7 +56,7 @@ check_grow <- function(start, grow_days, temperature, salinity, light, velocity,
     check_length <- c(length(temperature), length(salinity), length(light), length(velocity), length(nitrate), length(ammonium))
   } else if (!is.numeric(other_N)) {
     use_other_N <- T
-    rlang::inform("FATAL: Variable 'other_N' must be a numeric vector. If you do not want to use uptake of other_N, set other_N = NA.")
+    rlang::inform("WARN: Variable 'other_N' is set to NA")
     check_length <- c(length(temperature), length(salinity), length(light), length(velocity), length(nitrate), length(ammonium), length(other_N))
   }
   
