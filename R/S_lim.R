@@ -34,12 +34,14 @@ S_lim <- function(Sal, spec_params){
   if (spec_params['S_opt'] > spec_params['S_max']) {rlang::abort("error_bad_parameter", message = "Error: maximum salinity is lower than optimum salinity")} 
   if (spec_params['S_opt']-spec_params['S_min'] <= spec_params['S_max']-spec_params['S_opt']) {rlang::abort("error_bad_parameter", message = "Species CTMI function not valid! Must satisfy S_opt-S_min > S_max-S_opt")}
   
-  if (Sal >= spec_params['S_max']) {
-    Slim <- 0
+  Slim <- if (is.na(Sal)) {
+    1
+  } else if (Sal >= spec_params['S_max']) {
+    0
   } else if (Sal <= spec_params['S_min']) {
-    Slim <- 0
+    0
   } else {
-    Slim <- ((Sal - spec_params['S_max'])*(Sal - spec_params['S_min'])^2)/((spec_params['S_opt'] - spec_params['S_min'])*((spec_params['S_opt'] - spec_params['S_min'])*(Sal - spec_params['S_opt']) - (spec_params['S_opt'] - spec_params['S_max'])*(spec_params['S_opt'] + spec_params['S_min'] - 2*Sal)))
+    ((Sal - spec_params['S_max']) * (Sal - spec_params['S_min'])^2) / ((spec_params['S_opt'] - spec_params['S_min']) * ((spec_params['S_opt'] - spec_params['S_min']) * (Sal - spec_params['S_opt']) - (spec_params['S_opt'] - spec_params['S_max']) * (spec_params['S_opt'] + spec_params['S_min'] - 2 * Sal)))
   }
   return(unname(Slim))
 }
