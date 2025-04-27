@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_grow.R
 \name{check_grow}
 \alias{check_grow}
-\title{Check grow}
+\title{Pre-check all parameters for grow_macroalgae()}
 \usage{
 check_grow(
   start,

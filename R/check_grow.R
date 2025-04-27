@@ -1,4 +1,4 @@
-#' Check grow
+#' @title Pre-check all parameters for grow_macroalgae()
 #' 
 #' @description
 #' Check that all parameters, inputs and settings are correct for the `grow_macroalgae()` function. Gives a report on what needs to be included. This is to avoid the main function slowing down to give endless warnings and messages. 
