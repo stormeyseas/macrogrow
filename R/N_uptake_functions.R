@@ -54,8 +54,41 @@ get_uptake <- function(conc, uptake_shape = NA, Nform_abbr, spec_params) {
     } else {
       up <- MM_uptake(conc = conc, V = V, K = K)
     }
-    } else {
-      rlang::abort(glue::glue("Uptake shape `{uptake_shape}` is not recognised in FORT KICKASS"), class = "error_bad_parameter")
-    }
+  } else {
+    rlang::abort(glue::glue("Uptake shape `{uptake_shape}` is not recognised in FORT KICKASS"), class = "error_bad_parameter")
+  }
   return(up)
+}
+
+#' Uptake rate (linear)
+#' 
+#' @inheritParams MM_uptake
+#' @param M the slope of N uptake with increasing substrate concentration 
+#' @param C the intercept
+#'
+#' @return the rate of uptake at the specified external concentration
+#' @export
+#'
+#' @examples examples
+lin_uptake <- function(conc, M, C) {
+  uprate <- M * conc + C
+  return(unname(uprate))
+}
+
+#' Uptake rate (Michaelis-Menton)
+#'
+#' @param conc external substrate concentration
+#' @param V the maximum uptake rate \eqn{V_{max}}
+#' @param K the half-saturation constant \eqn{K_{c}}
+#'
+#' @return the rate of uptake at the specified external concentration
+#' @export
+#'
+MM_uptake <- function(conc, V, K) {
+  if (missing(V) & missing(K)) {abort_missing_parameter(param = "V and K", place = "spec_params. Did you mean to use lin_uptake() instead?")}
+  if (missing(V)) {abort_missing_parameter(param = "V", place = "spec_params and passed to function as 'V'")}
+  if (missing(K)) {abort_missing_parameter(param = "K", place = "spec_params and passed to function as 'K'")}
+  
+  uprate <- (V * conc / (K + conc))
+  return(unname(uprate))
 }
