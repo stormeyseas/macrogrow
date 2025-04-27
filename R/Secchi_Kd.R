@@ -1,4 +1,4 @@
-#' @title Kd from Secchi depth
+#' @title Get light attenuation parameter Kd from Secchi depth
 #'
 #' @description
 #' Calculates the light attenuation coefficient in water via:
@@ -12,11 +12,11 @@
 #' @return attenuation parameter for PAR
 #' @export
 #'
-Kd_from_Secchi <- function(SDD) {
+Secchi_to_Kd <- function(SDD) {
   1.584 * SDD^(-0.894)
 }
 
-#' @title Secchi depth from Kd
+#' @title Get Secchi depth from light attenuation parameter Kd
 #'
 #' @description
 #' Calculates the light attenuation coefficient in water via:
@@ -30,6 +30,6 @@ Kd_from_Secchi <- function(SDD) {
 #' @return Secchi disk depth (m)
 #' @export
 #'
-Secchi_from_Kd <- function(Kd) {
+Kd_to_Secchi <- function(Kd) {
   (Kd/1.584)^(-1/0.894)
 }
