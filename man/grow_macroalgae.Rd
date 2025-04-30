@@ -5,7 +5,7 @@
 \title{Grow macroalgae}
 \usage{
 grow_macroalgae(
-  start,
+  start = 1,
   grow_days,
   temperature,
   salinity,
@@ -21,11 +21,12 @@ grow_macroalgae(
   spec_params,
   initials,
   sparse_output = T,
+  track_limiting = T,
   other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
 )
 }
 \arguments{
-\item{start}{date, start of the growth period, date of at-sea deployment}
+\item{start}{numeric, start of the growth period (day of at-sea deployment). Defaults to 1.}
 
 \item{grow_days}{integer, number of day in growing period - if missing will take the length of the temperature vector}
 
@@ -33,7 +34,7 @@ grow_macroalgae(
 
 \item{salinity}{a vector of daily salt concentrations (g L-1)}
 
-\item{light}{a vector of incoming light (umol m-2 s-1)}
+\item{light}{a vector of surface light (umol m-2 s-1)}
 
 \item{velocity}{a vector of water velocities (m s-1)}
 
@@ -41,7 +42,7 @@ grow_macroalgae(
 
 \item{ammonium}{a vector of ammonium concentrations (mg m-3)}
 
-\item{other_N}{a vector of other nitrogen concentrations (mg N m-3)}
+\item{other_N}{a vector of other nitrogen concentrations (mg N m-3) - NOT IN USE}
 
 \item{site_params}{a named vector of species-specific parameters - see details}
 
@@ -50,6 +51,8 @@ grow_macroalgae(
 \item{initials}{a named vector of the macroalgae starting conditions}
 
 \item{sparse_output}{logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)}
+
+\item{track_limiting}{logical, whether to track a single "limiting" factor (see details)}
 
 \item{other_constants}{a named vector of miscellaneous constants (see u_c)}
 }

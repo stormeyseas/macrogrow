@@ -3,24 +3,25 @@
 #' @description
 #' Check that all parameters, inputs and settings are correct for the `grow_macroalgae()` function. Gives a report on what needs to be included. This is to avoid the main function slowing down to give endless warnings and messages. 
 #'
-#' @param start date, start of the growth period, date of at-sea deployment
+#' @param start numeric, start of the growth period (day of at-sea deployment). Defaults to 1.
 #' @param grow_days integer, number of day in growing period - if missing will take the length of the temperature vector
 #' @param temperature a vector of daily temperatures (C)
 #' @param salinity a vector of daily salt concentrations (g L-1)
-#' @param light a vector of incoming light (umol m-2 s-1)
+#' @param light a vector of surface light (umol m-2 s-1)
 #' @param velocity a vector of water velocities (m s-1)
 #' @param nitrate a vector of nitrate concentrations (mg m-3)
 #' @param ammonium a vector of ammonium concentrations (mg m-3)
-#' @param other_N a vector of other nitrogen concentrations (mg N m-3) 
+#' @param other_N a vector of other nitrogen concentrations (mg N m-3) - NOT IN USE
 #' @param site_params a named vector of species-specific parameters - see details
 #' @param spec_params a named vector of site-specific parameters - see details
 #' @param initials a named vector of the macroalgae starting conditions
 #' @param sparse_output logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)
+#' @param track_limiting logical, whether to track a single "limiting" factor (see details)
 #' @param other_constants a named vector of miscellaneous constants (see u_c)
 #'
 #' @importFrom lubridate is.Date ymd duration yday parse_date_time
 #' @importFrom glue glue
-#' @import rlang
+#' @import rlang cli
 #' @importFrom units set_units drop_units
 #' 
 #' @return printout of potential errors with main function
@@ -30,13 +31,18 @@
 #' Example csv with all the spec_params & site_params required?
 #'
 #' @examples "see here" link?
-check_grow <- function(start, grow_days, temperature, salinity, light, velocity, nitrate, ammonium, other_N = NA, ni_uptake, am_uptake, ot_uptake = NA, site_params, spec_params, initials, sparse_output = T, other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)) {
+check_grow <- function(start, grow_days, temperature, salinity, light, velocity, nitrate, ammonium, other_N = NA, ni_uptake, am_uptake, ot_uptake = NA, site_params, spec_params, initials, sparse_output = T, track_limiting = T, other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)) {
   rlang::inform("Starting all checks...")
   
   # Start date
-  if (!lubridate::is.Date(start)) {
-    rlang::inform("FATAL: Variable 'start' is not a date. Convert to date using lubridate::parse_date_time() or similar.")
+  if (!is.integer(start) & !is.numeric(start)) {
+    inform(c("x" = "Variable 'start' is not an integer. Convert a date to numeric using lubridate::yday() or similar, or use the default value of 1."))
+  } else if (!is.integer(start)) {
+    inform(c(">" = paste0("Variable 'start' is numeric (", start, ") but will be converted to integer (", as.integer(start), ")")))
+  } else {
+    inform(c("v" = "Variable 'start' looks good."))
   }
+  
   if (is.na(grow_days) | missing(grow_days)) {
     rlang::inform("WARN: Variable 'grow_days' not provided. Length of input variable 'temperature' will be used to populate timeseries.")
   } else if (!is.integer(grow_days) | grow_days <= 0) {
@@ -61,25 +67,41 @@ check_grow <- function(start, grow_days, temperature, salinity, light, velocity,
   }
   
   # Check that input variables are the correct length
+  t <- seq(start, (start+grow_days-1), 1)
   if (var(check_length) != 0) {
     rlang::inform("FATAL: Input variables are not all the same length.")
-  } else if ((check_length[1] - 1) == grow_days) {
-    rlang::inform("WARN: Variable 'grow_days' is one day shorter than input variables. grow_macroalgae() will add 1 day to grow_days to match input variables (it's inclusive of planting and harvest days).")
-  } else if (check_length[1] != grow_days) {
-    rlang::inform("FATAL: Variable 'grow_days' must be equal to the length of input variables (inclusive of planting and harvest days).")
+  } else if (check_length[1] == length(t)+1) {
+    rlang::inform(paste0("WARN: Variable 'grow_days' = ", grow_days, " but length of input variables = ", check_length[1], ". grow_macroalgae() will add 1 day to grow_days to match input variables (it's inclusive of planting and harvest days)."))
+  } else if (check_length[1] != length(t)) {
+    rlang::inform(paste0("WARN: Variable 'grow_days' = ", grow_days, " but length of input variables = ", check_length[1], ". These must match - 'grow_days' is inclusive of planting AND harvest days."))
   }
 
   essential_site_params <- c("farmA", "hz", "hc", "kW", "d_top")
   if (!all(essential_site_params %in% names(site_params))) {
     rlang::inform(paste0("FATAL: Parameter '", essential_site_params[which(!essential_site_params %in% names(site_params))], "' is missing from site_params."))
+  } else if (any(is.na(site_params[essential_site_params]))) {
+    rlang::inform(paste0("FATAL: Parameter '", essential_site_params[which(is.na(site_params[essential_site_params]))], "' in site_params cannot be NA."))
   }
   
-  if (is.na(initials['Nf'])) {rlang::inform("FATAL: Parameter 'Nf' is missing from initials. Calculate it using biomass_to_Nf() first if required.")}
-  if (is.na(initials['Q_int']) & is.na(initials['Q_rel'])) {rlang::inform("FATAL: Parameters 'Q_int' and 'Q_rel' are missing from initials. You must provide one of them to get macroalgae initial state. Calculate Q_int using Q_int() from Nf and Ns.")}
+  # Check validity of initial variables
+  if (!'Nf' %in% names(initials)) {
+    rlang::inform("FATAL: Parameter 'Nf' is missing from initials. Calculate it using biomass_to_Nf() first if required.")
+  } else if (is.na(initials['Nf'])) {
+    rlang::inform("FATAL: Parameter 'Nf' in initials cannot be NA.")
+  }
   
+  if (!'Q_int' %in% names(initials) & !'Q_rel' %in% names(initials)) {
+    rlang::inform("FATAL: Parameters 'Q_int' and 'Q_rel' are missing from initials. You must provide one of them to get macroalgae initial state. You can calculate Q_int using Q_int() from Nf and Ns.")
+  } else if (is.na(initials['Q_int']) & is.na(initials['Q_rel'])) {
+    rlang::inform("FATAL: Parameters 'Q_int' and 'Q_rel' in initials cannot both be NA.")
+  }
+  
+  # Check that all essential parameters are present
   essential_spec_params <- c('Q_min', 'Q_max', 'K_c', 'mu', 'a_cs', 'I_o', 'T_opt', 'T_min', 'T_max', 'DWWW')
   if (!all(essential_spec_params %in% names(spec_params))) {
     rlang::inform(paste0("FATAL: Parameter '", essential_spec_params[which(!essential_spec_params %in% names(spec_params))], "' is missing from spec_params."))
+  } else if (any(is.na(spec_params[essential_spec_params]))) {
+    rlang::inform(paste0("FATAL: Parameter '", essential_spec_params[which(is.na(spec_params[essential_spec_params]))], "' in spec_params cannot be NA."))
   }
   
   # Optional parts, which depend on other inputs -------------------------------------------------------------------------------------------------------
@@ -143,6 +165,15 @@ check_grow <- function(start, grow_days, temperature, salinity, light, velocity,
   } else {
     rlang::inform("INFORM: sparse_output is 'T', truncated outputs will be given.")
   }
+  
+  if(!is.logical(track_limiting)) {
+    rlang::inform("FATAL: track_limiting is not logical - must be 'T' (default) or 'F'.")
+  } else if (track_limiting == F) {
+    rlang::inform("INFORM: track_limiting is 'F', limiting factor will not be given.")
+  } else {
+    rlang::inform("INFORM: track_limiting is 'T', limiting factor will be given.")
+  }
+  
 }
 
 

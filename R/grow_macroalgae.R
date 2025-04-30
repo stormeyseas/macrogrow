@@ -3,19 +3,20 @@
 #' @description
 #' Initiate and grow macroalgae.
 #'
-#' @param start date, start of the growth period, date of at-sea deployment
+#' @param start numeric, start of the growth period (day of at-sea deployment). Defaults to 1.
 #' @param grow_days integer, number of day in growing period - if missing will take the length of the temperature vector
 #' @param temperature a vector of daily temperatures (C)
 #' @param salinity a vector of daily salt concentrations (g L-1)
-#' @param light a vector of incoming light (umol m-2 s-1)
+#' @param light a vector of surface light (umol m-2 s-1)
 #' @param velocity a vector of water velocities (m s-1)
 #' @param nitrate a vector of nitrate concentrations (mg m-3)
 #' @param ammonium a vector of ammonium concentrations (mg m-3)
-#' @param other_N a vector of other nitrogen concentrations (mg N m-3) 
+#' @param other_N a vector of other nitrogen concentrations (mg N m-3) - NOT IN USE
 #' @param site_params a named vector of species-specific parameters - see details
 #' @param spec_params a named vector of site-specific parameters - see details
 #' @param initials a named vector of the macroalgae starting conditions
 #' @param sparse_output logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)
+#' @param track_limiting logical, whether to track a single "limiting" factor (see details)
 #' @param other_constants a named vector of miscellaneous constants (see u_c)
 #'
 #' @importFrom lubridate is.Date ymd duration yday parse_date_time
@@ -32,23 +33,43 @@
 #'
 #' @examples "see here" link?
 #' @seealso [check_grow()]
-grow_macroalgae <- function(start, grow_days, temperature, salinity, light, velocity, nitrate, ammonium, other_N = NA, ni_uptake, am_uptake, ot_uptake = NA, site_params, spec_params, initials, sparse_output = T, other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)) {
+grow_macroalgae <- function(start = 1,
+                            grow_days,
+                            temperature,
+                            salinity,
+                            light,
+                            velocity,
+                            nitrate,
+                            ammonium,
+                            other_N = NA,
+                            ni_uptake,
+                            am_uptake,
+                            ot_uptake = NA,
+                            site_params,
+                            spec_params,
+                            initials,
+                            sparse_output = T,
+                            track_limiting = T,
+                            other_constants = c(s = 0.0045,
+                                                gam = 1.13,
+                                                a2 = 0.2^2,
+                                                Cb = 0.0025)) {
   
-  t <- seq(lubridate::yday(start), lubridate::yday(start)+grow_days, 1)
-  dates <- seq(start, start + lubridate::duration(grow_days, "days"), by = 'days')
+  t <- seq(start, (start+grow_days-1), 1)
   
   # Site parameters
   farmV <- unname(site_params['farmA'] * site_params['hc'])
   
   # Placeholder vectors
-  u_c <- I_top <- conc_nitrate <- conc_ammonium <- Nf <- Ns <- B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- conc_other <- Q_int <- Q_rel <- T_lim <- S_lim <- Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- up_Am <- up_Ni <- up_Ot <- # red_Am <- remin <- 
+  u_c <- I_top <- conc_nitrate <- conc_ammonium <- Nf <- Ns <- B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- conc_other <- Q_int <- Q_rel <- T_lim <- S_lim <- Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- up_Am <- up_Ni <- up_Ot <- limiting <- 
+    # red_Am <- remin <- 
     as.numeric(rep(NA, length(t)))
 
   add_ammonium     <- ammonium
   add_nitrate      <- nitrate
   add_other <- ifelse(any(is.na(other_N)), yes = rep(0, length(t)), no = other_N)
   use_Slim  <- ifelse(any(is.na(salinity)), yes = F, no = T)
-  
+
   # External starting state
   conc_ammonium[1] <- add_ammonium[1]
   conc_nitrate[1]  <- add_nitrate[1]
@@ -124,7 +145,7 @@ grow_macroalgae <- function(start, grow_days, temperature, salinity, light, velo
                                           spec_params = spec_params)
                              )
     
-    # If you're not at the final day
+    # If you're not at the final day, set up for next day
     if (i < length(t)) {
       # Changes in external state
       conc_ammonium[i+1] <- conc_ammonium[i] - up_Am[i] + Ns_loss[i]
@@ -141,16 +162,15 @@ grow_macroalgae <- function(start, grow_days, temperature, salinity, light, velo
   }
   
   # Some quick renaming
-  date <- dates
   add_nitrate <- nitrate
   add_ammonium <- ammonium
   conc_other_N <- other_N
   
   # Put all the data together for outputs 
   if (sparse_output == F) {
-    df <- cbind(t, date, Nf, Ns, growth_rate, Ns_to_Nf, Ns_loss, Nf_loss, Q_int, Q_rel, Q_lim, B_dw.mg, B_ww.mg, hm, add_nitrate, conc_nitrate, up_Ni, add_ammonium, conc_ammonium, up_Am, add_other, conc_other_N, up_Ot, temperature, T_lim, salinity, S_lim, light, I_top, I_lim, velocity, u_c, lambda)
+    df <- cbind(t, Nf, Ns, growth_rate, Ns_to_Nf, Ns_loss, Nf_loss, Q_int, Q_rel, Q_lim, B_dw.mg, B_ww.mg, hm, add_nitrate, conc_nitrate, up_Ni, add_ammonium, conc_ammonium, up_Am, add_other, conc_other_N, up_Ot, temperature, T_lim, salinity, S_lim, light, I_top, I_lim, velocity, u_c, lambda)
   } else {
-    df <- cbind(date, Nf, Ns, growth_rate, Ns_to_Nf, Ns_loss, Nf_loss, Q_int, Q_rel, Q_lim, B_dw.mg, B_ww.mg, hm, conc_nitrate, up_Ni, conc_ammonium, up_Am, up_Ot, T_lim, S_lim, I_top, I_lim, u_c)
+    df <- cbind(t, Nf, Ns, growth_rate, Ns_to_Nf, Ns_loss, Nf_loss, Q_int, Q_rel, Q_lim, B_dw.mg, B_ww.mg, hm, conc_nitrate, up_Ni, conc_ammonium, up_Am, conc_other, up_Ot, T_lim, S_lim, I_top, I_lim, u_c)
   }
   return(df)
 }
