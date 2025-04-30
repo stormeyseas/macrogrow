@@ -29,9 +29,14 @@ get_limiting <- function(output, spec_params) {
 
   for (i in 1:nrow(output)) {
     # growth_rate[i]  <- unname(spec_params['mu'] * min(T_lim[i], I_lim[i], S_lim[i]) * Q_lim[i])
+    growth_factors <- c(output[i,'T_lim'], output[i,'I_lim'], output[i,'S_lim'], output[i,'Q_lim'])
     
     if (output[i,'growth_rate']/spec_params['mu'] == 1) {
       limiting[i] <- "No_limit"
+    } else if (any(growth_factors == 0)) {
+      zero_lim <- which(growth_factors == 0)
+      zero_lim <- names(zero_lim)
+      limiting[i] <- paste(zero_lim, collapse = " & ")
     } else {
       # 1. Temperature, light, salinity, or nutrients
       first_lim <- min(output[i,'T_lim'], output[i,'I_lim'], output[i,'S_lim'], output[i,'Q_lim'])

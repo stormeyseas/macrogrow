@@ -6,15 +6,125 @@ date: "`r Sys.Date()`"
 
 This space will be used to detail how to use the main model function, `grow_macroalgae()`.
 
-```{r}
+```{r setup}
 library(macrogrow)
+library(here)
+library(magrittr)
+library(units)
+library(lubridate)
 ```
 
 # Environmental vectors
 
-```{r datafile}
-# df <- read.csv("../data-raw/environmental-vectors.csv")
+```{r load data}
+env <- here() %>% file.path("data", "env.rda")
+load(env)
+
+site_params <- c(
+  hz = 30.0,
+  d_top = 1.0,
+  hc = 5, 
+  kW = Secchi_to_Kd(10),
+  farmA = 50*50
+)
+
+a_armata <- c(
+  V_am = 4.991988e+00,
+  K_am = 1.402071e+02,
+  M_am = 3.360000e-03,
+  C_am = 2.954853e+00,
+  V_ni = NA,
+  K_ni = NA,
+  M_ni = 0.000000e+00,
+  C_ni = 1.138183e-01,
+  V_ot = NA,
+  K_ot = NA,
+  M_ot = 1.440000e-04,
+  C_ot = 2.958215e-01,
+  Q_min = 1.943162e+01,
+  Q_max = 4.303730e+01,
+  K_c = 6.000000e+00,
+  mu = 3.472222e-01,
+  D_m = NA,
+  D_ve = 1.533634e-02,
+  D_lo = 5.389931e-02,
+  D_mi = 1.270484e-01,
+  D_hi = 2.567621e-01,
+  a_cs = 2.509013e-06,
+  I_o = 1.500000e+02,
+  T_opt = 20,
+  T_min = 8.895487e+00,
+  T_max = 2.242924e+01,
+  S_opt = 3.525000e+01,
+  S_min = 3.375000e+01,
+  S_max = 3.625000e+01,
+  h_a = 3.850000e+03,
+  h_b = 1.750000e+00,
+  h_c = 1.000000e-03,
+  h_max = 2.600000e-01,
+  DWWW = 7.680000e+00
+)
+
+init_biomass <- 0.05 %>% set_units("g L-1") %>% set_units("mg m-3") %>% drop_units()
+init_arma <- c(
+  Nf = biomass_to_Nf(
+    biomass = init_biomass,
+    Q_rel = 0.75,
+    spec_params = a_armata,
+    dry = F
+  ),
+  Q_rel = 0.75
+)
+
+grow_dates <- seq(as.Date("2023-01-15"), length.out = 42, by = "days")
+```
+
+# Check macrogrow inputs
+
+Since the `grow_macroalgae()` function has so many inputs with very specific requirements, the `check_grow()` function is designed to take the exact same inputs as `grow_macroalgae()` and provide a report.
+
+```{r check for macrogrow}
+check_grow(
+  start = lubridate::yday(grow_dates[1]),
+  grow_days = length(grow_dates),
+  temperature = env$temperature[yday(grow_dates)],
+  salinity = env$salinity[yday(grow_dates)],
+  light = env$light[yday(grow_dates)],
+  velocity = env$velocity[yday(grow_dates)],
+  nitrate = env$nitrate[yday(grow_dates)],
+  ammonium = env$ammonium[yday(grow_dates)],
+  ni_uptake = "linear",
+  am_uptake = "MM",
+  site_params = site_params, 
+  spec_params = a_armata,
+  initials = init_arma
+)
+```
+
+```{r Tlim}
+sapply(FUN = T_lim, X = seq(0,30,0.5), spec_params = spec_params)
 ```
 
 
+```{r grow macroalgae}
+gro <- grow_macroalgae(
+  start = grow_dates[1],
+  grow_days = length(grow_dates),
+  temperature = env$temperature[yday(grow_dates)],
+  salinity = env$salinity[yday(grow_dates)],
+  light = env$light[yday(grow_dates)],
+  velocity = env$velocity[yday(grow_dates)],
+  nitrate = env$nitrate[yday(grow_dates)],
+  ammonium = env$ammonium[yday(grow_dates)],
+  ni_uptake = "linear",
+  am_uptake = "MM",
+  site_params = site_params, 
+  spec_params = a_armata,
+  initials = init_arma
+)
+```
+
+```{r get limiting}
+lims <- get_limiting(gro, spec_params = a_armata)
+```
 
