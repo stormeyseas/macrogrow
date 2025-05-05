@@ -5,19 +5,20 @@
 #'
 #' @param start numeric, start of the growth period (day of at-sea deployment). Defaults to 1.
 #' @param grow_days integer, number of day in growing period - if missing will take the length of the temperature vector
-#' @param temperature a vector of daily temperatures (C)
-#' @param salinity a vector of daily salt concentrations (g L-1)
-#' @param light a vector of surface light (umol m-2 s-1)
-#' @param velocity a vector of water velocities (m s-1)
-#' @param nitrate a vector of nitrate concentrations (mg m-3)
-#' @param ammonium a vector of ammonium concentrations (mg m-3)
-#' @param other_N a vector of other nitrogen concentrations (mg N m-3) - NOT IN USE
+#' @param temperature a vector of daily temperatures (\eqn{^{\circ}}C)
+#' @param salinity a vector of daily salt concentrations (g L\eqn{^{-1}})
+#' @param light a vector of surface light (umol m\eqn{^{-2}} s\eqn{^{-1}})
+#' @param kW a vector of light attenuation coefficients for open water (m\eqn{^{-1}})
+#' @param velocity a vector of water velocities (m s\eqn{^{-1}})
+#' @param nitrate a vector of nitrate concentrations (mg m\eqn{^{-3}})
+#' @param ammonium a vector of ammonium concentrations (mg m\eqn{^{-3}})
+#' @param other_N a vector of other nitrogen concentrations (mg N m\eqn{^{-3}}) - NOT IN USE
 #' @param site_params a named vector of species-specific parameters - see details
 #' @param spec_params a named vector of site-specific parameters - see details
 #' @param initials a named vector of the macroalgae starting conditions
 #' @param sparse_output logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)
 #' @param track_limiting logical, whether to track a single "limiting" factor (see details)
-#' @param other_constants a named vector of miscellaneous constants (see u_c)
+#' @param other_constants a named vector of miscellaneous constants (see `u_c()`)
 #'
 #' @importFrom lubridate is.Date ymd duration yday parse_date_time
 #' @importFrom glue glue
@@ -38,6 +39,7 @@ grow_macroalgae <- function(start = 1,
                             temperature,
                             salinity,
                             light,
+                            kW,
                             velocity,
                             nitrate,
                             ammonium,
@@ -112,8 +114,8 @@ grow_macroalgae <- function(start = 1,
     # Environmental limitation on growth
     T_lim[i]       <- T_lim(temperature[i], spec_params)
     Q_lim[i]       <- Q_lim(Nf[i], Ns[i], spec_params)
-    I_top[i]       <- unname(light[i] * exp(-site_params['kW'] * site_params['d_top']))
-    I_lim[i]       <- I_lim(Nf[i], I_top[i], spec_params, site_params)
+    I_top[i]       <- unname(light[i] * exp(-kW[i] * site_params['d_top']))
+    I_lim[i]       <- I_lim(Nf[i], I_top[i], kW[i], spec_params, site_params)
     S_lim[i]       <- ifelse(use_Slim == T, yes = S_lim(salinity[i], spec_params), no = 1)
     
     # Biomass loss - CHECK THIS WORKS WHEN PARAMETERS ARE MISSING

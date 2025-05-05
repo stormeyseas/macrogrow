@@ -12,6 +12,7 @@
 #' 
 #' @inheritParams Q_int
 #' @param I the surface irradiance, PAR (\eqn{\mu}mol photons m\eqn{^{-2}} s\eqn{^{-1}})
+#' @param kW the light attenuation coefficient for open water (m\eqn{^{-1}})
 #' @param spec_params a vector of named numbers. Must include:
 #' * `a_cs`, the carbon-specific self-shading constant
 #' * `I_o`, the light saturation parameter
@@ -19,7 +20,6 @@
 #' * `h_max`, maximum species height
 #' @param site_params A vector of named numbers. Must include:
 #' * \eqn{d_{top}} the below-surface  depth (m) of the top of the macroalgae culture
-#' * \eqn{kW} the light-attenuation coefficient of open water
 #'
 #' @return a scalar of relative light limitation on growth (between 0 and 1)
 #' @export

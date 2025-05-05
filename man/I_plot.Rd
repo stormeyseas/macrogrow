@@ -20,7 +20,6 @@ I_plot(Nf, spec_params, site_params, irr = seq(0, 2500, 10))
 \item{site_params}{A vector of named numbers. Must include:
 \itemize{
 \item \eqn{d_{top}} the below-surface  depth (m) of the top of the macroalgae culture
-\item \eqn{kW} the light-attenuation coefficient of open water
 }}
 
 \item{irr}{a vector of the range of surface irradiance values to be tested (defaults to seq(0, 2500, 10))}

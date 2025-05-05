@@ -55,6 +55,8 @@ check_grow(
 \item{track_limiting}{logical, whether to track a single "limiting" factor (see details)}
 
 \item{other_constants}{a named vector of miscellaneous constants (see u_c)}
+
+\item{kd}{a vector of light attenuation parameters (m-1)}
 }
 \value{
 printout of potential errors with main function

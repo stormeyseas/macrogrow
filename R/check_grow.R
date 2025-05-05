@@ -8,6 +8,7 @@
 #' @param temperature a vector of daily temperatures (C)
 #' @param salinity a vector of daily salt concentrations (g L-1)
 #' @param light a vector of surface light (umol m-2 s-1)
+#' @param kd a vector of light attenuation parameters (m-1)
 #' @param velocity a vector of water velocities (m s-1)
 #' @param nitrate a vector of nitrate concentrations (mg m-3)
 #' @param ammonium a vector of ammonium concentrations (mg m-3)

@@ -22,8 +22,9 @@ I_lim(Nf, I, spec_params, site_params)
 \item{site_params}{A vector of named numbers. Must include:
 \itemize{
 \item \eqn{d_{top}} the below-surface  depth (m) of the top of the macroalgae culture
-\item \eqn{kW} the light-attenuation coefficient of open water
 }}
+
+\item{kW}{the light attenuation coefficient for open water (m\eqn{^{-1}})}
 }
 \value{
 a scalar of relative light limitation on growth (between 0 and 1)

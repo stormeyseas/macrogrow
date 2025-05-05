@@ -10,6 +10,7 @@ grow_macroalgae(
   temperature,
   salinity,
   light,
+  kW,
   velocity,
   nitrate,
   ammonium,
@@ -30,19 +31,21 @@ grow_macroalgae(
 
 \item{grow_days}{integer, number of day in growing period - if missing will take the length of the temperature vector}
 
-\item{temperature}{a vector of daily temperatures (C)}
+\item{temperature}{a vector of daily temperatures (\eqn{^{\circ}}C)}
 
-\item{salinity}{a vector of daily salt concentrations (g L-1)}
+\item{salinity}{a vector of daily salt concentrations (g L\eqn{^{-1}})}
 
-\item{light}{a vector of surface light (umol m-2 s-1)}
+\item{light}{a vector of surface light (umol m\eqn{^{-2}} s\eqn{^{-1}})}
 
-\item{velocity}{a vector of water velocities (m s-1)}
+\item{kW}{a vector of light attenuation coefficients for open water (m\eqn{^{-1}})}
 
-\item{nitrate}{a vector of nitrate concentrations (mg m-3)}
+\item{velocity}{a vector of water velocities (m s\eqn{^{-1}})}
 
-\item{ammonium}{a vector of ammonium concentrations (mg m-3)}
+\item{nitrate}{a vector of nitrate concentrations (mg m\eqn{^{-3}})}
 
-\item{other_N}{a vector of other nitrogen concentrations (mg N m-3) - NOT IN USE}
+\item{ammonium}{a vector of ammonium concentrations (mg m\eqn{^{-3}})}
+
+\item{other_N}{a vector of other nitrogen concentrations (mg N m\eqn{^{-3}}) - NOT IN USE}
 
 \item{site_params}{a named vector of species-specific parameters - see details}
 
@@ -54,7 +57,7 @@ grow_macroalgae(
 
 \item{track_limiting}{logical, whether to track a single "limiting" factor (see details)}
 
-\item{other_constants}{a named vector of miscellaneous constants (see u_c)}
+\item{other_constants}{a named vector of miscellaneous constants (see \code{u_c()})}
 }
 \value{
 matrix of outputs
