@@ -4,12 +4,14 @@
 \alias{I_lim}
 \title{Light limitation on growth}
 \usage{
-I_lim(Nf, I, spec_params, site_params)
+I_lim(Nf, I, kW, spec_params, site_params)
 }
 \arguments{
 \item{Nf}{Fixed nitrogen (mg m\eqn{^{-3}})}
 
 \item{I}{the surface irradiance, PAR (\eqn{\mu}mol photons m\eqn{^{-2}} s\eqn{^{-1}})}
+
+\item{kW}{the light attenuation coefficient for open water (m\eqn{^{-1}})}
 
 \item{spec_params}{a vector of named numbers. Must include:
 \itemize{
@@ -23,8 +25,6 @@ I_lim(Nf, I, spec_params, site_params)
 \itemize{
 \item \eqn{d_{top}} the below-surface  depth (m) of the top of the macroalgae culture
 }}
-
-\item{kW}{the light attenuation coefficient for open water (m\eqn{^{-1}})}
 }
 \value{
 a scalar of relative light limitation on growth (between 0 and 1)

@@ -28,18 +28,17 @@
 #' 
 #' @seealso [algae_height()]
 #' 
-I_lim <- function(Nf, I, spec_params, site_params) {
+I_lim <- function(Nf, I, kW, spec_params, site_params) {
   # Check that required parameters are supplied
-  if (is.na(site_params['kW'])) {abort_missing_parameter(param = "kW", place = "site_params")}
   if (is.na(site_params['d_top'])) {abort_missing_parameter(param = "d_top", place = "site_params")}
   if (is.na(spec_params['a_cs'])) {abort_missing_parameter(param = "a_cs", place = "spec_params")}
   if (is.na(spec_params['I_o'])) {abort_missing_parameter(param = "I_o", place = "spec_params")}
   
-  I_top <- I * exp(-(site_params['kW']*site_params['d_top']))
+  I_top <- I * exp(-(kW*site_params['d_top']))
   
   h_m <- algae_height(Nf, spec_params)
   k_ma <-  Nf * h_m * spec_params['a_cs'] * pmax(h_m/site_params['d_top'], 1) * 1/(pmin(h_m, site_params['d_top']))
-  K <- k_ma + site_params['kW']
+  K <- k_ma + kW
   
   Ilim <- exp(1)/(K*h_m) *
     (
