@@ -23,7 +23,8 @@ biomass_to_Nf <- function(biomass, Q_int = NULL, Q_rel = 0.5, spec_params, dry =
     biomass <- biomass/unname(spec_params['DWWW'])
   }
   Nf <- unname((biomass * (Q_int/1000))/(1 + (Q_int/spec_params['Q_min'] - 1)))
+  Ns <- unname(Nf * (Q_int/spec_params['Q_min'] - 1))
   
-  return(Nf)
+  return(c(Nf = Nf, Ns = Ns))
 }
 
