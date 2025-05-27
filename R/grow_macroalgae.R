@@ -112,7 +112,7 @@ grow_macroalgae <- function(start = 1,
     conc_other[i]        <- add_other[i]    * lambda_0[i]/lambda[i]
     
     # Environmental limitation on growth
-    T_lim[i]       <- T_lim(temperature[i], spec_params)
+    T_lim[i]       <- T_lim(Tc = temperature[i], spec_params = spec_params)
     Q_lim[i]       <- Q_lim(Nf[i], Ns[i], spec_params)
     I_top[i]       <- unname(light[i] * exp(-kW[i] * site_params['d_top']))
     I_lim[i]       <- I_lim(Nf[i], I_top[i], kW[i], spec_params, site_params)

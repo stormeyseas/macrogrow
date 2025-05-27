@@ -29,9 +29,15 @@ T_lim <- function(Tc, spec_params){
   if (is.na(spec_params['T_min'])) {abort_missing_parameter(param = "T_min", place = "spec_params")}
   if (is.na(spec_params['T_max'])) {abort_missing_parameter(param = "T_max", place = "spec_params")}
   
-  if (spec_params['T_opt'] < spec_params['T_min']) {rlang::abort("error_bad_parameter", message = "Minimum temperature is higher than optimum temperature")}
-  if (spec_params['T_opt'] > spec_params['T_max']) {rlang::abort("error_bad_parameter", message = "Error: maximum temperature is lower than optimum temperature")} 
-  if (spec_params['T_opt']-spec_params['T_min'] <= spec_params['T_max']-spec_params['T_opt']) {rlang::abort("error_bad_parameter", message = "Species CTMI function not valid! Must satisfy T_opt-T_min > T_max-T_opt")}
+  if (spec_params['T_opt'] < spec_params['T_min']) {
+    rlang::abort("error_bad_parameter", message = "Minimum temperature is higher than optimum temperature")
+  }
+  if (spec_params['T_opt'] > spec_params['T_max']) {
+    rlang::abort("error_bad_parameter", message = "Error: maximum temperature is lower than optimum temperature")
+  } 
+  if (spec_params['T_opt']-spec_params['T_min'] <= spec_params['T_max']-spec_params['T_opt']) {
+    rlang::abort("error_bad_parameter", message = "Species CTMI function not valid! Must satisfy T_opt-T_min > T_max-T_opt")
+  }
   
   if (Tc >= spec_params['T_max']) {
     Tlim <- 0
