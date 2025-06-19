@@ -21,7 +21,7 @@
 get_uptake <- function(conc, uptake_shape = NA, Nform_abbr, spec_params) {
   
   if (is.na(conc)) {
-    rlang::abort("Concentration cannot be NA", class = "error_bad_parameter")
+    rlang::abort("Concentration passed to get_uptake cannot be NA", class = "error_bad_parameter")
   }
   
   M <- spec_params[paste0("M", "_", Nform_abbr)]

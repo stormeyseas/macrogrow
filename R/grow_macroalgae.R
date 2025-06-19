@@ -3,7 +3,7 @@
 #' @description
 #' Initiate and grow macroalgae.
 #'
-#' @param start numeric, start of the growth period (day of at-sea deployment). Defaults to 1.
+#' @param start integer, start of the growth period (day of at-sea deployment). Defaults to 1.
 #' @param grow_days integer, number of day in growing period - if missing will take the length of the temperature vector
 #' @param temperature a vector of daily temperatures (\eqn{^{\circ}}C)
 #' @param salinity a vector of daily salt concentrations (g L\eqn{^{-1}})
@@ -17,7 +17,6 @@
 #' @param spec_params a named vector of site-specific parameters - see details
 #' @param initials a named vector of the macroalgae starting conditions
 #' @param sparse_output logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)
-#' @param track_limiting logical, whether to track a single "limiting" factor (see details)
 #' @param other_constants a named vector of miscellaneous constants (see `u_c()`)
 #'
 #' @importFrom lubridate is.Date ymd duration yday parse_date_time
@@ -51,13 +50,12 @@ grow_macroalgae <- function(start = 1,
                             spec_params,
                             initials,
                             sparse_output = T,
-                            track_limiting = T,
                             other_constants = c(s = 0.0045,
                                                 gam = 1.13,
                                                 a2 = 0.2^2,
                                                 Cb = 0.0025)) {
   
-  t <- seq(start, (start+grow_days-1), 1)
+  t <- seq(as.integer(start), (as.integer(start)+grow_days-1), 1)
   
   # Site parameters
   farmV <- unname(site_params['farmA'] * site_params['hc'])

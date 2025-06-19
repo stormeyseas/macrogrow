@@ -22,12 +22,11 @@ grow_macroalgae(
   spec_params,
   initials,
   sparse_output = T,
-  track_limiting = T,
   other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
 )
 }
 \arguments{
-\item{start}{numeric, start of the growth period (day of at-sea deployment). Defaults to 1.}
+\item{start}{integer, start of the growth period (day of at-sea deployment). Defaults to 1.}
 
 \item{grow_days}{integer, number of day in growing period - if missing will take the length of the temperature vector}
 
@@ -54,8 +53,6 @@ grow_macroalgae(
 \item{initials}{a named vector of the macroalgae starting conditions}
 
 \item{sparse_output}{logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)}
-
-\item{track_limiting}{logical, whether to track a single "limiting" factor (see details)}
 
 \item{other_constants}{a named vector of miscellaneous constants (see \code{u_c()})}
 }

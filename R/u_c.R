@@ -23,7 +23,7 @@
 #' @export
 #' @seealso [algae_height(), u_b(), C_t()]
 #' 
-u_c <- function(U0, macro_state = c(biomass, hm), site_params, spec_params, constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)){
+u_c <- function(U0, macro_state, site_params, spec_params, constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)){
   
   if (missing(spec_params) | is.na(spec_params["SA_WW"])) {
     SA_WW <- 0.5 * (0.0306/2) # default is based on Macrocystis pyrifera

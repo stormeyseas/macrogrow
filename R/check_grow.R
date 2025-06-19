@@ -8,7 +8,7 @@
 #' @param temperature a vector of daily temperatures (C)
 #' @param salinity a vector of daily salt concentrations (g L-1)
 #' @param light a vector of surface light (umol m-2 s-1)
-#' @param kd a vector of light attenuation parameters (m-1)
+#' @param kW a vector of light attenuation parameters (m-1)
 #' @param velocity a vector of water velocities (m s-1)
 #' @param nitrate a vector of nitrate concentrations (mg m-3)
 #' @param ammonium a vector of ammonium concentrations (mg m-3)
@@ -17,7 +17,6 @@
 #' @param spec_params a named vector of site-specific parameters - see details
 #' @param initials a named vector of the macroalgae starting conditions
 #' @param sparse_output logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)
-#' @param track_limiting logical, whether to track a single "limiting" factor (see details)
 #' @param other_constants a named vector of miscellaneous constants (see u_c)
 #'
 #' @importFrom lubridate is.Date ymd duration yday parse_date_time
@@ -77,7 +76,7 @@ check_grow <- function(start, grow_days, temperature, salinity, light, velocity,
     rlang::inform(paste0("WARN: Variable 'grow_days' = ", grow_days, " but length of input variables = ", check_length[1], ". These must match - 'grow_days' is inclusive of planting AND harvest days."))
   }
 
-  essential_site_params <- c("farmA", "hz", "hc", "kW", "d_top")
+  essential_site_params <- c("farmA", "hz", "hc", "d_top")
   if (!all(essential_site_params %in% names(site_params))) {
     rlang::inform(paste0("FATAL: Parameter '", essential_site_params[which(!essential_site_params %in% names(site_params))], "' is missing from site_params."))
   } else if (any(is.na(site_params[essential_site_params]))) {
@@ -145,12 +144,11 @@ check_grow <- function(start, grow_days, temperature, salinity, light, velocity,
   if (is.na(spec_params['S_opt'])) {rlang::inform("FATAL: Parameter 'S_opt' is missing from spec_params")}
   if (is.na(spec_params['S_min'])) {rlang::inform("FATAL: Parameter 'S_min' is missing from spec_params")}
   if (is.na(spec_params['S_max'])) {rlang::inform("FATAL: Parameter 'S_max' is missing from spec_params")}
-  # "h_a"
-  # "h_b"
-  # "h_c"
-  # "h_max"
-
-  # Get checks and warnings from algae_height()
+  if (is.na(spec_params['h_max'])) {rlang::inform("FATAL: Parameter 'h_max' is missing from spec_params")}
+  if (any(is.na(c(spec_params['h_a'], spec_params['h_b'], spec_params['h_c'])))) {
+    rlang::inform("WARN: Some height parameters are missing from spec_params. Unless supplied, parameters will default to h_a = 1000, h_b = 1, h_c = 0.")
+  }
+  
   # Get checks and warnings from u_c()
   # Get checks and warnings from T_lim()
   # Get checks and warnings from S_lim()
@@ -166,15 +164,6 @@ check_grow <- function(start, grow_days, temperature, salinity, light, velocity,
   } else {
     rlang::inform("INFORM: sparse_output is 'T', truncated outputs will be given.")
   }
-  
-  if(!is.logical(track_limiting)) {
-    rlang::inform("FATAL: track_limiting is not logical - must be 'T' (default) or 'F'.")
-  } else if (track_limiting == F) {
-    rlang::inform("INFORM: track_limiting is 'F', limiting factor will not be given.")
-  } else {
-    rlang::inform("INFORM: track_limiting is 'T', limiting factor will be given.")
-  }
-  
 }
 
 

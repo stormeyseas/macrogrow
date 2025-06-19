@@ -9,14 +9,12 @@
 #' @export
 #'
 Q_rel <- function(Nf = NULL, Ns = NULL, Q_int = NULL, spec_params) {
-
   if (!is.null(Nf) & !is.null(Ns)) {
     Q_int <- Q_int(Nf = Nf, Ns = Ns, spec_params = spec_params)
   }
   if (!is.null(Q_int)) {
     Q_rel <- 1 - (spec_params['Q_max'] - Q_int)/(spec_params['Q_max'] - spec_params['Q_min'])
   }
-  
   return(unname(Q_rel))
 }
 

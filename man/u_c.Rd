@@ -6,7 +6,7 @@
 \usage{
 u_c(
   U0,
-  macro_state = c(biomass, hm),
+  macro_state,
   site_params,
   spec_params,
   constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)

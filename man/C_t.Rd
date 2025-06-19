@@ -7,7 +7,7 @@
 C_t(
   u_c,
   u_b,
-  macro_state = c(biomass, hm),
+  macro_state,
   SA_WW = 0.5 * (0.0306/2),
   site_params,
   constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)

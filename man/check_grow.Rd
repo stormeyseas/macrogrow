@@ -52,11 +52,9 @@ check_grow(
 
 \item{sparse_output}{logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)}
 
-\item{track_limiting}{logical, whether to track a single "limiting" factor (see details)}
-
 \item{other_constants}{a named vector of miscellaneous constants (see u_c)}
 
-\item{kd}{a vector of light attenuation parameters (m-1)}
+\item{kW}{a vector of light attenuation parameters (m-1)}
 }
 \value{
 printout of potential errors with main function
