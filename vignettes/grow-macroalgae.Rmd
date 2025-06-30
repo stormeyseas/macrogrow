@@ -2,89 +2,96 @@
 title: "Grow macroalgae"
 author: "Tormey Reimer"
 date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
 ---
 
 This space will be used to detail how to use the main model function, `grow_macroalgae()`.
 
 ```{r setup}
 library(macrogrow)
-library(here)
 library(magrittr)
 library(units)
 library(lubridate)
+library(ggplot2)
+library(cowplot)
 ```
 
-# Environmental vectors
+# Load datasets
 
-```{r load data}
-load(file.path("data", "env.rda"))
+Within this package, there are three default datasets:
 
-site_params <- c(
-  hz = 30.0,
-  d_top = 1.0,
-  hc = 5, 
-  kW = Secchi_to_Kd(10),
-  farmA = 50*50
+* `env` is a datafrae of default environmental variables
+* `a_armata` is a named vector of parameters for _Asparagopsis armata_
+* `site_params` is a named vector of site-specific parameters (culture conditions)
+
+## Check environmental data
+
+First let's check to make sure our environmental inputs look reasonable. We should also check that they are within the species tolerance limits or the macroalgae will not grow.
+
+```{r env-plots, fig.width=10, fig.height=12}
+p_temperature <- ggplot(env, aes(x = t, y = temperature)) +
+     geom_line(linewidth = 0.75) +
+     geom_hline(yintercept = a_armata["T_opt"], linewidth = 1) +
+     geom_hline(yintercept = a_armata["T_min"], linewidth = 0.75, linetype = "dashed") +
+     geom_hline(yintercept = a_armata["T_max"], linewidth = 0.75, linetype = "dashed") +     
+     theme_classic() +
+     labs(x = "Day of year", y = "Temperature (°C)") +
+     ggtitle("Temperature")
+
+p_light <- ggplot(env, aes(x = t, y = (light*exp(-(kW*site_params['d_top']))))) +
+     geom_line(linewidth = 0.75) +
+     geom_hline(yintercept = a_armata["I_o"], linewidth = 0.75, linetype = "dashed") + 
+     theme_classic() +
+     labs(x = "Day of year", y = "Light at canopy top (μmol m⁻² s⁻¹)") +
+     ggtitle("Light")
+
+p_salinity <- ggplot(env, aes(x = t, y = salinity)) +
+     geom_line(linewidth = 0.75) +
+     geom_hline(yintercept = a_armata["S_opt"], linewidth = 1) +
+     geom_hline(yintercept = a_armata["S_min"], linewidth = 0.75, linetype = "dashed") +
+     geom_hline(yintercept = a_armata["S_max"], linewidth = 0.75, linetype = "dashed") +     
+     theme_classic() +
+     labs(x = "Day of year", y = "Salinity (g L⁻¹)") +
+     ggtitle("Salinity")
+
+p_velocity <- ggplot(env, aes(x = t, y = velocity)) +
+     geom_line(linewidth = 0.75) +   
+     theme_classic() +
+     labs(x = "Day of year", y = "Velocity (m s⁻¹)") +
+     ggtitle("Water Velocity")
+
+p_nitrate <- ggplot(env, aes(x = t, y = nitrate)) +
+     geom_line(linewidth = 0.75) +   
+     theme_classic() +
+     labs(x = "Day of year", y = "Nitrate (mg m⁻³)") +
+     ggtitle("Nitrate Concentration")
+
+p_ammonium <- ggplot(env, aes(x = t, y = ammonium)) +
+     geom_line(linewidth = 0.75) +   
+     theme_classic() +
+     labs(x = "Day of year", y = "Ammonium (mg m⁻³)") +
+     ggtitle("Ammonium Concentration")
+
+plot_grid(
+     p_temperature, p_light, p_salinity, p_velocity, p_nitrate, p_ammonium,
+     cols = 2
 )
-
-a_armata <- c(
-  V_am = 4.991988e+00,
-  K_am = 1.402071e+02,
-  M_am = 3.360000e-03,
-  C_am = 2.954853e+00,
-  V_ni = NA,
-  K_ni = NA,
-  M_ni = 0.000000e+00,
-  C_ni = 1.138183e-01,
-  V_ot = NA,
-  K_ot = NA,
-  M_ot = 1.440000e-04,
-  C_ot = 2.958215e-01,
-  Q_min = 1.943162e+01,
-  Q_max = 4.303730e+01,
-  K_c = 6.000000e+00,
-  mu = 3.472222e-01,
-  D_m = NA,
-  D_ve = 1.533634e-02,
-  D_lo = 5.389931e-02,
-  D_mi = 1.270484e-01,
-  D_hi = 2.567621e-01,
-  a_cs = 2.509013e-06,
-  I_o = 1.500000e+02,
-  T_opt = 20,
-  T_min = 8.895487e+00,
-  T_max = 2.242924e+01,
-  S_opt = 3.525000e+01,
-  S_min = 3.375000e+01,
-  S_max = 3.625000e+01,
-  h_a = 3.850000e+03,
-  h_b = 1.750000e+00,
-  h_c = 1.000000e-03,
-  h_max = 2.600000e-01,
-  DWWW = 7.680000e+00
-)
-
-init_biomass <- 0.005 %>% set_units("g L-1") %>% set_units("mg m-3") %>% drop_units()
-init_arma <- c(Q_rel = 0.75)
-init_arma <- c(init_arma, biomass_to_Nf(biomass = init_biomass, Q_rel = init_arma["Q_rel"], spec_params = a_armata, dry = F))
-
-start <- lubridate::yday(as.Date("2023-05-15")) %>% as.integer()
-grow_days <- 40L
-gd <- start:(start+grow_days)
 ```
 
-# Check macrogrow inputs
+# Check all inputs
 
 Since the `grow_macroalgae()` function has so many inputs with very specific requirements, the `check_grow()` function is designed to take the exact same inputs as `grow_macroalgae()` and provide a report.
 
-```{r check for macrogrow}
+```{r check for macrogrow, eval=F}
 check_grow(
   start = start,
   grow_days = grow_days,
   temperature = env$temperature[gd],
   salinity = env$salinity[gd],
   light = env$light[gd],
-  kW = env$kW[gd],
+  # kW = env$kW[gd],
   velocity = env$velocity[gd],
   nitrate = env$nitrate[gd],
   ammonium = env$ammonium[gd],
@@ -96,12 +103,9 @@ check_grow(
 )
 ```
 
-```{r Tlim}
-sapply(FUN = T_lim, X = seq(0,30,0.5), spec_params = a_armata)
-```
+# Grow macroalgae 
 
-
-```{r grow macroalgae}
+```{r grow macroalgae, eval=F}
 gro <- grow_macroalgae(
   start = start,
   grow_days = grow_days,
