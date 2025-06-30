@@ -8,12 +8,14 @@ df$unit[df$parameter == "h_max"]
 ## Save as named vector
 a_armata <- df$value
 names(a_armata) <- df$param
+incl <- stringr::str_detect(names(a_armata), "_ot", negate = T) # "other N" is not yet included in growth functions
+a_armata <- a_armata[incl]
 
 # Save the cleaned data in the required R package location
 usethis::use_data(a_armata, overwrite = T)
 
 # Also set some default site_params
-site_params <- c(hz = 30, d_top = 1, hc = 3, kW = 0.6)
+site_params <- c(hz = 30, d_top = 1, hc = 3)
 usethis::use_data(site_params, overwrite = T)
 
 # And some default vectors
