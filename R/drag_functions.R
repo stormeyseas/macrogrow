@@ -13,7 +13,7 @@
 #'  * `d_top`, depth of the top of the canopy beneath the water surface (m)
 #' @param spec_params vector of named numbers. Must include:
 #'  * `SA_WW`, conversion of wet weight to surface area
-#' @param constants vector of named numbers defining extra constants for the attenuation submodel. Must include:
+#' @param constants vector of named numbers defining extra constants for the attenuation submodel. Must include all constants, which have the following default values:
 #'  * `s` = 0.0045
 #'  * `gam` = 1.13
 #'  * `a2` = 0.2^2
@@ -23,7 +23,8 @@
 #' @export
 #' @seealso [algae_height(), u_b(), C_t()]
 #' 
-u_c <- function(U0, macro_state, site_params, spec_params, constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)){
+u_c <- function(U0, macro_state, site_params, spec_params, 
+  constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)){
   
   if (missing(spec_params) | is.na(spec_params["SA_WW"])) {
     SA_WW <- 0.5 * (0.0306/2) # default is based on Macrocystis pyrifera
@@ -52,7 +53,8 @@ u_c <- function(U0, macro_state, site_params, spec_params, constants = c(s = 0.0
 #' @export
 #' 
 #' @examples examples
-u_b <- function(U0, macro_state, SA_WW = 0.5 * (0.0306/2), site_params, constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)){
+u_b <- function(U0, macro_state, SA_WW = 0.5 * (0.0306/2), site_params, 
+  constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)){
   uc <- uc(U0, macro_state, SA_WW, site_params, constants)
   Hc <- (site_params['d_top'] + site_params['hc']) / site_params['hz']
   u_b <- (1 - u_c * Hc) / (1 - Hc)
@@ -65,10 +67,19 @@ u_b <- function(U0, macro_state, SA_WW = 0.5 * (0.0306/2), site_params, constant
 #' 
 #' @return The total drag coefficient C_t
 #' 
-C_t <- function(u_c, u_b, macro_state, SA_WW = 0.5 * (0.0306/2), site_params, constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)) {
-  D <- SA_WW * min(macro_state['hm']/site_params['hc'], 1) * macro_state['biomass']
-  Kd <- 0.5 * site_params['hz'] * D * constants['s'] * U0^(constants['gam'] - 2)
-  Hc <- (site_params['d_top'] + site_params['hc']) / site_params['hz']
+C_t <- function(U0, macro_state, site_params, spec_params, 
+  constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)) {
+  
+  if (missing(spec_params) | is.na(spec_params["SA_WW"])) {
+    SA_WW <- 0.5 * (0.0306/2) # default is based on Macrocystis pyrifera
+  } else {
+    SA_WW <- spec_params["SA_WW"]
+  }
+  D <- SA_WW * min(macro_state['hm']/abs(site_params['hc']), 1) * macro_state['biomass']
+  Kd <- 0.5 * abs(site_params['hz']) * D * constants['s'] * U0^(constants['gam'] - 2)
+  Hc <- (abs(site_params['d_top']) + abs(site_params['hc'])) / abs(site_params['hz'])
+  u_c <- u_c(U0, macro_state, site_params, spec_params, constants)
+
   C_t <- (Kd * Hc * u_c ^ 2 + constants['Cb'] * u_b^2)
   return(unname(C_t))
 }
