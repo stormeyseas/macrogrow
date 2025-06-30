@@ -3,7 +3,7 @@
 #' @description
 #' Check that all parameters, inputs and settings are correct for the `grow_macroalgae()` function. Gives a report on what needs to be modified for the main function to run smoothly. This is to avoid the main function slowing down to give endless warnings and messages. 
 #'
-#' @inheritParams grow_macroalgae()
+#' @inheritParams grow_macroalgae
 #'
 #' @importFrom lubridate is.Date ymd duration yday parse_date_time
 #' @importFrom glue glue

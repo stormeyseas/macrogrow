@@ -13,36 +13,35 @@ check_grow(
   velocity,
   nitrate,
   ammonium,
-  other_N = NA,
   ni_uptake,
   am_uptake,
-  ot_uptake = NA,
   site_params,
   spec_params,
   initials,
   sparse_output = T,
-  track_limiting = T,
   other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
 )
 }
 \arguments{
-\item{start}{numeric, start of the growth period (day of at-sea deployment). Defaults to 1.}
+\item{start}{integer, start of the growth period (day of at-sea deployment). Defaults to 1.}
 
 \item{grow_days}{integer, number of day in growing period - if missing will take the length of the temperature vector}
 
-\item{temperature}{a vector of daily temperatures (C)}
+\item{temperature}{a vector of daily temperatures (\eqn{^{\circ}}C)}
 
-\item{salinity}{a vector of daily salt concentrations (g L-1)}
+\item{salinity}{a vector of daily salt concentrations (g L\eqn{^{-1}})}
 
-\item{light}{a vector of surface light (umol m-2 s-1)}
+\item{light}{a vector of surface light (umol m\eqn{^{-2}} s\eqn{^{-1}})}
 
-\item{velocity}{a vector of water velocities (m s-1)}
+\item{velocity}{a vector of water velocities (m s\eqn{^{-1}})}
 
-\item{nitrate}{a vector of nitrate concentrations (mg m-3)}
+\item{nitrate}{a vector of nitrate concentrations (mg m\eqn{^{-3}})}
 
-\item{ammonium}{a vector of ammonium concentrations (mg m-3)}
+\item{ammonium}{a vector of ammonium concentrations (mg m\eqn{^{-3}})}
 
-\item{other_N}{a vector of other nitrogen concentrations (mg N m-3) - NOT IN USE}
+\item{ni_uptake}{shape for nitrate uptake, either "MM" for Michaelis-Menton saturation kinetics or "linear" for linear uptake}
+
+\item{am_uptake}{shape for ammonium uptake, either "MM" for Michaelis-Menton saturation kinetics or "linear" for linear uptake}
 
 \item{site_params}{a named vector of species-specific parameters - see details}
 
@@ -52,15 +51,13 @@ check_grow(
 
 \item{sparse_output}{logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)}
 
-\item{other_constants}{a named vector of miscellaneous constants (see u_c)}
-
-\item{kW}{a vector of light attenuation parameters (m-1)}
+\item{other_constants}{a named vector of other constants for intermediate equations (see \code{u_c()})}
 }
 \value{
 printout of potential errors with main function
 }
 \description{
-Check that all parameters, inputs and settings are correct for the \code{grow_macroalgae()} function. Gives a report on what needs to be included. This is to avoid the main function slowing down to give endless warnings and messages.
+Check that all parameters, inputs and settings are correct for the \code{grow_macroalgae()} function. Gives a report on what needs to be modified for the main function to run smoothly. This is to avoid the main function slowing down to give endless warnings and messages.
 }
 \details{
 Example csv with all the spec_params & site_params required?
