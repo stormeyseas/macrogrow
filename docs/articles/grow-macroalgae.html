@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">macrogrow</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +59,7 @@
                         <h4 data-toc-skip class="author">Tormey
 Reimer</h4>
             
-            <h4 data-toc-skip class="date">2025-03-22</h4>
+            <h4 data-toc-skip class="date">2025-06-30</h4>
       
 
       <div class="d-none name"><code>grow-macroalgae.Rmd</code></div>
@@ -70,12 +70,145 @@ Reimer</h4>
 <p>This space will be used to detail how to use the main model function,
 <code><a href="../reference/grow_macroalgae.html">grow_macroalgae()</a></code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">macrogrow</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">macrogrow</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-quantities.github.io/units/" class="external-link">units</a></span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## udunits database from C:/Users/treimer/AppData/Local/R/win-library/4.3/units/share/udunits/udunits2.xml</span></span></code></pre>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://lubridate.tidyverse.org" class="external-link">lubridate</a></span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Attaching package: 'lubridate'</span></span></code></pre>
+<pre><code><span><span class="co">## The following objects are masked from 'package:base':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     date, intersect, setdiff, union</span></span></code></pre>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/" class="external-link">cowplot</a></span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Attaching package: 'cowplot'</span></span></code></pre>
+<pre><code><span><span class="co">## The following object is masked from 'package:lubridate':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     stamp</span></span></code></pre>
 <div class="section level2">
-<h2 id="environmental-vectors">Environmental vectors<a class="anchor" aria-label="anchor" href="#environmental-vectors"></a>
+<h2 id="load-datasets">Load datasets<a class="anchor" aria-label="anchor" href="#load-datasets"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># df &lt;- read.csv("../data-raw/environmental-vectors.csv")</span></span></code></pre></div>
+<p>Within this package, there are three default datasets:</p>
+<ul>
+<li>
+<code>env</code> is a datafrae of default environmental
+variables</li>
+<li>
+<code>a_armata</code> is a named vector of parameters for
+<em>Asparagopsis armata</em>
+</li>
+<li>
+<code>site_params</code> is a named vector of site-specific
+parameters (culture conditions)</li>
+</ul>
+<div class="section level3">
+<h3 id="check-environmental-data">Check environmental data<a class="anchor" aria-label="anchor" href="#check-environmental-data"></a>
+</h3>
+<p>First let’s check to make sure our environmental inputs look
+reasonable. We should also check that they are within the species
+tolerance limits or the macroalgae will not grow.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p_temperature</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">env</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="va">temperature</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="va">a_armata</span><span class="op">[</span><span class="st">"T_opt"</span><span class="op">]</span>, linewidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="va">a_armata</span><span class="op">[</span><span class="st">"T_min"</span><span class="op">]</span>, linewidth <span class="op">=</span> <span class="fl">0.75</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="va">a_armata</span><span class="op">[</span><span class="st">"T_max"</span><span class="op">]</span>, linewidth <span class="op">=</span> <span class="fl">0.75</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span>     </span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Day of year"</span>, y <span class="op">=</span> <span class="st">"Temperature (°C)"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Temperature"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p_light</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">env</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="op">(</span><span class="va">light</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">kW</span><span class="op">*</span><span class="va">site_params</span><span class="op">[</span><span class="st">'d_top'</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="va">a_armata</span><span class="op">[</span><span class="st">"I_o"</span><span class="op">]</span>, linewidth <span class="op">=</span> <span class="fl">0.75</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Day of year"</span>, y <span class="op">=</span> <span class="st">"Light at canopy top (μmol m⁻² s⁻¹)"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Light"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p_salinity</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">env</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="va">salinity</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="va">a_armata</span><span class="op">[</span><span class="st">"S_opt"</span><span class="op">]</span>, linewidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="va">a_armata</span><span class="op">[</span><span class="st">"S_min"</span><span class="op">]</span>, linewidth <span class="op">=</span> <span class="fl">0.75</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="va">a_armata</span><span class="op">[</span><span class="st">"S_max"</span><span class="op">]</span>, linewidth <span class="op">=</span> <span class="fl">0.75</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span>     </span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Day of year"</span>, y <span class="op">=</span> <span class="st">"Salinity (g L⁻¹)"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Salinity"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p_velocity</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">env</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="va">velocity</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span>   </span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Day of year"</span>, y <span class="op">=</span> <span class="st">"Velocity (m s⁻¹)"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Water Velocity"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p_nitrate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">env</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="va">nitrate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span>   </span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Day of year"</span>, y <span class="op">=</span> <span class="st">"Nitrate (mg m⁻³)"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Nitrate Concentration"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p_ammonium</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">env</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="va">ammonium</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span>   </span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Day of year"</span>, y <span class="op">=</span> <span class="st">"Ammonium (mg m⁻³)"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Ammonium Concentration"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
+<span>     <span class="va">p_temperature</span>, <span class="va">p_light</span>, <span class="va">p_salinity</span>, <span class="va">p_velocity</span>, <span class="va">p_nitrate</span>, <span class="va">p_ammonium</span>,</span>
+<span>     cols <span class="op">=</span> <span class="fl">2</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning in plot_grid(p_temperature, p_light, p_salinity, p_velocity, p_nitrate,</span></span>
+<span><span class="co">## : Argument 'cols' is deprecated. Use 'ncol' instead.</span></span></code></pre>
+<p><img src="grow-macroalgae_files/figure-html/env-plots-1.png" width="960"></p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="check-all-inputs">Check all inputs<a class="anchor" aria-label="anchor" href="#check-all-inputs"></a>
+</h2>
+<p>Since the <code><a href="../reference/grow_macroalgae.html">grow_macroalgae()</a></code> function has so many inputs
+with very specific requirements, the <code><a href="../reference/check_grow.html">check_grow()</a></code> function
+is designed to take the exact same inputs as
+<code><a href="../reference/grow_macroalgae.html">grow_macroalgae()</a></code> and provide a report.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/check_grow.html">check_grow</a></span><span class="op">(</span></span>
+<span>  start <span class="op">=</span> <span class="va">start</span>,</span>
+<span>  grow_days <span class="op">=</span> <span class="va">grow_days</span>,</span>
+<span>  temperature <span class="op">=</span> <span class="va">env</span><span class="op">$</span><span class="va">temperature</span><span class="op">[</span><span class="va">gd</span><span class="op">]</span>,</span>
+<span>  salinity <span class="op">=</span> <span class="va">env</span><span class="op">$</span><span class="va">salinity</span><span class="op">[</span><span class="va">gd</span><span class="op">]</span>,</span>
+<span>  light <span class="op">=</span> <span class="va">env</span><span class="op">$</span><span class="va">light</span><span class="op">[</span><span class="va">gd</span><span class="op">]</span>,</span>
+<span>  <span class="co"># kW = env$kW[gd],</span></span>
+<span>  velocity <span class="op">=</span> <span class="va">env</span><span class="op">$</span><span class="va">velocity</span><span class="op">[</span><span class="va">gd</span><span class="op">]</span>,</span>
+<span>  nitrate <span class="op">=</span> <span class="va">env</span><span class="op">$</span><span class="va">nitrate</span><span class="op">[</span><span class="va">gd</span><span class="op">]</span>,</span>
+<span>  ammonium <span class="op">=</span> <span class="va">env</span><span class="op">$</span><span class="va">ammonium</span><span class="op">[</span><span class="va">gd</span><span class="op">]</span>,</span>
+<span>  ni_uptake <span class="op">=</span> <span class="st">"linear"</span>,</span>
+<span>  am_uptake <span class="op">=</span> <span class="st">"MM"</span>,</span>
+<span>  site_params <span class="op">=</span> <span class="va">site_params</span>, </span>
+<span>  spec_params <span class="op">=</span> <span class="va">a_armata</span>,</span>
+<span>  initials <span class="op">=</span> <span class="va">init_arma</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="grow-macroalgae">Grow macroalgae<a class="anchor" aria-label="anchor" href="#grow-macroalgae"></a>
+</h2>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">gro</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/grow_macroalgae.html">grow_macroalgae</a></span><span class="op">(</span></span>
+<span>  start <span class="op">=</span> <span class="va">start</span>,</span>
+<span>  grow_days <span class="op">=</span> <span class="va">grow_days</span>,</span>
+<span>  temperature <span class="op">=</span> <span class="va">env</span><span class="op">$</span><span class="va">temperature</span><span class="op">[</span><span class="va">gd</span><span class="op">]</span>,</span>
+<span>  salinity <span class="op">=</span> <span class="va">env</span><span class="op">$</span><span class="va">salinity</span><span class="op">[</span><span class="va">gd</span><span class="op">]</span>,</span>
+<span>  light <span class="op">=</span> <span class="va">env</span><span class="op">$</span><span class="va">light</span><span class="op">[</span><span class="va">gd</span><span class="op">]</span>,</span>
+<span>  kW <span class="op">=</span> <span class="va">env</span><span class="op">$</span><span class="va">kW</span><span class="op">[</span><span class="va">gd</span><span class="op">]</span>,</span>
+<span>  velocity <span class="op">=</span> <span class="va">env</span><span class="op">$</span><span class="va">velocity</span><span class="op">[</span><span class="va">gd</span><span class="op">]</span>,</span>
+<span>  nitrate <span class="op">=</span> <span class="va">env</span><span class="op">$</span><span class="va">nitrate</span><span class="op">[</span><span class="va">gd</span><span class="op">]</span>,</span>
+<span>  ammonium <span class="op">=</span> <span class="va">env</span><span class="op">$</span><span class="va">ammonium</span><span class="op">[</span><span class="va">gd</span><span class="op">]</span>,</span>
+<span>  ni_uptake <span class="op">=</span> <span class="st">"linear"</span>,</span>
+<span>  am_uptake <span class="op">=</span> <span class="st">"MM"</span>,</span>
+<span>  site_params <span class="op">=</span> <span class="va">site_params</span>, </span>
+<span>  spec_params <span class="op">=</span> <span class="va">a_armata</span>,</span>
+<span>  initials <span class="op">=</span> <span class="va">init_arma</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

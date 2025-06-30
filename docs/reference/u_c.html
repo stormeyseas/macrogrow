@@ -47,7 +47,7 @@ A short description...</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">u_c</span><span class="op">(</span></span>
 <span>  <span class="va">U0</span>,</span>
-<span>  macro_state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">biomass</span>, <span class="va">hm</span><span class="op">)</span>,</span>
+<span>  <span class="va">macro_state</span>,</span>
 <span>  <span class="va">site_params</span>,</span>
 <span>  <span class="va">spec_params</span>,</span>
 <span>  constants <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>s <span class="op">=</span> <span class="fl">0.0045</span>, gam <span class="op">=</span> <span class="fl">1.13</span>, a2 <span class="op">=</span> <span class="fl">0.2</span><span class="op">^</span><span class="fl">2</span>, Cb <span class="op">=</span> <span class="fl">0.0025</span><span class="op">)</span></span>
@@ -81,7 +81,7 @@ A short description...</p>
 
 
 <dt id="arg-constants">constants<a class="anchor" aria-label="anchor" href="#arg-constants"></a></dt>
-<dd><p>vector of named numbers defining extra constants for the attenuation submodel. Must include:</p><ul><li><p><code>s</code> = 0.0045</p></li>
+<dd><p>vector of named numbers defining extra constants for the attenuation submodel. Must include all constants, which have the following default values:</p><ul><li><p><code>s</code> = 0.0045</p></li>
 <li><p><code>gam</code> = 1.13</p></li>
 <li><p><code>a2</code> = 0.2^2</p></li>
 <li><p><code>Cb</code> = 0.0025</p></li>
@@ -106,7 +106,7 @@ A short description...</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>
