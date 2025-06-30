@@ -40,11 +40,9 @@ check_grow <- function(
     velocity,
     nitrate,
     ammonium,
-    other_N = NA,
-    ni_uptake,
+        ni_uptake,
     am_uptake,
-    ot_uptake = NA,
-    site_params,
+        site_params,
     spec_params,
     initials,
     sparse_output = T,
@@ -125,19 +123,7 @@ check_grow <- function(
   }
   
   # Optional parts, which depend on other inputs -------------------------------------------------------------------------------------------------------
-  if (use_other_N == T) {
-    if (is.na(ot_uptake) & all(c("V_ot", "K_ot", "M_ot", "K_ot") %in% names(spec_params))) {
-      rlang::inform(">" = "spec_params has provided parameters for Michaelis-Menton and linear uptake for other_N. Uptake will default to Michaelis-Menton kinetics.")
-    } else if (ot_uptake == "MM" & all(!c("V_ot", "K_ot") %in% names(spec_params))) {
-      rlang::inform("x" = "Variable 'ot_uptake' (uptake of other_N) is set to Michaelis-Menton kinetics but required parameters are not provided. 'V_ot' and 'K_ot' must be provided in spec_params.")
-    } else if (ot_uptake == "MM" & all(!c("V_ot", "K_ot") %in% names(spec_params))) {
-      rlang::inform("x" = "Variable 'ot_uptake' (uptake of other_N) is set to linear kinetics but required parameters are not provided. 'M_ot' and 'C_ot' must be provided in spec_params.")
-    }
-  } else {
-    rlang::inform(">" = "Variable 'other_N' not provided - no uptake of 'other' N sources will occur.")
-  }
-  
-  if (is.na(ni_uptake) & all(c("V_ni", "K_ni", "M_ni", "K_ni") %in% names(spec_params))) {
+    if (is.na(ni_uptake) & all(c("V_ni", "K_ni", "M_ni", "K_ni") %in% names(spec_params))) {
     rlang::inform(">" = "spec_params has provided parameters for Michaelis-Menton and linear uptake for nitrate. Uptake will default to Michaelis-Menton kinetics.")
   } else if (ni_uptake == "MM" & all(!c("V_ni", "K_ni") %in% names(spec_params))) {
     rlang::inform("x" = "Variable 'ni_uptake' (uptake of nitrate) is set to Michaelis-Menton kinetics but required parameters are not provided. 'V_ni' and 'K_ni' must be provided in spec_params.")

@@ -12,7 +12,8 @@
 #' @param velocity a vector of water velocities (m s\eqn{^{-1}})
 #' @param nitrate a vector of nitrate concentrations (mg m\eqn{^{-3}})
 #' @param ammonium a vector of ammonium concentrations (mg m\eqn{^{-3}})
-#' @param other_N a vector of other nitrogen concentrations (mg N m\eqn{^{-3}}) - NOT IN USE
+#' @param ni_uptake shape for nitrate uptake, either "MM" for Michaelis-Menton saturation kinetics or "linear" for linear uptake
+#' @param am_uptake shape for ammonium uptake, either "MM" for Michaelis-Menton saturation kinetics or "linear" for linear uptake
 #' @param site_params a named vector of species-specific parameters - see details
 #' @param spec_params a named vector of site-specific parameters - see details
 #' @param initials a named vector of the macroalgae starting conditions
@@ -42,11 +43,9 @@ grow_macroalgae <- function(start = 1,
                             velocity,
                             nitrate,
                             ammonium,
-                            other_N = NA,
-                            ni_uptake,
+                                                        ni_uptake,
                             am_uptake,
-                            ot_uptake = NA,
-                            site_params,
+                                                        site_params,
                             spec_params,
                             initials,
                             sparse_output = T,
@@ -61,20 +60,18 @@ grow_macroalgae <- function(start = 1,
   farmV <- unname(site_params['farmA'] * site_params['hc'])
   
   # Placeholder vectors
-  u_c <- I_top <- conc_nitrate <- conc_ammonium <- Nf <- Ns <- B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- conc_other <- Q_int <- Q_rel <- T_lim <- S_lim <- Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- up_Am <- up_Ni <- up_Ot <- limiting <- 
+  u_c <- I_top <- conc_nitrate <- conc_ammonium <- Nf <- Ns <- B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- Q_int <- Q_rel <- T_lim <- S_lim <- Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- up_Am <- up_Ni <- 
     # red_Am <- remin <- 
     as.numeric(rep(NA, length(t)))
 
   add_ammonium     <- ammonium
   add_nitrate      <- nitrate
-  add_other <- ifelse(any(is.na(other_N)), yes = rep(0, length(t)), no = other_N)
-  use_Slim  <- ifelse(any(is.na(salinity)), yes = F, no = T)
+    use_Slim  <- ifelse(any(is.na(salinity)), yes = F, no = T)
 
   # External starting state
   conc_ammonium[1] <- add_ammonium[1]
   conc_nitrate[1]  <- add_nitrate[1]
-  conc_other[1]    <- add_other[1]
-  
+    
   # Macroalgae starting state
   if (is.na(initials['Q_int'])) {
     initials['Q_int'] <- Q_int(Nf = initials['Nf'], Q_rel = initials['Q_rel'], spec_params = spec_params)
@@ -107,8 +104,7 @@ grow_macroalgae <- function(start = 1,
     # Nutrient delivery
     conc_ammonium[i]     <- add_ammonium[i] * lambda_0[i]/lambda[i]
     conc_nitrate[i]      <- add_nitrate[i]  * lambda_0[i]/lambda[i]
-    conc_other[i]        <- add_other[i]    * lambda_0[i]/lambda[i]
-    
+        
     # Environmental limitation on growth
     T_lim[i]       <- T_lim(Tc = temperature[i], spec_params = spec_params)
     Q_lim[i]       <- Q_lim(Nf[i], Ns[i], spec_params)
@@ -164,13 +160,12 @@ grow_macroalgae <- function(start = 1,
   # Some quick renaming
   add_nitrate <- nitrate
   add_ammonium <- ammonium
-  conc_other_N <- other_N
-  
+    
   # Put all the data together for outputs 
   if (sparse_output == F) {
-    df <- cbind(t, Nf, Ns, growth_rate, Ns_to_Nf, Ns_loss, Nf_loss, Q_int, Q_rel, Q_lim, B_dw.mg, B_ww.mg, hm, add_nitrate, conc_nitrate, up_Ni, add_ammonium, conc_ammonium, up_Am, add_other, conc_other_N, up_Ot, temperature, T_lim, salinity, S_lim, light, I_top, I_lim, velocity, u_c, lambda)
+    df <- cbind(t, Nf, Ns, growth_rate, Ns_to_Nf, Ns_loss, Nf_loss, Q_int, Q_rel, Q_lim, B_dw.mg, B_ww.mg, hm, add_nitrate, conc_nitrate, up_Ni, add_ammonium, conc_ammonium, up_Am, temperature, T_lim, salinity, S_lim, light, I_top, I_lim, velocity, u_c, lambda)
   } else {
-    df <- cbind(t, Nf, Ns, growth_rate, Ns_to_Nf, Ns_loss, Nf_loss, Q_int, Q_rel, Q_lim, B_dw.mg, B_ww.mg, hm, conc_nitrate, up_Ni, conc_ammonium, up_Am, conc_other, up_Ot, T_lim, S_lim, I_top, I_lim, u_c)
+    df <- cbind(t, Nf, Ns, growth_rate, Ns_to_Nf, Ns_loss, Nf_loss, Q_int, Q_rel, Q_lim, B_dw.mg, B_ww.mg, hm, conc_nitrate, up_Ni, conc_ammonium, up_Am, T_lim, S_lim, I_top, I_lim, u_c)
   }
   return(df)
 }
