@@ -1,23 +1,9 @@
 #' @title Pre-check all parameters for grow_macroalgae()
 #' 
 #' @description
-#' Check that all parameters, inputs and settings are correct for the `grow_macroalgae()` function. Gives a report on what needs to be included. This is to avoid the main function slowing down to give endless warnings and messages. 
+#' Check that all parameters, inputs and settings are correct for the `grow_macroalgae()` function. Gives a report on what needs to be modified for the main function to run smoothly. This is to avoid the main function slowing down to give endless warnings and messages. 
 #'
-#' @param start numeric, start of the growth period (day of at-sea deployment). Defaults to 1.
-#' @param grow_days integer, number of day in growing period - if missing will take the length of the temperature vector
-#' @param temperature a vector of daily temperatures (C)
-#' @param salinity a vector of daily salt concentrations (g L-1)
-#' @param light a vector of surface light (umol m-2 s-1)
-#' @param kW a vector of light attenuation parameters (m-1)
-#' @param velocity a vector of water velocities (m s-1)
-#' @param nitrate a vector of nitrate concentrations (mg m-3)
-#' @param ammonium a vector of ammonium concentrations (mg m-3)
-#' @param other_N a vector of other nitrogen concentrations (mg N m-3) - NOT IN USE
-#' @param site_params a named vector of species-specific parameters - see details
-#' @param spec_params a named vector of site-specific parameters - see details
-#' @param initials a named vector of the macroalgae starting conditions
-#' @param sparse_output logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)
-#' @param other_constants a named vector of miscellaneous constants (see u_c)
+#' @inheritParams grow_macroalgae()
 #'
 #' @importFrom lubridate is.Date ymd duration yday parse_date_time
 #' @importFrom glue glue
@@ -52,11 +38,9 @@ check_grow <- function(
   
   # Start date
   if (!is.integer(start) & !is.numeric(start)) {
-    inform(c("x" = "Variable 'start' is not an integer. Convert a date to numeric using lubridate::yday() or 
-             similar, or use the default value of 1."))
+    inform(c("x" = "Variable 'start' is not an integer. Convert a date to numeric using lubridate::yday() or similar, or use the default value of 1."))
   } else if (is.numeric(start)) {
-    inform(c(">" = paste0("Variable 'start' is numeric (", start, ") but will be converted to integer (", 
-                          as.integer(start), ")")))
+    inform(c(">" = paste0("Variable 'start' is numeric (", start, ") but will be converted to integer (", as.integer(start), ")")))
   } else if (is.integer(start)) {
     inform(c("v" = "Variable 'start' looks good."))
   }

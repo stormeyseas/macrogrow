@@ -18,7 +18,7 @@
 #' @param spec_params a named vector of site-specific parameters - see details
 #' @param initials a named vector of the macroalgae starting conditions
 #' @param sparse_output logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)
-#' @param other_constants a named vector of miscellaneous constants (see `u_c()`)
+#' @param other_constants a named vector of other constants for intermediate equations (see `u_c()`)
 #'
 #' @importFrom lubridate is.Date ymd duration yday parse_date_time
 #' @importFrom glue glue
@@ -34,7 +34,7 @@
 #'
 #' @examples "see here" link?
 #' @seealso [check_grow()]
-grow_macroalgae <- function(start = 1,
+grow_macroalgae <- function(start = 1L,
                             grow_days,
                             temperature,
                             salinity,
