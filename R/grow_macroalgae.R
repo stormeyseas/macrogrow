@@ -92,12 +92,12 @@ grow_macroalgae <- function(start = 1L,
     # Environmental state (incoming)
     u_c[i]         <- suppressWarnings(
                         u_c(U0 = velocity[i], 
-                            macro_state = c(biomass = B_ww.mg[i]/1000, hm[i]),
+                            macro_state = c(biomass = drop_units(set_units(set_units(B_ww.mg[i], "mg"), "g")), hm[i]),
                             site_params = site_params,
                             spec_params = spec_params,
                             constants = other_constants
                         ))
-    U_0            <- set_units(set_units(velocity[i], "m s-1"), "m d-1")
+    U_0            <- drop_units(set_units(set_units(velocity[i], "m s-1"), "m d-1"))
     lambda[i]      <- (u_c[i] * U_0)/farmV 
     lambda_0[i]    <- U_0/farmV 
     
