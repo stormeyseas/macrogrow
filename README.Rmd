@@ -16,17 +16,17 @@ library(knitr)
 
 # macrogrow
 
-# Introduction
-
 This package intends to formalise and disseminate the macroalgae growth model originally developed by @hadley_modeling_2015 and modified in subsequent works. 
 
-# Getting started
+## Getting started 
 
 Install the package with:
 
 ```{r eval=F, include=T}
-devtools::install_github("https://github.com/stormeyseas/macrogrow.git")
+devtools::install_github("https://github.com/stormeyseas/macrogrow")
 ```
+
+## Grow macroalgae 
 
 The main function to grow macroaglae is `grow_macroalgae()`. A simple case is shown below, and you can find a full use case in the [Grow macroalgae](vignettes/grow-macroalgae.Rmd) article.
 
@@ -35,7 +35,6 @@ The model requires three basic sets of data to run:
 * daily input vectors of temperature, surface irradience, salinity, and water velocity, 
 * a named vector of species-specific parameters, and
 * a named vector of site-specific parameters
-
 
 <!-- # Updates and changes -->
 

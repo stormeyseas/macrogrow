@@ -43,9 +43,9 @@ grow_macroalgae <- function(start = 1L,
                             velocity,
                             nitrate,
                             ammonium,
-                                                        ni_uptake,
+                            ni_uptake,
                             am_uptake,
-                                                        site_params,
+                            site_params,
                             spec_params,
                             initials,
                             sparse_output = T,
@@ -66,12 +66,12 @@ grow_macroalgae <- function(start = 1L,
 
   add_ammonium     <- ammonium
   add_nitrate      <- nitrate
-    use_Slim  <- ifelse(any(is.na(salinity)), yes = F, no = T)
+  use_Slim  <- ifelse(any(is.na(salinity)), yes = F, no = T)
 
   # External starting state
   conc_ammonium[1] <- add_ammonium[1]
   conc_nitrate[1]  <- add_nitrate[1]
-    
+  
   # Macroalgae starting state
   if (is.na(initials['Q_int'])) {
     initials['Q_int'] <- Q_int(Nf = initials['Nf'], Q_rel = initials['Q_rel'], spec_params = spec_params)
@@ -104,7 +104,7 @@ grow_macroalgae <- function(start = 1L,
     # Nutrient delivery
     conc_ammonium[i]     <- add_ammonium[i] * lambda_0[i]/lambda[i]
     conc_nitrate[i]      <- add_nitrate[i]  * lambda_0[i]/lambda[i]
-        
+    
     # Environmental limitation on growth
     T_lim[i]       <- T_lim(Tc = temperature[i], spec_params = spec_params)
     Q_lim[i]       <- Q_lim(Nf[i], Ns[i], spec_params)
@@ -160,7 +160,7 @@ grow_macroalgae <- function(start = 1L,
   # Some quick renaming
   add_nitrate <- nitrate
   add_ammonium <- ammonium
-    
+  
   # Put all the data together for outputs 
   if (sparse_output == F) {
     df <- cbind(t, Nf, Ns, growth_rate, Ns_to_Nf, Ns_loss, Nf_loss, Q_int, Q_rel, Q_lim, B_dw.mg, B_ww.mg, hm, add_nitrate, conc_nitrate, up_Ni, add_ammonium, conc_ammonium, up_Am, temperature, T_lim, salinity, S_lim, light, I_top, I_lim, velocity, u_c, lambda)

@@ -26,9 +26,9 @@ check_grow <- function(
     velocity,
     nitrate,
     ammonium,
-        ni_uptake,
+    ni_uptake,
     am_uptake,
-        site_params,
+    site_params,
     spec_params,
     initials,
     sparse_output = T,
@@ -106,8 +106,8 @@ check_grow <- function(
     rlang::inform(paste0("x" = "Parameter '", essential_spec_params[which(is.na(spec_params[essential_spec_params]))], "' in spec_params cannot be NA."))
   }
   
-  # Optional parts, which depend on other inputs -------------------------------------------------------------------------------------------------------
-    if (is.na(ni_uptake) & all(c("V_ni", "K_ni", "M_ni", "K_ni") %in% names(spec_params))) {
+  # Optional parts, which depend on other inputs -------------------------------------------------------------------------------------------------------  
+  if (is.na(ni_uptake) & all(c("V_ni", "K_ni", "M_ni", "K_ni") %in% names(spec_params))) {
     rlang::inform(">" = "spec_params has provided parameters for Michaelis-Menton and linear uptake for nitrate. Uptake will default to Michaelis-Menton kinetics.")
   } else if (ni_uptake == "MM" & all(!c("V_ni", "K_ni") %in% names(spec_params))) {
     rlang::inform("x" = "Variable 'ni_uptake' (uptake of nitrate) is set to Michaelis-Menton kinetics but required parameters are not provided. 'V_ni' and 'K_ni' must be provided in spec_params.")
