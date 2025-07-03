@@ -34,27 +34,23 @@
 #'
 #' @examples "see here" link?
 #' @seealso [check_grow()]
-grow_macroalgae <- function(start = 1L,
-                            grow_days,
-                            temperature,
-                            salinity,
-                            light,
-                            kW,
-                            velocity,
-                            nitrate,
-                            ammonium,
-                            ni_uptake,
-                            am_uptake,
-                            site_params,
-                            spec_params,
-                            initials,
-                            sparse_output = T,
-                            other_constants = c(s = 0.0045,
-                                                gam = 1.13,
-                                                a2 = 0.2^2,
-                                                Cb = 0.0025)) {
-  
-  t <- seq(as.integer(start), (as.integer(start)+grow_days-1), 1)
+grow_macroalgae <- function(
+  t = 1:30,
+  temperature,
+  salinity,
+  light,
+  kW,
+  velocity,
+  nitrate,
+  ammonium,
+  ni_uptake,
+  am_uptake,
+  site_params,
+  spec_params,
+  initials,
+  sparse_output = T,
+  other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
+) {
   
   # Site parameters
   farmV <- unname(site_params['farmA'] * site_params['hc'])
@@ -66,7 +62,10 @@ grow_macroalgae <- function(start = 1L,
 
   add_ammonium     <- ammonium
   add_nitrate      <- nitrate
+
   use_Slim  <- ifelse(any(is.na(salinity)), yes = F, no = T)
+  use_Ilim  <- ifelse(any(is.na(c(light, kW))), yes = F, no = T)
+  use_Uc    <- ifelse(any(is.na(velocity)), yes = F, no = T)
 
   # External starting state
   conc_ammonium[1] <- add_ammonium[1]
@@ -90,16 +89,21 @@ grow_macroalgae <- function(start = 1L,
     hm[i]          <- algae_height(Nf[i], spec_params)
     
     # Environmental state (incoming)
-    u_c[i]         <- suppressWarnings(
-                        u_c(U0 = velocity[i], 
-                            macro_state = c(biomass = drop_units(set_units(set_units(B_ww.mg[i], "mg"), "g")), hm[i]),
-                            site_params = site_params,
-                            spec_params = spec_params,
-                            constants = other_constants
-                        ))
-    U_0            <- drop_units(set_units(set_units(velocity[i], "m s-1"), "m d-1"))
-    lambda[i]      <- (u_c[i] * U_0)/farmV 
-    lambda_0[i]    <- U_0/farmV 
+    if (use_Uc) {
+      u_c[i]         <- suppressWarnings(
+                          u_c(U0 = velocity[i], 
+                              macro_state = c(biomass = drop_units(set_units(set_units(B_ww.mg[i], "mg"), "g")), hm[i]),
+                              site_params = site_params,
+                              spec_params = spec_params,
+                              constants = other_constants
+                          ))
+      U_0            <- drop_units(set_units(set_units(velocity[i], "m s-1"), "m d-1"))
+      lambda[i]      <- (u_c[i] * U_0)/farmV 
+      lambda_0[i]    <- U_0/farmV 
+    } else {
+      U_0[i] <- NA
+      u_c[i] <- lambda[i] <- lambda_0[i] <- 1
+    }
     
     # Nutrient delivery
     conc_ammonium[i]     <- add_ammonium[i] * lambda_0[i]/lambda[i]
@@ -109,14 +113,12 @@ grow_macroalgae <- function(start = 1L,
     T_lim[i]       <- T_lim(Tc = temperature[i], spec_params = spec_params)
     Q_lim[i]       <- Q_lim(Nf[i], Ns[i], spec_params)
     I_top[i]       <- unname(light[i] * exp(-kW[i] * site_params['d_top']))
-    I_lim[i]       <- I_lim(Nf[i], I_top[i], kW[i], spec_params, site_params)
-    S_lim[i]       <- ifelse(use_Slim == T, yes = S_lim(salinity[i], spec_params), no = 1)
+    I_lim[i]       <- ifelse(use_Ilim, I_lim(Nf[i], I_top[i], kW[i], spec_params, site_params), 1)
+    S_lim[i]       <- ifelse(use_Slim, S_lim(salinity[i], spec_params))
     
-    # Biomass loss - CHECK THIS WORKS WHEN PARAMETERS ARE MISSING
-    U_c            <- velocity[i] * u_c[i]
-    D_m            <- suppressMessages(
-      loss(U0 = U_c, turbulence = site_params['turbulence'], spec_params = spec_params)
-    )
+    # Biomass loss
+    U_c <- velocity[i] * u_c[i]
+    D_m <- loss(U0 = U_c, turbulence = site_params['turbulence'], spec_params = spec_params)
     
     growth_rate[i]  <- unname(spec_params['mu'] * min(T_lim[i], I_lim[i], S_lim[i]) * Q_lim[i])
     
@@ -155,7 +157,7 @@ grow_macroalgae <- function(start = 1L,
       if (Nf[i+1] <= 0) break
     }
   # End of main model run
-  }
+    }
   
   # Some quick renaming
   add_nitrate <- nitrate

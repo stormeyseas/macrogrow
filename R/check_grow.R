@@ -10,7 +10,7 @@
 #' @import rlang cli
 #' @importFrom units set_units drop_units
 #' 
-#' @return printout of potential errors with main function
+#' @return printout of potential errors for main function
 #' @export 
 #' 
 #' @details
@@ -18,8 +18,7 @@
 #'
 #' @examples "see here" link?
 check_grow <- function(
-    start,
-    grow_days,
+    t = 1:30,
     temperature,
     salinity,
     light,
@@ -37,46 +36,21 @@ check_grow <- function(
   rlang::inform("Starting all checks...")
   
   # Start date
-  if (!is.integer(start) & !is.numeric(start)) {
-    inform(c("x" = "Variable 'start' is not an integer. Convert a date to numeric using lubridate::yday() or similar, or use the default value of 1."))
-  } else if (is.numeric(start)) {
-    inform(c(">" = paste0("Variable 'start' is numeric (", start, ") but will be converted to integer (", as.integer(start), ")")))
-  } else if (is.integer(start)) {
-    inform(c("v" = "Variable 'start' looks good."))
+  if (any(!is.integer(t), !is.numeric(t))) {
+    inform(c("x" = "Variable 't' must be a vector of integers, or numbers coercible to integers. (Hint: Convert dates using lubridate::yday)"))
+  } else {
+    inform(c("v" = "Timeseries looks good."))
   }
-  
-  if (is.na(grow_days) | missing(grow_days)) {
-    rlang::inform(">" = "Variable 'grow_days' not provided. Length of input variable 'temperature' will be used to populate timeseries.")
-  } else if (!is.integer(grow_days) | grow_days <= 0) {
-    rlang::inform("x" = "Variable 'grow_days' must be a positive integer. Only whole days can be used.")
-  }
-  
-  # Check that input variables are present
-  if (!is.numeric(temperature)) {rlang::inform("x" = "Variable 'temperature' must be a numeric vector.")}
-  if (!is.numeric(salinity)) {rlang::inform("x" = "Variable 'salinity' must be a numeric vector.")}
-  if (!is.numeric(light)) {rlang::inform("x" = "Variable 'light' must be a numeric vector.")}
-  if (!is.numeric(velocity)) {rlang::inform("x" = "Variable 'velocity' must be a numeric vector.")}
-  if (!is.numeric(nitrate)) {rlang::inform("x" = "Variable 'nitrate' must be a numeric vector.")}
-  if (!is.numeric(ammonium)) {rlang::inform("x" = "Variable 'ammonium' must be a numeric vector.")}
-  
-  if (is.na(other_N)) {
-    use_other_N <- F
-    check_length <- c(length(temperature), length(salinity), length(light), length(velocity), length(nitrate), length(ammonium))
-  } else if (!is.numeric(other_N)) {
-    use_other_N <- T
-    rlang::inform(">" = "Variable 'other_N' is set to NA")
-    check_length <- c(length(temperature), length(salinity), length(light), length(velocity), length(nitrate), length(ammonium), length(other_N))
-  }
-  
-  # Check that input variables are the correct length
-  t <- seq(start, (start+grow_days-1), 1)
-  if (var(check_length) != 0) {
-    rlang::inform("x" = "Input variables are not all the same length.")
-  } else if (check_length[1] == length(t)+1) {
-    rlang::inform(paste0(">" = "Variable 'grow_days' = ", grow_days, " but length of input variables = ", check_length[1], ". grow_macroalgae() will add 1 day to grow_days to match input variables (it's inclusive of planting and harvest days)."))
-  } else if (check_length[1] != length(t)) {
-    rlang::inform(paste0(">" = "Variable 'grow_days' = ", grow_days, " but length of input variables = ", check_length[1], ". These must match - 'grow_days' is inclusive of planting AND harvest days."))
-  }
+
+  # Check that input variables are present and look good
+  helpcheck(t, temperature, "temperature")
+  helpcheck(t, salinity, "salinity")
+  helpcheck(t, light, "light")
+  helpcheck(t, kW, "kW")
+  helpcheck(t, light, "light")
+  helpcheck(t, velocity, "velocity")  
+  helpcheck(t, nitrate, "nitrate")
+  helpcheck(t, ammonium, "ammonium")
 
   essential_site_params <- c("farmA", "hz", "hc", "d_top")
   if (!all(essential_site_params %in% names(site_params))) {
@@ -156,4 +130,26 @@ check_grow <- function(
   }
 }
 
+
+
+
+helpcheck <- function(t, vec, name) {
+  if (any(!is.numeric(vec))) {
+    rlang::inform(paste0("x" = "Variable '", name, "' must be a numeric vector."))
+  } else if (length(vec) != length(t)) {
+    rlang::inform(paste0("x" = "Variable '", name, "' is not the same length as timeseries vector 't'."))
+  } else if (any(is.na(vec))) {
+    if (name == c("temperature", "ammonium", "nitrate")) {
+      rlang::inform(paste0("x" = "Variable '", name, "' has missing values. This input is essential and cannot have missing values."))
+    } else if (name == "salinity") {
+      rlang::inform(paste0(">" = "Variable '", name, "' has missing values. Salinity limitation will not be factored into growth. To use salinity limitation, make sure the input vector has no missing values"))
+    } else if (name %in% c("light", "kW")) {
+      rlang::inform(paste0(">" = "Variable '", name, "' has missing values. Light limitation will not be factored into growth. To use light limitation, make sure the input vector has no missing values"))
+    } else if (name == "velocity") {
+      rlang::inform(paste0(">" = "Variable '", name, "' has missing values. Biomass loss due to current speed will not be factored into growth. To use loss, make sure the input vector has no missing values"))
+    }    
+  } else {
+    rlang::inform(paste0(">" = "Variable '", name, "' looks good."))
+  }
+}
 

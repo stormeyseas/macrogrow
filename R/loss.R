@@ -27,62 +27,24 @@
 #' @examples examples
 #' 
 loss <- function(U0, turbulence = 0, spec_params) {
-  
-  # If loss with velocity is missing...
-  if (is.na(spec_params['D_ve'])) {
-    if (missing(U0) | is.na(U0)) {
-      spec_params['D_ve'] <- 0
-    } else {
-      spec_params['D_ve'] <- 0
-      rlang::inform("Velocity unused - no velocity loss parameter provided")
-    }
-  } else {
-    if (missing(U0) | is.na(U0)) {
-      spec_params['D_ve'] <- 0
-      rlang::inform("Warning: velocity loss parameter provided but U0 is missing")
-    }
-  }
 
-  # if (is.na(turbulence)) {
-    D_turbulence <- 0
-  #   if (!is.na(spec_params['D_st'])) {rlang::inform("Warning: turbulence loss parameter(s) provided but turbulence level = NA.")}
-  #   
-  # } else {
-  #   if (turbulence == 0 | turbulence == "none" | turbulence == "static") {
-  #     if (!is.na(spec_params['D_st'])) {
-  #       D_turbulence <- spec_params['D_st']
-  #     } else {
-  #       rlang::abort(glue::glue("Turbulence is `{turbulence}` but 'D_st' parameter not provided"), class = "error_bad_parameter")
-  #     }
-  #   } else if (turbulence == 1 | turbulence == "low") {
-  #     if (!is.na(spec_params['D_low'])) {
-  #       D_turbulence <- spec_params['D_low']
-  #     } else {
-  #       rlang::abort(glue::glue("Turbulence is `{turbulence}` but 'D_low' parameter not provided"), class = "error_bad_parameter")
-  #     }
-  #   } else if (turbulence == 2 | turbulence == "medium" | turbulence == "mid") {
-  #     if (!is.na(spec_params['D_mi'])) {
-  #       D_turbulence <- spec_params['D_mi']
-  #     } else {
-  #       rlang::abort(glue::glue("Turbulence is `{turbulence}` but 'D_mi' parameter not provided"), class = "error_bad_parameter")
-  #     }
-  #   } else if (turbulence == 3 | turbulence == "high") {
-  #     if (!is.na(spec_params['D_hi'])) {
-  #       D_turbulence <- spec_params['D_hi']
-  #     } else {
-  #       rlang::abort(glue::glue("Turbulence is `{turbulence}` but 'D_hi' parameter not provided"), class = "error_bad_parameter")
-  #     }
-  #   } else {
-  #     rlang::inform("Your turbulence level is not recognised in FORT KICKASS")
-  #   }
-  # }
-  
-  if (is.na(spec_params['D_m'])) {
-    spec_params['D_m'] <- 0
+  D_m <- ifelse(is.na(spec_params['D_m']), 0, spec_params['D_m'])  
+  D_ve <- ifelse(is.na(spec_params['D_ve']), 0, spec_params['D_ve'])
+
+  D_turbulence <- if (turbulence == "none" | turbulence == "static") {
+    ifelse(is.na(spec_params['D_st']), 0, spec_params['D_st'])
+  } else if (turbulence == "low") {
+    ifelse(is.na(spec_params['D_lo']), 0, spec_params['D_lo'])
+  } else if (turbulence == "medium" | turbulence == "mid") {
+    ifelse(is.na(spec_params['D_mi']), 0, spec_params['D_mi'])
+  } else if (turbulence == "high") {
+    ifelse(is.na(spec_params['D_hi']), 0, spec_params['D_hi'])
+  } else {
+    NA
   }
 
   # Actual loss calculation
-  D_m <- U0 * spec_params['D_ve'] + D_turbulence + spec_params['D_m']
+  D_m <- U0 * D_ve + D_turbulence + D_m
   
   return(unname(D_m))
 }
