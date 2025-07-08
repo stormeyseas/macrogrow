@@ -14,7 +14,8 @@ Imports: rlang,
     glue,
     units,
     lubridate,
-    cli
+    cli,
+    nleqslv
 Suggests: rmarkdown,
     testthat (>= 3.0.0),
     tidyverse

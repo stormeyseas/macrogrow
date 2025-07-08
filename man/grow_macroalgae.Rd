@@ -5,8 +5,7 @@
 \title{Grow macroalgae}
 \usage{
 grow_macroalgae(
-  start = 1L,
-  grow_days,
+  t = 1:30,
   temperature,
   salinity,
   light,
@@ -24,10 +23,6 @@ grow_macroalgae(
 )
 }
 \arguments{
-\item{start}{integer, start of the growth period (day of at-sea deployment). Defaults to 1.}
-
-\item{grow_days}{integer, number of day in growing period - if missing will take the length of the temperature vector}
-
 \item{temperature}{a vector of daily temperatures (\eqn{^{\circ}}C)}
 
 \item{salinity}{a vector of daily salt concentrations (g L\eqn{^{-1}})}
@@ -55,6 +50,10 @@ grow_macroalgae(
 \item{sparse_output}{logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)}
 
 \item{other_constants}{a named vector of other constants for intermediate equations (see \code{u_c()})}
+
+\item{start}{integer, start of the growth period (day of at-sea deployment). Defaults to 1.}
+
+\item{grow_days}{integer, number of day in growing period - if missing will take the length of the temperature vector}
 }
 \value{
 matrix of outputs

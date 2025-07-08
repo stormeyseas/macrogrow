@@ -5,8 +5,7 @@
 \title{Pre-check all parameters for grow_macroalgae()}
 \usage{
 check_grow(
-  start,
-  grow_days,
+  t = 1:30,
   temperature,
   salinity,
   light,
@@ -23,10 +22,6 @@ check_grow(
 )
 }
 \arguments{
-\item{start}{integer, start of the growth period (day of at-sea deployment). Defaults to 1.}
-
-\item{grow_days}{integer, number of day in growing period - if missing will take the length of the temperature vector}
-
 \item{temperature}{a vector of daily temperatures (\eqn{^{\circ}}C)}
 
 \item{salinity}{a vector of daily salt concentrations (g L\eqn{^{-1}})}
@@ -54,7 +49,7 @@ check_grow(
 \item{other_constants}{a named vector of other constants for intermediate equations (see \code{u_c()})}
 }
 \value{
-printout of potential errors with main function
+printout of potential errors for main function
 }
 \description{
 Check that all parameters, inputs and settings are correct for the \code{grow_macroalgae()} function. Gives a report on what needs to be modified for the main function to run smoothly. This is to avoid the main function slowing down to give endless warnings and messages.
