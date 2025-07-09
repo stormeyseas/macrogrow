@@ -28,30 +28,23 @@ Within this package, there are three default datasets:
 
 ## Check environmental data
 
-First let's check to make sure our environmental inputs look reasonable. We should also check that they are within the species tolerance limits or the macroalgae will not grow.
+First let's check to make sure our environmental inputs look reasonable. You should also check that they are within the species tolerance limits or the macroalgae will not grow (or maybe that's what you want).
 
 ```{r env-plots, fig.width=10, fig.height=12}
 p_temperature <- ggplot(env, aes(x = t, y = temperature)) +
      geom_line(linewidth = 0.75) +
-     geom_hline(yintercept = a_armata["T_opt"], linewidth = 1) +
-     geom_hline(yintercept = a_armata["T_min"], linewidth = 0.75, linetype = "dashed") +
-     geom_hline(yintercept = a_armata["T_max"], linewidth = 0.75, linetype = "dashed") +     
      theme_classic() +
      labs(x = "Day of year", y = "Temperature (°C)") +
-     ggtitle("Temperature")
+     ggtitle("Surface temperature")
 
 p_light <- ggplot(env, aes(x = t, y = (light*exp(-(kW*site_params['d_top']))))) +
      geom_line(linewidth = 0.75) +
-     geom_hline(yintercept = a_armata["I_o"], linewidth = 0.75, linetype = "dashed") + 
      theme_classic() +
      labs(x = "Day of year", y = "Light at canopy top (μmol m⁻² s⁻¹)") +
-     ggtitle("Light")
+     ggtitle("Light at top of canopy")
 
 p_salinity <- ggplot(env, aes(x = t, y = salinity)) +
      geom_line(linewidth = 0.75) +
-     geom_hline(yintercept = a_armata["S_opt"], linewidth = 1) +
-     geom_hline(yintercept = a_armata["S_min"], linewidth = 0.75, linetype = "dashed") +
-     geom_hline(yintercept = a_armata["S_max"], linewidth = 0.75, linetype = "dashed") +     
      theme_classic() +
      labs(x = "Day of year", y = "Salinity (g L⁻¹)") +
      ggtitle("Salinity")
@@ -66,62 +59,82 @@ p_nitrate <- ggplot(env, aes(x = t, y = nitrate)) +
      geom_line(linewidth = 0.75) +   
      theme_classic() +
      labs(x = "Day of year", y = "Nitrate (mg m⁻³)") +
-     ggtitle("Nitrate Concentration")
+     ggtitle("Ambient nitrate concentration")
 
 p_ammonium <- ggplot(env, aes(x = t, y = ammonium)) +
      geom_line(linewidth = 0.75) +   
      theme_classic() +
      labs(x = "Day of year", y = "Ammonium (mg m⁻³)") +
-     ggtitle("Ammonium Concentration")
+     ggtitle("Ambient ammonium concentration")
 
 plot_grid(
      p_temperature, p_light, p_salinity, p_velocity, p_nitrate, p_ammonium,
-     cols = 2
+     ncol = 2
 )
+```
+
+# Get initial macroalgae stat
+
+Three values are required for macroalgae initialisation: $N_f$, $N_s$, and $Q_{rel}$. $N_f$, $N_s$ must be in mg m$^{-3}$ and can be calculated from an initial biomass using `biomass_to_Nf()`.
+
+```{r initial-state}
+
+init_biomass <- 0.005 %>% set_units("g L-1") %>% set_units("mg m-3") %>% drop_units()
+
+init_NfNs <- biomass_to_Nf(
+     biomass = init_biomass, 
+     Q_rel = 0.5, 
+     spec_params = a_armata,
+     dry = T
+)
+
+init_state <- c(init_NfNs, Q_rel = 0.5)
 ```
 
 # Check all inputs
 
 Since the `grow_macroalgae()` function has so many inputs with very specific requirements, the `check_grow()` function is designed to take the exact same inputs as `grow_macroalgae()` and provide a report.
 
-```{r check for macrogrow, eval=F}
+```{r check for macrogrow 1, echo=T}
 check_grow(
-  start = start,
-  grow_days = grow_days,
-  temperature = env$temperature[gd],
-  salinity = env$salinity[gd],
-  light = env$light[gd],
-  # kW = env$kW[gd],
-  velocity = env$velocity[gd],
-  nitrate = env$nitrate[gd],
-  ammonium = env$ammonium[gd],
-  ni_uptake = "linear",
-  am_uptake = "MM",
-  site_params = site_params, 
-  spec_params = a_armata,
-  initials = init_arma
-)
+    t = 1:60,
+    temperature = env$temperature[1:60],
+    salinity = env$salinity[1:60],
+    light = env$light[1:60],
+    kW = env$kW[1:60],
+    velocity = env$velocity[1:60],
+    nitrate = env$nitrate[1:60],
+    ammonium = env$ammonium[1:60],
+    ni_uptake = NA,
+    am_uptake = NA,
+    site_params = site_params,
+    spec_params = a_armata,
+    initials = init_state,
+    sparse_output = T,
+    other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
+  )
 ```
 
 # Grow macroalgae 
 
 ```{r grow macroalgae, eval=F}
 gro <- grow_macroalgae(
-  start = start,
-  grow_days = grow_days,
-  temperature = env$temperature[gd],
-  salinity = env$salinity[gd],
-  light = env$light[gd],
-  kW = env$kW[gd],
-  velocity = env$velocity[gd],
-  nitrate = env$nitrate[gd],
-  ammonium = env$ammonium[gd],
-  ni_uptake = "linear",
-  am_uptake = "MM",
-  site_params = site_params, 
-  spec_params = a_armata,
-  initials = init_arma
-)
+    t = 1:60,
+    temperature = env$temperature[1:60],
+    salinity = env$salinity[1:60],
+    light = env$light[1:60],
+    kW = env$kW[1:60],
+    velocity = env$velocity[1:60],
+    nitrate = env$nitrate[1:60],
+    ammonium = env$ammonium[1:60],
+    ni_uptake = NA,
+    am_uptake = NA,
+    site_params = site_params,
+    spec_params = a_armata,
+    initials = init_state,
+    sparse_output = T,
+    other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
+  )
 ```
 
 

@@ -9,6 +9,7 @@ check_grow(
   temperature,
   salinity,
   light,
+  kW,
   velocity,
   nitrate,
   ammonium,
@@ -27,6 +28,8 @@ check_grow(
 \item{salinity}{a vector of daily salt concentrations (g L\eqn{^{-1}})}
 
 \item{light}{a vector of surface light (umol m\eqn{^{-2}} s\eqn{^{-1}})}
+
+\item{kW}{a vector of light attenuation coefficients for open water (m\eqn{^{-1}})}
 
 \item{velocity}{a vector of water velocities (m s\eqn{^{-1}})}
 
