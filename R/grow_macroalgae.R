@@ -52,9 +52,6 @@ grow_macroalgae <- function(
   other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
 ) {
   
-  # Site parameters
-  farmV <- unname(site_params['farmA'] * site_params['hc'])
-  
   # Placeholder vectors
   u_c <- I_top <- conc_nitrate <- conc_ammonium <- Nf <- Ns <- B_dw.mg <- B_ww.mg <- hm <- lambda <- lambda_0 <- Q_int <- Q_rel <- T_lim <- S_lim <- Q_lim <- I_lim <- growth_rate <- Ns_to_Nf <- Ns_loss <- Nf_loss <- up_Am <- up_Ni <- 
     # red_Am <- remin <- 
@@ -98,8 +95,8 @@ grow_macroalgae <- function(
                               constants = other_constants
                           ))
       U_0            <- drop_units(set_units(set_units(velocity[i], "m s-1"), "m d-1"))
-      lambda[i]      <- (u_c[i] * U_0)/farmV 
-      lambda_0[i]    <- U_0/farmV 
+      lambda[i]      <- (u_c[i] * U_0)/unname(site_params['farmA'] * site_params['hc']) 
+      lambda_0[i]    <- U_0/unname(site_params['farmA'] * site_params['hc']) 
     } else {
       U_0[i] <- NA
       u_c[i] <- lambda[i] <- lambda_0[i] <- 1
