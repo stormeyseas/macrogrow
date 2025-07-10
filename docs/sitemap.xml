@@ -17,6 +17,8 @@
 <url><loc>/reference/get_limiting.html</loc></url>
 <url><loc>/reference/get_uptake.html</loc></url>
 <url><loc>/reference/grow_macroalgae.html</loc></url>
+<url><loc>/reference/handle_missing_values.html</loc></url>
+<url><loc>/reference/helpcheck.html</loc></url>
 <url><loc>/reference/hm_plot.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/I_lim.html</loc></url>
@@ -47,5 +49,6 @@
 <url><loc>/reference/T_range.html</loc></url>
 <url><loc>/reference/u_b.html</loc></url>
 <url><loc>/reference/u_c.html</loc></url>
+<url><loc>/reference/validate_uptake_params.html</loc></url>
 </urlset>
 
