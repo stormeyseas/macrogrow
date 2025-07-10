@@ -62,6 +62,7 @@
 #'   \item{`hz`}{Water depth (m)}
 #'   \item{`d_top`}{Distance from surface to top of the macroalgae canopy (m)}
 #'   \item{`hc`}{Canopy vertical width in the water column (m)}
+#'   \item{`farmA`}{Total farm area (m2)}
 #' }
 #'
 #' @examples

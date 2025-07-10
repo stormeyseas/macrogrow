@@ -10,6 +10,7 @@ A named numeric vector with 4 elements:
 \item{\code{hz}}{Water depth (m)}
 \item{\code{d_top}}{Distance from surface to top of the macroalgae canopy (m)}
 \item{\code{hc}}{Canopy vertical width in the water column (m)}
+\item{\code{farmA}}{Total farm area (m2)}
 }
 }
 \usage{
