@@ -126,18 +126,18 @@ grow_macroalgae <- function(
 
     up_Am[i]        <-  pmin(conc_ammonium[i],
                              (1 - Q_rel(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)) * (B_dw.mg[i]/1000) *
-                               get_uptake(conc = conc_ammonium[i],
+                               suppressMessages(get_uptake(conc = conc_ammonium[i],
                                           uptake_shape = am_uptake,
                                           Nform_abbr = "am",
-                                          spec_params = spec_params)
+                                          spec_params = spec_params))
                              )
     
     up_Ni[i]        <-  pmin(conc_nitrate[i],
                              (1 - Q_rel(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)) * (B_dw.mg[i]/1000) * 
-                               get_uptake(conc = conc_nitrate[i], 
+                               suppressMessages(get_uptake(conc = conc_nitrate[i], 
                                           uptake_shape = ni_uptake, 
                                           Nform_abbr = "ni", 
-                                          spec_params = spec_params)
+                                          spec_params = spec_params))
                              )
     
     # If you're not at the final day, set up for next day

@@ -110,8 +110,8 @@ check_grow(
     site_params = site_params,
     spec_params = a_armata,
     initials = init_state,
-    sparse_output = T,
-    other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
+    # sparse_output = T,
+    # other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
   )
 ```
 
@@ -129,11 +129,11 @@ gro <- grow_macroalgae(
     ammonium = env$ammonium[1:60],
     ni_uptake = NA,
     am_uptake = NA,
-    site_params = site_params,
+    site_params = c(site_params, turbulence = NA),
     spec_params = a_armata,
     initials = init_state,
-    sparse_output = T,
-    other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
+    # sparse_output = T,
+    # other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
   )
 ```
 

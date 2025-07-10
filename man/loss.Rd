@@ -4,7 +4,7 @@
 \alias{loss}
 \title{Loss through fragmentation}
 \usage{
-loss(U0, turbulence = 0, spec_params)
+loss(U0, turbulence = NA, spec_params)
 }
 \arguments{
 \item{U0}{incoming incident water velocity (m/s)}

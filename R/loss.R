@@ -26,12 +26,12 @@
 #'
 #' @examples examples
 #' 
-loss <- function(U0, turbulence = 0, spec_params) {
+loss <- function(U0, turbulence = NA, spec_params) {
 
   D_m <- ifelse(is.na(spec_params['D_m']), 0, spec_params['D_m'])  
   D_ve <- ifelse(is.na(spec_params['D_ve']), 0, spec_params['D_ve'])
 
-  D_turbulence <- if (turbulence == "none" | turbulence == "static") {
+  D_turbulence <- if(is.na(turbulence) | turbulence == "static" | turbulence == "none") {
     ifelse(is.na(spec_params['D_st']), 0, spec_params['D_st'])
   } else if (turbulence == "low") {
     ifelse(is.na(spec_params['D_lo']), 0, spec_params['D_lo'])
@@ -39,8 +39,6 @@ loss <- function(U0, turbulence = 0, spec_params) {
     ifelse(is.na(spec_params['D_mi']), 0, spec_params['D_mi'])
   } else if (turbulence == "high") {
     ifelse(is.na(spec_params['D_hi']), 0, spec_params['D_hi'])
-  } else {
-    NA
   }
 
   # Actual loss calculation
