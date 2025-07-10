@@ -208,8 +208,8 @@ is designed to take the exact same inputs as
 <span>    site_params <span class="op">=</span> <span class="va">site_params</span>,</span>
 <span>    spec_params <span class="op">=</span> <span class="va">a_armata</span>,</span>
 <span>    initials <span class="op">=</span> <span class="va">init_state</span>,</span>
-<span>    sparse_output <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>    other_constants <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>s <span class="op">=</span> <span class="fl">0.0045</span>, gam <span class="op">=</span> <span class="fl">1.13</span>, a2 <span class="op">=</span> <span class="fl">0.2</span><span class="op">^</span><span class="fl">2</span>, Cb <span class="op">=</span> <span class="fl">0.0025</span><span class="op">)</span></span>
+<span>    <span class="co"># sparse_output = T,</span></span>
+<span>    <span class="co"># other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Starting all checks...</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Timeseries looks good.</span></span>
@@ -242,11 +242,11 @@ is designed to take the exact same inputs as
 <span>    ammonium <span class="op">=</span> <span class="va">env</span><span class="op">$</span><span class="va">ammonium</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">60</span><span class="op">]</span>,</span>
 <span>    ni_uptake <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>    am_uptake <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>    site_params <span class="op">=</span> <span class="va">site_params</span>,</span>
+<span>    site_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">site_params</span>, turbulence <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span>,</span>
 <span>    spec_params <span class="op">=</span> <span class="va">a_armata</span>,</span>
 <span>    initials <span class="op">=</span> <span class="va">init_state</span>,</span>
-<span>    sparse_output <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>    other_constants <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>s <span class="op">=</span> <span class="fl">0.0045</span>, gam <span class="op">=</span> <span class="fl">1.13</span>, a2 <span class="op">=</span> <span class="fl">0.2</span><span class="op">^</span><span class="fl">2</span>, Cb <span class="op">=</span> <span class="fl">0.0025</span><span class="op">)</span></span>
+<span>    <span class="co"># sparse_output = T,</span></span>
+<span>    <span class="co"># other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
