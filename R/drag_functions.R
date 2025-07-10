@@ -36,11 +36,12 @@ u_c <- function(U0, macro_state, site_params, spec_params,
   Kd <- 0.5 * abs(site_params['hz']) * D * constants['s'] * U0^(constants['gam'] - 2)
   Hc <- (abs(site_params['d_top']) + abs(site_params['hc'])) / abs(site_params['hz'])
   
-  drag_test <- sqrt(Kd * (1 - Hc) * Hc * (constants['Cb'] * Hc + constants['a2']) - constants['a2'] * constants['Cb'] * Hc)
-  if (is.na(drag_test)) {
-    u_c <- 1
-  } else {
-    u_c <- (-constants['a2'] - constants['Cb'] * Hc ^ 2 + (1 - Hc) * drag_test) / (Kd * Hc * (1 - Hc) ^ 3 - constants['a2'] - constants['Cb'] * Hc ^ 3)
+  drag_test <- unname(suppressWarnings(
+    sqrt(Kd * (1 - Hc) * Hc * (constants['Cb'] * Hc + constants['a2']) - constants['a2'] * constants['Cb'] * Hc)
+    ))
+    
+  u_c <- if (is.na(drag_test)) {1} else {
+    (-constants['a2'] - constants['Cb'] * Hc ^ 2 + (1 - Hc) * drag_test) / (Kd * Hc * (1 - Hc) ^ 3 - constants['a2'] - constants['Cb'] * Hc ^ 3)
   }
   return(unname(u_c))
 }

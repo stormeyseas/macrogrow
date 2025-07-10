@@ -87,13 +87,14 @@ grow_macroalgae <- function(
     
     # Environmental state (incoming)
     if (use_Uc) {
-      u_c[i]         <- suppressWarnings(
-                          u_c(U0 = velocity[i], 
-                              macro_state = c(biomass = drop_units(set_units(set_units(B_ww.mg[i], "mg"), "g")), hm[i]),
-                              site_params = site_params,
-                              spec_params = spec_params,
-                              constants = other_constants
-                          ))
+      biom <- drop_units(set_units(set_units(B_ww.mg[i], "mg"), "g"))
+      u_c[i] <- u_c(
+        U0 = velocity[i],
+        macro_state = c(biomass = biom, hm = hm[i]),
+        site_params = site_params,
+        spec_params = spec_params,
+        constants = other_constants
+      )
       U_0            <- drop_units(set_units(set_units(velocity[i], "m s-1"), "m d-1"))
       lambda[i]      <- (u_c[i] * U_0)/unname(site_params['farmA'] * site_params['hc']) 
       lambda_0[i]    <- U_0/unname(site_params['farmA'] * site_params['hc']) 
@@ -115,7 +116,11 @@ grow_macroalgae <- function(
     
     # Biomass loss
     U_c <- velocity[i] * u_c[i]
-    D_m <- loss(U0 = U_c, turbulence = site_params['turbulence'], spec_params = spec_params)
+    D_m <- loss(
+      U0 = U_c, 
+      # turbulence = site_params['turbulence'], 
+      spec_params = spec_params
+      )
     
     growth_rate[i]  <- unname(spec_params['mu'] * min(T_lim[i], I_lim[i], S_lim[i]) * Q_lim[i])
     
