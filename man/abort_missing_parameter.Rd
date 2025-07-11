@@ -14,3 +14,4 @@ abort_missing_parameter(param, place)
 \description{
 Custom error for missing parameters
 }
+\keyword{internal}

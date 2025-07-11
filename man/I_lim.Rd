@@ -44,5 +44,5 @@ examples TBD
 
 }
 \seealso{
-\code{\link[=algae_height]{algae_height()}}
+\code{\link[=height]{height()}}
 }

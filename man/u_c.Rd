@@ -49,5 +49,5 @@ the relative water attenuation coefficient (u_c)
 A short description...
 }
 \seealso{
-\code{\link[=algae_height(), u_b(), C_t]{algae_height(), u_b(), C_t()}}
+\code{\link[=height(), u_b(), C_t]{height(), u_b(), C_t()}}
 }

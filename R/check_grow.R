@@ -5,7 +5,6 @@
 #'
 #' @inheritParams grow_macroalgae
 #'
-#' @importFrom lubridate is.Date ymd duration yday parse_date_time
 #' @importFrom glue glue
 #' @import rlang cli
 #' @importFrom units set_units drop_units

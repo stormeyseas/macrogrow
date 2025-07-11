@@ -13,7 +13,6 @@ Depends:
 Imports: rlang,
     glue,
     units,
-    lubridate,
     cli,
     nleqslv
 Suggests: rmarkdown,

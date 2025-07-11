@@ -20,7 +20,6 @@
 #' @param sparse_output logical, whether to include input vectors and other non-essential information in final dataframe (default = TRUE)
 #' @param other_constants a named vector of other constants for intermediate equations (see `u_c()`)
 #'
-#' @importFrom lubridate is.Date ymd duration yday parse_date_time
 #' @importFrom glue glue
 #' @import rlang
 #' @importFrom units set_units drop_units
@@ -87,7 +86,7 @@ grow_macroalgae <- function(
     
     # Environmental state (incoming)
     if (use_Uc) {
-      biom <- drop_units(set_units(set_units(B_ww.mg[i], "mg"), "g"))
+      biom <- units::drop_units(units::set_units(units::set_units(B_ww.mg[i], "mg"), "g"))
       u_c[i] <- u_c(
         U0 = velocity[i],
         macro_state = c(biomass = biom, hm = hm[i]),
@@ -95,7 +94,7 @@ grow_macroalgae <- function(
         spec_params = spec_params,
         constants = other_constants
       )
-      U_0            <- drop_units(set_units(set_units(velocity[i], "m s-1"), "m d-1"))
+      U_0            <- units::drop_units(units::set_units(units::set_units(velocity[i], "m s-1"), "m d-1"))
       lambda[i]      <- (u_c[i] * U_0)/unname(site_params['farmA'] * site_params['hc']) 
       lambda_0[i]    <- U_0/unname(site_params['farmA'] * site_params['hc']) 
     } else {
