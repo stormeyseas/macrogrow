@@ -2,6 +2,8 @@
 #'
 #' @param param missing parameter
 #' @param place place where parameter should be defined
+#' 
+#' @keywords internal
 #'
 abort_missing_parameter <- function(param, place) {
   if (is.null(place)) {

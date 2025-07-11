@@ -16,10 +16,10 @@
 #' @examples 
 #' my_species <- c(h_a = 750, h_b = 0.5, h_c = 0.01, h_max = 1)
 #' Nf <- seq(100, 1000, 10)
-#' height <- sapply(X = Nf, FUN = algae_height, spec_params = my_species)
+#' height <- sapply(X = Nf, FUN = height, spec_params = my_species)
 #' plot(Nf, height)
 
-algae_height <- function(Nf, spec_params) {
+height <- function(Nf, spec_params) {
   # Check which parameters are supplied
   h_a <- ifelse(is.na(spec_params['h_a']), 1000, spec_params['h_a'])
   h_b <- ifelse(is.na(spec_params['h_b']), 1000, spec_params['h_b'])

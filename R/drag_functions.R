@@ -21,7 +21,7 @@
 #'
 #' @return the relative water attenuation coefficient (u_c)
 #' @export
-#' @seealso [algae_height(), u_b(), C_t()]
+#' @seealso [height(), u_b(), C_t()]
 #' 
 u_c <- function(U0, macro_state, site_params, spec_params, 
   constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)){

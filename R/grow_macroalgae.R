@@ -83,7 +83,7 @@ grow_macroalgae <- function(
     Q_rel[i]       <- Q_rel(Q_int = Q_int[i], spec_params = spec_params)
     B_dw.mg[i]     <- unname(10^3 * (Nf[i]+Ns[i]) / Q_int[i])
     B_ww.mg[i]     <- unname(B_dw.mg[i] * spec_params['DWWW'])
-    hm[i]          <- algae_height(Nf[i], spec_params)
+    hm[i]          <- height(Nf[i], spec_params)
     
     # Environmental state (incoming)
     if (use_Uc) {
