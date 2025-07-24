@@ -1,6 +1,6 @@
-pandoc: 3.6.3
-pkgdown: 2.1.1
+pandoc: '3.4'
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   grow-macroalgae: grow-macroalgae.html
-last_built: 2025-07-11T00:51Z
+last_built: 2025-07-24T01:39Z

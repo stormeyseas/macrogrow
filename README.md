@@ -1,21 +1,49 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 # macrogrow
-
-# Introduction
 
 This package intends to formalise and disseminate the macroalgae growth
 model originally developed by Hadley et al. (2015) and modified in
 subsequent works.
 
-# Usage
+## Getting started
 
-## Default data
+Install the package with:
 
-# Updates and changes
+``` r
+devtools::install_github("https://github.com/stormeyseas/macrogrow")
+```
 
-# References
+## Grow macroalgae
+
+The main function to grow macroaglae is `grow_macroalgae()`. You can
+find a full use case in the [Grow
+macroalgae](vignettes/grow-macroalgae.Rmd) article.
+
+The model requires three basic sets of data to run:
+
+- daily input vectors of environmental input drivers
+  - Essential: temperature, nitrate, ammonium
+  - Optional: surface irradience, salinity, water velocity
+- a named vector of species-specific parameters, and
+- a named vector of site-specific parameters
+
+The package includes default datasets for each of these so that a simple
+example run can be executed immediately. These datasets are called:
+
+- env
+- a_armata (*Asparagopsis armata* parameters, see <paper DOI to go here>
+  for details)
+- site_params
+
+Most other functions included here are called within
+`grow_macroalgae()`. There is also a checking function
+`check_macroalgae()` which is designed to take all the same parameters
+as `grow_macroalgae()` and output a report on their validity. This is to
+reduce the error handling contained within `grow_macroalgae()` and its
+helper functions. As a consequence, `grow_macroalgae()` will likely give
+very unhelpful errors.
+
+## References
 
 <div id="refs" class="references csl-bib-body hanging-indent"
 entry-spacing="0">
