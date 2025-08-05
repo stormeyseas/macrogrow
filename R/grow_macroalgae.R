@@ -89,15 +89,15 @@ grow_macroalgae <- function(
     
     # Environmental state (incoming)
     if (use_Uc) {
-      biom <- units::drop_units(units::set_units(units::set_units(B_ww.mg[i], "mg"), "g"))
+      biom <- B_ww.mg[i] |> units::set_units("mg") |> units::set_units("g") |> units::drop_units()
       u_c[i] <- u_c(
-        U0 = velocity[i],
+        U0 = velocity[i], # m/s
         macro_state = c(biomass = biom, hm = hm[i]),
         site_params = site_params,
         spec_params = spec_params,
         constants = other_constants
       )
-      U_0            <- units::drop_units(units::set_units(units::set_units(velocity[i], "m s-1"), "m d-1"))
+      U_0 <- velocity[i] |> units::set_units("m s-1") |> units::set_units("m d-1") |> units::drop_units() # This is now m/d-1
       lambda[i]      <- (u_c[i] * U_0)/unname(site_params['farmA'] * site_params['hc']) 
       lambda_0[i]    <- U_0/unname(site_params['farmA'] * site_params['hc']) 
     } else {
@@ -117,7 +117,7 @@ grow_macroalgae <- function(
     S_lim[i]       <- ifelse(use_Slim, S_lim(salinity[i], spec_params))
     
     # Biomass loss
-    U_c <- velocity[i] * u_c[i]
+    U_c <- velocity[i] * u_c[i] # m/s
     D_m <- loss(
       U0 = U_c, 
       # turbulence = site_params['turbulence'], 
@@ -127,10 +127,10 @@ grow_macroalgae <- function(
     growth_rate[i]  <- unname(spec_params['mu'] * min(T_lim[i], I_lim[i], S_lim[i]) * Q_lim[i])
     
     # Nitrogen pool changes
-    Ns_to_Nf[i]     <- pmin(growth_rate[i] * Ns[i], Ns[i]) # cannot convert more Ns than available
     Ns_loss[i]      <- unname(D_m * Ns[i])
     Nf_loss[i]      <- unname(D_m * Nf[i])
-
+    Ns_to_Nf[i]     <- min(growth_rate[i]*(Ns[i]-Nf_loss[i]), (Ns[i]-Nf_loss[i]))
+    
     up_Am[i]        <-  pmin(conc_ammonium[i],
                              (1 - Q_rel(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)) * (B_dw.mg[i]/1000) *
                                suppressMessages(get_uptake(conc = conc_ammonium[i],
