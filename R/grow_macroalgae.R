@@ -78,7 +78,7 @@ grow_macroalgae <- function(
   for (i in 1:length(t)) {
     
     # Some combinations of Q_min and Q_max result in macroalgae having a Q ceiling, so that internal quotient limitation doesn't actually scale between 0 and 1. The Q_lim_max is a temporary measure to rescale Q_lim so that it's on the same relative scale as other potential limiters.
-    Q_lim_max <- max(sapply(FUN = Q_lim, X = 100, Ns = 1:200, spec_params))
+    Q_lim_max <- max(sapply(FUN = Q_lim, X = 1:200, Ns = 100, spec_params))
     
     # Macroalgae state at start of day
     Q_int[i]       <- Q_int(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)
