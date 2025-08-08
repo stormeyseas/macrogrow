@@ -79,10 +79,8 @@ grow_macroalgae <- function(
     # Macroalgae state at start of day
     Q_int[i]       <- Q_int(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)
     Q_rel[i]       <- Q_rel(Q_int = Q_int[i], spec_params = spec_params)
-    
-    B_dw.mg[i]     <- (units::set_units(Nf[i]+Ns[i], "mg m-3")/units::set_units(Q_int[i], "mg g-1")) |> 
-      units::drop_units() |> unname()
-    B_ww.mg[i]     <- unname(B_dw.mg[i] * spec_params['DWWW'])
+    B_dw.mg[i]     <- Nf_to_biomass(Nf = Nf[i], Ns = Ns[i], Q_rel = Q_rel[i], dry = T, spec_params = spec_params)
+    B_ww.mg[i]     <- Nf_to_biomass(Nf = Nf[i], Ns = Ns[i], Q_rel = Q_rel[i], dry = F, spec_params = spec_params)
     hm[i]          <- height(Nf[i], spec_params)
     
     # Environmental state (incoming)
