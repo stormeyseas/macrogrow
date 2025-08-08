@@ -100,7 +100,6 @@ grow_macroalgae <- function(
       lambda[i]      <- (u_c[i] * U_0)/unname(site_params['farmA'] * site_params['hc']) 
       lambda_0[i]    <- U_0/unname(site_params['farmA'] * site_params['hc']) 
     } else {
-      U_0[i] <- NA
       u_c[i] <- lambda[i] <- lambda_0[i] <- 1
     }
     
