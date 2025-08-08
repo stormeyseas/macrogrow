@@ -147,6 +147,9 @@ grow_macroalgae <- function(
     
     # If you're not at the final day, set up for next day
     if (i < length(t)) {
+      # IF MACROALGAE DIES
+      if (Nf[i] <= 0) break
+      
       # Changes in external state
       conc_ammonium[i+1] <- conc_ammonium[i] - up_Am[i] + Ns_loss[i]
       conc_nitrate[i+1] <- conc_nitrate[i] - up_Ni[i] 
@@ -154,9 +157,6 @@ grow_macroalgae <- function(
       # Change in algae state
       Nf[i+1]      <- Nf[i] + Ns_to_Nf[i] - Nf_loss[i]
       Ns[i+1]      <- Ns[i] + up_Am[i] + up_Ni[i] - Ns_to_Nf[i] - Ns_loss[i]
-      
-      # IF MACROALGAE DIES
-      if (Nf[i+1] <= 0) break
     }
   # End of main model run
     }
