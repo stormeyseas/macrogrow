@@ -107,43 +107,46 @@ grow_macroalgae <- function(
     conc_ammonium[i]     <- add_ammonium[i] * lambda_0[i]/lambda[i]
     conc_nitrate[i]      <- add_nitrate[i]  * lambda_0[i]/lambda[i]
     
+    # Nitrogen uptake
+    up_Am[i]        <- min(
+      # Concentration of ammonium available
+      conc_ammonium[i],
+      # Uptake rate in current state
+      (1 - Q_rel[i]) * B_dw.mg[i]/1000 *
+        suppressMessages(get_uptake(
+          conc = conc_ammonium[i], 
+          spec_params = spec_params,
+          uptake_shape = am_uptake, 
+          Nform_abbr = "am"))
+    )
+    
+    up_Ni[i]        <- min(
+      conc_nitrate[i],
+      (1 - Q_rel[i]) * (B_dw.mg[i]/1000) * 
+        suppressMessages(get_uptake(
+          conc = conc_nitrate[i], 
+          uptake_shape = ni_uptake, 
+          Nform_abbr = "ni", 
+          spec_params = spec_params))
+    )
+    
     # Environmental limitation on growth
     T_lim[i]       <- T_lim(Tc = temperature[i], spec_params = spec_params)
-    Q_lim[i]       <- Q_lim(Nf[i], Ns[i], spec_params)
     I_top[i]       <- unname(light[i] * exp(-kW[i] * site_params['d_top']))
     I_lim[i]       <- ifelse(use_Ilim, I_lim(Nf[i], I_top[i], kW[i], spec_params, site_params), 1)
     S_lim[i]       <- ifelse(use_Slim, S_lim(salinity[i], spec_params), 1)
-    
-    # Biomass loss
-    U_c <- velocity[i] * u_c[i] # m/s
-    D_m <- loss(
-      U0 = U_c, 
-      # turbulence = site_params['turbulence'], 
-      spec_params = spec_params
-      )
-    
+    Q_lim[i]       <- Q_lim(Nf[i], Ns[i], spec_params)
     growth_rate[i]  <- unname(spec_params['mu'] * min(T_lim[i], I_lim[i], S_lim[i]) * Q_lim[i])
     
-    # Nitrogen pool changes
-    Ns_loss[i]      <- unname(D_m * Ns[i])
-    Nf_loss[i]      <- unname(D_m * Nf[i])
-    Ns_to_Nf[i]     <- min(growth_rate[i]*(Ns[i]-Nf_loss[i]), (Ns[i]-Nf_loss[i]))
+    # Nitrogen fixation
+    Ns_to_Nf[i]     <- min(growth_rate[i] * Ns[i], Ns[i])
     
-    up_Am[i]        <-  pmin(conc_ammonium[i],
-                             (1 - Q_rel(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)) * (B_dw.mg[i]/1000) *
-                               suppressMessages(get_uptake(conc = conc_ammonium[i],
-                                          uptake_shape = am_uptake,
-                                          Nform_abbr = "am",
-                                          spec_params = spec_params))
-                             )
-    
-    up_Ni[i]        <-  pmin(conc_nitrate[i],
-                             (1 - Q_rel(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)) * (B_dw.mg[i]/1000) * 
-                               suppressMessages(get_uptake(conc = conc_nitrate[i], 
-                                          uptake_shape = ni_uptake, 
-                                          Nform_abbr = "ni", 
-                                          spec_params = spec_params))
-                             )
+    # Biomass loss
+    U_c            <- velocity[i] * u_c[i] # m/s
+    D_m            <- loss(U0 = U_c, spec_params = spec_params)
+    Ns_Nf          <- unname(Ns[i]/(Nf[i]+Ns[i])) # Ratio of Ns to total N
+    Ns_loss[i]     <- unname(D_m * Ns[i] * Ns_Nf)
+    Nf_loss[i]     <- unname(D_m * Nf[i] * (1-Ns_Nf))
     
     # If you're not at the final day, set up for next day
     if (i < length(t)) {
