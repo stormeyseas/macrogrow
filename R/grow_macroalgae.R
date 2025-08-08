@@ -81,8 +81,7 @@ grow_macroalgae <- function(
     Q_rel[i]       <- Q_rel(Q_int = Q_int[i], spec_params = spec_params)
     
     B_dw.mg[i]     <- (units::set_units(Nf[i]+Ns[i], "mg m-3")/units::set_units(Q_int[i], "mg g-1")) |> 
-      units::drop_units() |>
-      unname()
+      units::drop_units() |> unname()
     B_ww.mg[i]     <- unname(B_dw.mg[i] * spec_params['DWWW'])
     hm[i]          <- height(Nf[i], spec_params)
     
@@ -153,16 +152,12 @@ grow_macroalgae <- function(
       # IF MACROALGAE DIES
       if (Nf[i] <= 0) break
       
-      # Changes in external state
-      conc_ammonium[i+1] <- conc_ammonium[i] - up_Am[i] + Ns_loss[i]
-      conc_nitrate[i+1] <- conc_nitrate[i] - up_Ni[i] 
-      
       # Change in algae state
       Nf[i+1]      <- Nf[i] + Ns_to_Nf[i] - Nf_loss[i]
       Ns[i+1]      <- Ns[i] + up_Am[i] + up_Ni[i] - Ns_to_Nf[i] - Ns_loss[i]
     }
   # End of main model run
-    }
+  }
   
   # Some quick renaming
   add_nitrate <- nitrate
