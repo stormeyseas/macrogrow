@@ -141,7 +141,7 @@ grow_macroalgae <- function(
     # Biomass loss
     U_c            <- velocity[i] * u_c[i] # m/s
     D_m            <- loss(U0 = U_c, spec_params = spec_params)
-    N_loss         <- biomass_to_Nf(biomass = (B_ww.mg[i] * D_m), Q_rel = Q_rel[i], spec_params = spec_params, dry = T)
+    N_loss         <- biomass_to_Nf(biomass = (B_ww.mg[i] * D_m), Q_rel = Q_rel[i], spec_params = spec_params, dry = F)
     Ns_loss[i]     <- unname(N_loss["Nf"])
     Nf_loss[i]     <- unname(N_loss["Ns"])
     
