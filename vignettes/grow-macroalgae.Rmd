@@ -16,6 +16,15 @@ library(units)
 library(lubridate)
 library(ggplot2)
 library(cowplot)
+library(dplyr)
+library(tidyr)
+
+remove_unit("gN")
+remove_unit("molN")
+install_unit(name = "gN")
+install_unit(name = "molN", def = "14.067 gN")
+
+dir.create("pngs")
 ```
 
 # Load datasets
@@ -25,6 +34,20 @@ Within this package, there are three default datasets:
 * `env` is a datafrae of default environmental variables
 * `a_armata` is a named vector of parameters for _Asparagopsis armata_
 * `site_params` is a named vector of site-specific parameters (culture conditions)
+
+```{r}
+#| label: convert-N
+
+env$nitrate_uM <- env$nitrate %>% set_units("mgN m-3") %>% set_units("umolN L-1") %>% drop_units()
+env$ammonium_uM <- env$ammonium %>% set_units("mgN m-3") %>% set_units("umolN L-1") %>% drop_units()
+```
+
+```{r}
+#| label: changes-to-armata
+
+my_species <- a_armata
+```
+
 
 ## Check environmental data
 
@@ -40,7 +63,7 @@ p_temperature <- ggplot(env, aes(x = t, y = temperature)) +
 p_light <- ggplot(env, aes(x = t, y = (light*exp(-(kW*site_params['d_top']))))) +
      geom_line(linewidth = 0.75) +
      theme_classic() +
-     labs(x = "Day of year", y = "Light at canopy top (μmol m⁻² s⁻¹)") +
+     labs(x = "Day of year", y = "Light (μmol m⁻² s⁻¹)") +
      ggtitle("Light at top of canopy")
 
 p_salinity <- ggplot(env, aes(x = t, y = salinity)) +
@@ -67,8 +90,27 @@ p_ammonium <- ggplot(env, aes(x = t, y = ammonium)) +
      labs(x = "Day of year", y = "Ammonium (mg m⁻³)") +
      ggtitle("Ambient ammonium concentration")
 
+p_nitrate_2 <- ggplot(env, aes(x = t, y = nitrate_uM)) +
+     geom_line(linewidth = 0.75) +   
+     theme_classic() +
+     labs(x = "Day of year", y = expression("Nitrate ("*mu*"M)")) +
+     ggtitle("Ambient nitrate concentration (uM)")
+
+p_ammonium_2 <- ggplot(env, aes(x = t, y = ammonium_uM)) +
+     geom_line(linewidth = 0.75) +   
+     theme_classic() +
+     labs(x = "Day of year", y = expression("Ammonium ("*mu*"M)")) +
+     ggtitle("Ambient ammonium concentration (uM)")
+
 plot_grid(
-     p_temperature, p_light, p_salinity, p_velocity, p_nitrate, p_ammonium,
+     p_temperature + theme(axis.title.x = element_blank(), axis.text.x = element_blank()), 
+     p_light + theme(axis.title.x = element_blank(), axis.text.x = element_blank()), 
+     p_salinity + theme(axis.title.x = element_blank(), axis.text.x = element_blank()), 
+     p_velocity + theme(axis.title.x = element_blank(), axis.text.x = element_blank()), 
+     p_nitrate + theme(axis.title.x = element_blank(), axis.text.x = element_blank()), 
+     p_ammonium + theme(axis.title.x = element_blank(), axis.text.x = element_blank()),
+     p_nitrate_2,
+     p_ammonium_2,
      ncol = 2
 )
 ```
@@ -77,14 +119,15 @@ plot_grid(
 
 Three values are required for macroalgae initialisation: $N_f$, $N_s$, and $Q_{rel}$. $N_f$, $N_s$ must be in mg m$^{-3}$ and can be calculated from an initial biomass using `biomass_to_Nf()`.
 
-```{r initial-state}
+```{r}
+#| label: initial-state
 
 init_biomass <- 0.005 %>% set_units("g L-1") %>% set_units("mg m-3") %>% drop_units()
 
 init_NfNs <- biomass_to_Nf(
      biomass = init_biomass, 
      Q_rel = 0.5, 
-     spec_params = a_armata,
+     spec_params = my_species,
      dry = T
 )
 
@@ -95,7 +138,10 @@ init_state <- c(init_NfNs, Q_rel = 0.5)
 
 Since the `grow_macroalgae()` function has so many inputs with very specific requirements, the `check_grow()` function is designed to take the exact same inputs as `grow_macroalgae()` and provide a report.
 
-```{r check for macrogrow 1, echo=T}
+```{r}
+#| label: check-macrogrow
+#| echo: true
+
 check_grow(
     t = 1:60,
     temperature = env$temperature[1:60],
@@ -108,7 +154,7 @@ check_grow(
     ni_uptake = NA,
     am_uptake = NA,
     site_params = site_params,
-    spec_params = a_armata,
+    spec_params = my_species,
     initials = init_state,
     # sparse_output = T,
     # other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
@@ -117,7 +163,9 @@ check_grow(
 
 # Grow macroalgae 
 
-```{r grow macroalgae, eval=F}
+```{r}
+#| label: grow macroalgae
+
 gro <- grow_macroalgae(
     t = 1:60,
     temperature = env$temperature[1:60],
@@ -130,11 +178,209 @@ gro <- grow_macroalgae(
     ni_uptake = NA,
     am_uptake = NA,
     site_params = c(site_params, turbulence = NA),
-    spec_params = a_armata,
+    spec_params = my_species,
     initials = init_state,
     # sparse_output = T,
     # other_constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)
   )
+
+gro <- as.data.frame(gro)
+```
+
+## Biomass, Nf and Ns outputs
+
+```{r}
+#| label: biomass-outputs
+
+ggplot(gro, aes(t, B_dw.mg * hm)) +
+  geom_line(linewidth = 0.75) +
+  theme_classic() +
+  ggtitle(expression("Dry biomass (mg m"^-2*")"))
+ggsave("pngs/biomass.png")
+```
+
+```{r}
+#| label: macroalgae-nitrogen
+
+ggplot(gro, aes(t, (Nf * Ns))) +
+  geom_line(linewidth = 0.75) +
+  theme_classic() +
+  ggtitle(expression("Total macroalgae nitrogen (mg m"^-3*")"))
+ggsave("pngs/nitrogen.png")
+```
+
+```{r}
+#| label: macroalgae-height
+
+ggplot(gro, aes(t, hm)) +
+  geom_line(linewidth = 0.75) +
+  theme_classic() +
+  ggtitle(expression("Macroalgae height (m)"))
+ggsave("pngs/height.png")
+```
+
+```{r}
+#| label: nitrate-uptake
+
+ggplot(gro, aes(t, up_Ni)) +
+  geom_line(linewidth = 0.75) +
+  theme_classic() +
+  ggtitle(expression("Nitrate taken up (mg m-3)"))
+ggsave("pngs/nitrate_uptake.png")
+```
+
+```{r}
+#| label: ammonium-uptake
+
+ggplot(gro, aes(t, up_Am)) +
+  geom_line(linewidth = 0.75) +
+  theme_classic() +
+  ggtitle(expression("Ammonium taken up (mg m-3)"))
+ggsave("pngs/ammonium_uptake.png")
+```
+
+```{r}
+#| label: Qlim
+
+ggplot(gro, aes(t, Q_lim)) +
+  geom_line(linewidth = 0.75) +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_classic() +
+  ggtitle(expression("Q limitation"))
+ggsave("pngs/Q_lim.png")
+```
+
+```{r}
+#| label: Tlim
+
+ggplot(gro, aes(t, T_lim)) +
+  geom_line(linewidth = 0.75) +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_classic() +
+  ggtitle(expression("Temperature limitation"))
+ggsave("pngs/T_lim.png")
+```
+
+```{r}
+#| label: Ilim
+
+ggplot(gro, aes(t, I_lim)) +
+  geom_line(linewidth = 0.75) +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_classic() +
+  ggtitle(expression("Light limitation"))
+ggsave("pngs/I_lim.png")
+```
+
+```{r}
+#| label: Slim
+
+ggplot(gro, aes(t, S_lim)) +
+  geom_line(linewidth = 0.75) +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_classic() +
+  ggtitle(expression("Salinity limitation"))
+ggsave("pngs/S_lim.png")
+```
+
+```{r}
+#| label: uc
+
+ggplot(gro, aes(t, u_c)) +
+  geom_line(linewidth = 0.75) +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_classic() +
+  ggtitle(expression("Water attenuation"))
+ggsave("pngs/u_c.png")
+```
+
+```{r}
+#| label: growth-rate
+
+ggplot(gro, aes(t, growth_rate)) +
+  geom_line(linewidth = 0.75) +
+  geom_hline(yintercept = my_species["mu"], linetype = "dashed") +
+  theme_classic() +
+  ggtitle(expression("Growth rate (d-1)"))
+ggsave("pngs/growth_rate.png")
+```
+
+```{r}
+#| label: nf-loss
+
+ggplot(gro, aes(t, Nf_loss)) +
+  geom_line(linewidth = 0.75) +
+  theme_classic() +
+  ggtitle(expression("Nf loss (mg m-3)"))
+ggsave("pngs/Nf_loss.png")
+```
+
+```{r}
+#| label: ns-loss
+
+ggplot(gro, aes(t, Ns_loss)) +
+  geom_line(linewidth = 0.75) +
+  theme_classic() +
+  ggtitle(expression("Ns loss (mg m-3)"))
+ggsave("pngs/Ns_loss.png")
+```
+
+# Sensitivity to parameter changes
+
+```{r}
+#| label: sensitivity
+
+params <- names(my_species)
+params <- params[!params %in% c("M_am", "C_am", "V_ni", "K_ni", "D_lo", "D_mi", "D_hi", "T_opt", "T_min", "T_max", "S_opt", "S_min", "S_max")]
+factors <- c(0.9, 1, 1.1)
+
+res <- data.frame(
+  param = rep(params, each = length(factors)),
+  factor = rep(factors, times = length(params))
+)
+
+params_adj <- purrr::map(1:nrow(res), function(r) {
+  my_species_adj <- my_species
+  my_species_adj[res$param[r]] <- my_species_adj[res$param[r]] * res$factor[r]
+  my_species_adj
+})
+
+res_1 <- purrr::map(params_adj, function(pa) {
+  gro <- grow_macroalgae(
+    t = 1:60,
+    temperature = env$temperature[1:60],
+    salinity = env$salinity[1:60],
+    light = env$light[1:60],
+    kW = env$kW[1:60],
+    velocity = env$velocity[1:60],
+    nitrate = env$nitrate[1:60],
+    ammonium = env$ammonium[1:60],
+    ni_uptake = NA,
+    am_uptake = NA,
+    site_params = c(site_params, turbulence = NA),
+    spec_params = pa,
+    initials = init_state
+  )
+  data.frame(
+    B_dw = unname(gro[nrow(gro),"B_dw.mg"]),
+    total_N = unname((gro[nrow(gro),"Nf"] + gro[nrow(gro),"Ns"])*gro[nrow(gro),"hm"])
+  )
+})
+
+res_2 <- res_1 %>% 
+  bind_rows() %>% 
+  cbind(res) %>% 
+  pivot_wider(
+    names_from = factor,
+    values_from = c(B_dw, total_N)
+  ) %>% 
+  mutate(sens.total_N = (total_N_1.1-total_N_0.9)/(0.2*total_N_1),
+         sens.B_dw = (B_dw_1.1-B_dw_0.9)/(0.2*B_dw_1)) %>% 
+  dplyr::select(c(param, contains("sens")))
+
+ggplot(res_2, aes(x = param, y = sens.total_N)) +
+  geom_col() +
+  coord_flip()
 ```
 
 
