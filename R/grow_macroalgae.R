@@ -133,7 +133,7 @@ grow_macroalgae <- function(
     I_lim[i]       <- ifelse(use_Ilim, I_lim(Nf[i], I_top[i], kW[i], spec_params, site_params), 1)
     S_lim[i]       <- ifelse(use_Slim, S_lim(salinity[i], spec_params), 1)
     Q_lim[i]       <- Q_lim(Nf[i], Ns[i], spec_params)
-    growth_rate[i]  <- unname(spec_params['mu'] * min(T_lim[i], I_lim[i], S_lim[i]) * Q_lim[i])
+    growth_rate[i] <- unname(spec_params['mu'] * min(T_lim[i], I_lim[i], S_lim[i]) * Q_lim[i])
     
     # Nitrogen fixation
     Ns_to_Nf[i]     <- min(growth_rate[i] * Ns[i], Ns[i])
@@ -141,9 +141,9 @@ grow_macroalgae <- function(
     # Biomass loss
     U_c            <- velocity[i] * u_c[i] # m/s
     D_m            <- loss(U0 = U_c, spec_params = spec_params)
-    Ns_Nf          <- unname(Ns[i]/(Nf[i]+Ns[i])) # Ratio of Ns to total N
-    Ns_loss[i]     <- unname(D_m * Ns[i] * Ns_Nf)
-    Nf_loss[i]     <- unname(D_m * Nf[i] * (1-Ns_Nf))
+    N_loss         <- biomass_to_Nf(biomass = (B_ww.mg[i] * D_m), Q_rel = Q_rel[i], spec_params = spec_params, dry = T)
+    Ns_loss[i]     <- unname(N_loss["Nf"])
+    Nf_loss[i]     <- unname(N_loss["Ns"])
     
     # If you're not at the final day, set up for next day
     if (i < length(t)) {
