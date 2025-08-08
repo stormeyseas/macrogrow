@@ -80,7 +80,7 @@ grow_macroalgae <- function(
     Q_int[i]       <- Q_int(Nf = Nf[i], Ns = Ns[i], spec_params = spec_params)
     Q_rel[i]       <- Q_rel(Q_int = Q_int[i], spec_params = spec_params)
     
-    B_dw.mg[i]     <- (units::set_units(Nf[i], "mg m-3")/units::set_units(Q_int[i], "mg g-1")) |> 
+    B_dw.mg[i]     <- (units::set_units(Nf[i]+Ns[i], "mg m-3")/units::set_units(Q_int[i], "mg g-1")) |> 
       units::drop_units() |>
       unname()
     B_ww.mg[i]     <- unname(B_dw.mg[i] * spec_params['DWWW'])
