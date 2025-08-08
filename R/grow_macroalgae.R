@@ -112,7 +112,7 @@ grow_macroalgae <- function(
     Q_lim[i]       <- Q_lim(Nf[i], Ns[i], spec_params)
     I_top[i]       <- unname(light[i] * exp(-kW[i] * site_params['d_top']))
     I_lim[i]       <- ifelse(use_Ilim, I_lim(Nf[i], I_top[i], kW[i], spec_params, site_params), 1)
-    S_lim[i]       <- ifelse(use_Slim, S_lim(salinity[i], spec_params))
+    S_lim[i]       <- ifelse(use_Slim, S_lim(salinity[i], spec_params), 1)
     
     # Biomass loss
     U_c <- velocity[i] * u_c[i] # m/s
