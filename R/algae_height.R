@@ -16,8 +16,12 @@
 #' @examples 
 #' my_species <- c(h_a = 750, h_b = 0.5, h_c = 0.01, h_max = 1)
 #' Nf <- seq(100, 1000, 10)
+#' 
+#' # Calculate height for a range of fixed nitrogen values
 #' height <- sapply(X = Nf, FUN = height, spec_params = my_species)
-#' plot(Nf, height)
+#' \dontrun{
+#'   plot(Nf, height, type = "l")
+#' }
 
 height <- function(Nf, spec_params) {
   # Check which parameters are supplied

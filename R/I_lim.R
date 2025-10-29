@@ -19,12 +19,27 @@
 #' * `h_a`, `h_b` and `h_c`, parameters governing height change with `N_f`
 #' * `h_max`, maximum species height
 #' @param site_params A vector of named numbers. Must include:
-#' * \eqn{d_{top}} the below-surface  depth (m) of the top of the macroalgae culture
+#' * `d_top`, the below-surface  depth (m) of the top of the macroalgae culture
 #'
 #' @return a scalar of relative light limitation on growth (between 0 and 1)
 #' @export
 #'
-#' @examples examples TBD
+#' @examples 
+#' my_species <- c(I_o = 200, a_cs = 0.001, h_a = 750, h_b = 0.5, h_c = 0.01, h_max = 1)
+#' my_site <- c(d_top = 1)
+#' I <- seq(0, 2000, 10)
+#' kW <- rnorm(length(I), 0.05, 0.01)
+#' 
+#' # Use purrr::map2 to calculate light limitation over a range of light and attenuation values, but fixed Nf
+#' \dontrun{
+#' df <- purrr::map2_dfr(I, kW, function(Iz, kWz) {
+#'   data.frame(
+#'     I = Iz,
+#'     kW = kWz,
+#'     lim = I_lim(Nf = 1000, I = Iz, kW = kWz, spec_params = my_species, site_params = my_site)
+#'   )
+#' })
+#' }
 #' 
 #' @seealso [height()]
 #' 
