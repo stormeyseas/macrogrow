@@ -14,37 +14,30 @@
 #' @param biomass whether dry (default) or wet biomass is provided, mg m-3
 #'
 #' @return Nf, mg m-3
-#' @importFrom units remove_unit install_unit set_units drop_units
 #' @export
 #'
 #' @examples 
-#' Examples TBD
-#' @seealso [Nf_to_biomass(), Q_rel(), Q_int()]
+#' my_species <- c(DWWW = 7.5, Q_min = 20, Q_max = 45)
+#' starting_biomass <- 250 # mg m-3
+#' 
+#' # Using default Q_rel = 0.5
+#' \dontrun{Nf_to_biomass(biomass = starting_biomass, spec_params = my_species, dry = T)}
+#' 
+#' # Using a specific Q_int
+#' \dontrun{Nf_to_biomass(biomass = starting_biomass, Q_int = 30, spec_params = my_species, dry = T)}
+#' 
+#' @seealso [macrogrow::Nf_to_biomass()], [macrogrow::Q_rel()], [macrogrow::Q_int()]
+#' 
 biomass_to_Nf <- function(biomass, Q_int = NULL, Q_rel = 0.5, spec_params, dry = T) {
-  remove_unit("gDW")
-  install_unit("gDW")
-
-  # If only Q_rel is given convert to Q_int
-  if (is.null(Q_int)) {
-    Q <- Q_int(Q_rel = Q_rel, spec_params = spec_params)
-  }
-  Q <- set_units(Q, "mg gDW-1")
-  Q_min <- set_units(spec_params['Q_min'], "mg gDW-1") |> unname()
+  # If only Q_rel is given, convert to Q_int
+  if (is.null(Q_int)) {Q_int<- Q_int(Q_rel = Q_rel, spec_params = spec_params)}
 
   # Biomass must be dry
-  if (dry == F) {
-    biomass <- biomass/unname(spec_params['DWWW'])
-  }
-  biomass <- set_units(biomass, "mgDW m-3")
+  if (dry == F) {biomass <- biomass/unname(spec_params['DWWW'])}
 
-  Nf <- biomass*Q_min # Nf comes directly from biomass
-  Nf_Ns <- Q/Q_min - set_units(1, "1") # Ratio of Nf to Ns
+  Nf <- biomass * unname(spec_params['Q_min']) * 10^-3 # Nf comes directly from biomass
+  Nf_Ns <- Q_int / unname(spec_params['Q_min']) - 1 # Ratio of Nf to Ns
   Ns <- Nf_Ns * Nf
-
-  Nf <- set_units(Nf, "mg m-3") |> drop_units()
-  Ns <- set_units(Ns, "mg m-3") |> drop_units()
-  
-  remove_unit("gDW")
 
   return(c(Nf = Nf, Ns = Ns))
 }
@@ -57,28 +50,25 @@ biomass_to_Nf <- function(biomass, Q_int = NULL, Q_rel = 0.5, spec_params, dry =
 #' @param dry logical, return dry or wet biomass. If dry = F, spec_params['DWWW'] must be provided
 #'
 #' @return dry (or wet) biomass, mg m-3
-#' @importFrom units remove_unit install_unit set_units drop_units
 #' @export
 #'
-#' @examples examples
-#' @seealso [biomass_to_Nf(), Q_rel(), Q_int()]
+#' @examples 
+#' my_species <- c(DWWW = 7.5, Q_min = 20, Q_max = 45)
+#' starting_biomass <- 250 # mg m-3
+#' 
+#' # Using default Q_rel = 0.5
+#' \dontrun{Nf_to_biomass(biomass = starting_biomass, spec_params = my_species, dry = T)}
+#' 
+#' # Using a specific Q_int
+#' \dontrun{Nf_to_biomass(biomass = starting_biomass, Q_int = 30, spec_params = my_species, dry = T)}
+#' 
+#' @seealso [macrogrow::biomass_to_Nf()], [macrogrow::Q_rel()], [macrogrow::Q_int()]
+#' 
 Nf_to_biomass <- function(Nf, Ns, Q_int = NULL, Q_rel = 0.5, spec_params, dry = T) {
-  remove_unit("gDW")
-  install_unit("gDW")
-  
-  if (is.null(Q_int)) {
-    Q <- Q_int(Nf = Nf, Ns = Ns, Q_rel = Q_rel, spec_params = spec_params)
-  }
-  Q <- set_units(Q, "mg gDW-1")
-  Nf <- set_units(Nf, "mg m-3")
-  Ns <- set_units(Ns, "mg m-3")
-  
-  biomass <- ((Nf + Ns) / Q) |> set_units("mgDW m-3") |> drop_units()
-  if (dry == F) {
-    biomass <- biomass * unname(spec_params['DWWW'])
-  }
-  
-  remove_unit("gDW")
-  
+  # If only Q_rel is given, convert to Q_int
+  if (is.null(Q_int)) {Q_int <- Q_int(Nf = Nf, Ns = Ns, Q_rel = Q_rel, spec_params = spec_params)}
+  biomass <- ((Nf + Ns) / Q_int) * 10^3
+  # If biomass is dry, convert
+  if (dry == F) {biomass <- biomass * unname(spec_params['DWWW'])}
   return(biomass)
 }
