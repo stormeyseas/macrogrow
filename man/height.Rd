@@ -29,6 +29,10 @@ Algae height therefore defaults to \eqn{N_f \times 10^{-3}} if no parameters are
 \examples{
 my_species <- c(h_a = 750, h_b = 0.5, h_c = 0.01, h_max = 1)
 Nf <- seq(100, 1000, 10)
+
+# Calculate height for a range of fixed nitrogen values
 height <- sapply(X = Nf, FUN = height, spec_params = my_species)
-plot(Nf, height)
+\dontrun{
+  plot(Nf, height, type = "l")
+}
 }

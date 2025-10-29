@@ -21,3 +21,6 @@ the relative (0-1) internal nutrient quotient
 \description{
 Relative nutrient quotient
 }
+\seealso{
+\code{\link[=Q_int]{Q_int()}}
+}

@@ -31,5 +31,5 @@ If no shape is supplied, attempts to infer the correct shape from supplied param
 E.g. if \code{Nform_abbr} = "amm" (for ammonium) the function will look for \code{M_amm} and \code{C_amm} or \code{V_amm} and \code{K_amm} in spec_params and will ignore other uptake parameters which may be included for other substrates.
 }
 \seealso{
-\code{\link[=lin_uptake(), MM_uptake]{lin_uptake(), MM_uptake()}}
+\code{\link[=lin_uptake]{lin_uptake()}} \code{\link[=MM_uptake]{MM_uptake()}}
 }

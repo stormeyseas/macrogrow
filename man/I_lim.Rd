@@ -23,7 +23,7 @@ I_lim(Nf, I, kW, spec_params, site_params)
 
 \item{site_params}{A vector of named numbers. Must include:
 \itemize{
-\item \eqn{d_{top}} the below-surface  depth (m) of the top of the macroalgae culture
+\item \code{d_top}, the below-surface  depth (m) of the top of the macroalgae culture
 }}
 }
 \value{
@@ -40,9 +40,23 @@ and \eqn{K=k_{m}+kW} is the total attenuation coefficient.
 where \eqn{h_m} is the macroalgae height.
 }
 \examples{
-examples TBD
+my_species <- c(I_o = 200, a_cs = 0.001, h_a = 750, h_b = 0.5, h_c = 0.01, h_max = 1)
+my_site <- c(d_top = 1)
+I <- seq(0, 2000, 10)
+kW <- rnorm(length(I), 0.05, 0.01)
+
+# Use purrr::map2 to calculate light limitation over a range of light and attenuation values, but fixed Nf
+\dontrun{
+df <- purrr::map2_dfr(I, kW, function(Iz, kWz) {
+  data.frame(
+    I = Iz,
+    kW = kWz,
+    lim = I_lim(Nf = 1000, I = Iz, kW = kWz, spec_params = my_species, site_params = my_site)
+  )
+})
+}
 
 }
 \seealso{
-\code{\link[=height]{height()}}
+\code{\link[=algae_height]{algae_height()}}
 }

@@ -18,7 +18,7 @@ Nf_to_biomass(Nf, Ns, Q_int = NULL, Q_rel = 0.5, spec_params, dry = T)
 \item \code{Q_min}, the minimum internal nutrient quotient
 }}
 
-\item{dry}{logical, return dry or wet biomass. If dry = F, spec_params\link{'DWWW'} must be provided}
+\item{dry}{logical, return dry or wet biomass. If dry = F, \code{spec_params['DWWW']} must be provided}
 }
 \value{
 dry (or wet) biomass, mg m-3
@@ -26,9 +26,21 @@ dry (or wet) biomass, mg m-3
 \description{
 Convert Nf to biomass
 }
+\details{
+Not all parameters need to be provided to this function.
+}
 \examples{
-examples
+my_species <- c(DWWW = 7.5, Q_min = 20, Q_max = 45)
+starting_Nf <- 150 # mg m-3
+starting_Ns <- 50 # mg m-3
+
+# Using default Q_rel = 0.5
+\dontrun{Nf_to_biomass(Nf = starting_Nf, Ns = starting_Ns, spec_params = my_species, dry = T)}
+
+# Using a specific Q_int
+\dontrun{Nf_to_biomass(biomass = starting_biomass, Q_int = 30, spec_params = my_species, dry = T)}
+
 }
 \seealso{
-\code{\link[=biomass_to_Nf(), Q_rel(), Q_int]{biomass_to_Nf(), Q_rel(), Q_int()}}
+\code{\link[=biomass_to_Nf]{biomass_to_Nf()}}, \code{\link[=Q_rel]{Q_rel()}}, \code{\link[=Q_int]{Q_int()}}
 }

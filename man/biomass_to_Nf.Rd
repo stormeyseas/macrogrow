@@ -7,11 +7,11 @@
 biomass_to_Nf(biomass, Q_int = NULL, Q_rel = 0.5, spec_params, dry = T)
 }
 \arguments{
-\item{biomass}{whether dry (default) or wet biomass is provided, mg m-3}
+\item{biomass}{starting biomass, mg m-3}
 
 \item{Q_int}{Non-dimensionalised internal nutrient quotient}
 
-\item{Q_rel}{the non-dimensionalised relative internal nutrient quotient (\eqn{Q_{rel}}). If neither of Q_int and Q_rel are provided the default Q_rel of 0.5 will be used.}
+\item{Q_rel}{the non-dimensionalised relative internal nutrient quotient (\eqn{Q_{rel}}). Only one of \eqn{Q_{int}} or \eqn{Q_{rel}} need to be provided. If neither \eqn{Q_{int}} or \eqn{Q_{rel}} are provided the default if \eqn{Q_{rel}=0.5} will be used.}
 
 \item{spec_params}{a vector of named numbers. Must include:
 \itemize{
@@ -20,7 +20,7 @@ biomass_to_Nf(biomass, Q_int = NULL, Q_rel = 0.5, spec_params, dry = T)
 \item \code{Q_max}, the maximum internal nutrient quotient
 }}
 
-\item{dry}{logical, return dry or wet biomass. If dry = F, spec_params\link{'DWWW'} must be provided}
+\item{dry}{whether dry (default) or wet biomass is provided, mg m-3}
 }
 \value{
 Nf, mg m-3
@@ -30,8 +30,16 @@ B = (N_f + N_s)/Q_min
 Q_rel = Q_min * (1 + N_s/N_f)
 }
 \examples{
-Examples TBD
+my_species <- c(DWWW = 7.5, Q_min = 20, Q_max = 45)
+starting_biomass <- 250 # mg m-3
+
+# Using default Q_rel = 0.5
+\dontrun{biomass_to_Nf(biomass = starting_biomass, spec_params = my_species, dry = T)}
+
+# Using a specific Q_int
+\dontrun{biomass_to_Nf(biomass = starting_biomass, Q_int = 30, spec_params = my_species, dry = T)}
+
 }
 \seealso{
-\code{\link[=Nf_to_biomass(), Q_rel(), Q_int]{Nf_to_biomass(), Q_rel(), Q_int()}}
+\code{\link[=Nf_to_biomass]{Nf_to_biomass()}}, \code{\link[=Q_rel]{Q_rel()}}, \code{\link[=Q_int]{Q_int()}}
 }

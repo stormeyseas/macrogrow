@@ -63,3 +63,6 @@ Example csv with all the spec_params & site_params required?
 \examples{
 "see here" link?
 }
+\seealso{
+\code{\link[=grow_macroalgae]{grow_macroalgae()}}
+}

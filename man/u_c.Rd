@@ -49,5 +49,5 @@ the relative water attenuation coefficient (u_c)
 A short description...
 }
 \seealso{
-\code{\link[=height(), u_b(), C_t]{height(), u_b(), C_t()}}
+\code{\link[=height]{height()}}, \code{\link[=u_b]{u_b()}}, \code{\link[=C_t]{C_t()}}
 }

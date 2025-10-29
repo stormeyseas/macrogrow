@@ -32,5 +32,5 @@ Q_{lim} &=& \frac{Q_{int} - Q_{min}}{Q_{int} - K_c}
 examples
 }
 \seealso{
-\code{\link[=N_int(), N_rel(), Q_int(), Q_rel]{N_int(), N_rel(), Q_int(), Q_rel()}}
+\code{\link[=N_int]{N_int()}}, \code{\link[=N_rel]{N_rel()}}, \code{\link[=Q_int]{Q_int()}}, \code{\link[=Q_rel]{Q_rel()}}
 }
