@@ -16,7 +16,7 @@
 #' @export
 #' 
 #' @examples examples
-#' @seealso [N_int(), N_rel(), Q_int(), Q_rel()]
+#' @seealso [macrogrow::N_int()], [macrogrow::N_rel()], [macrogrow::Q_int()], [macrogrow::Q_rel()]
 #' 
 Q_lim <- function(Nf, Ns, spec_params) {
   Q_int <- Q_int(Nf = Nf, Ns = Ns, spec_params = spec_params)

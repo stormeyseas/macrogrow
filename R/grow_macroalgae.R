@@ -32,7 +32,7 @@
 #' - Note that the final growth dataframe is inclusive of the start and end date, so the environmental vectors must be the same
 #'
 #' @examples "see here" link?
-#' @seealso [check_grow()]
+#' @seealso [macrogrow::check_grow()]
 grow_macroalgae <- function(
   t = 1:30,
   temperature,

@@ -21,7 +21,7 @@
 #' 8. Ns_fixed_not_replaced - the Ns fixed last timestep was not replaced this timestep (Q_rel is declining)
 #' 9. Ns_loss_not_replaced - the Ns lost last timestep was not replaced this timestep (Q_rel is declining)
 #'
-#' @seealso [grow_macroalgae()]
+#' @seealso [macrogrow::grow_macroalgae()]
 get_limiting <- function(output, spec_params) {
   
   limiting <- rep(NA, nrow(output))

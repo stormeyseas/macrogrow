@@ -16,7 +16,7 @@
 #' E.g. if `Nform_abbr` = "amm" (for ammonium) the function will look for `M_amm` and `C_amm` or `V_amm` and `K_amm` in spec_params and will ignore other uptake parameters which may be included for other substrates. 
 #' 
 #' @export
-#' @seealso [lin_uptake(), MM_uptake()]
+#' @seealso [macrogrow::lin_uptake()] [macrogrow::MM_uptake()]
 #' 
 get_uptake <- function(conc, uptake_shape = NA, Nform_abbr, spec_params) {
   
