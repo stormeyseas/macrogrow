@@ -17,7 +17,23 @@
 #' E.g. if `Nform_abbr` = "amm" (for ammonium) the function will look for `M_amm` and `C_amm` or `V_amm` and `K_amm` in spec_params and will ignore other uptake parameters which may be included for other substrates. 
 #' 
 #' @export
-#' @seealso [macrogrow::lin_uptake()] [macrogrow::MM_uptake()]
+#' @seealso [lin_uptake()] [MM_uptake()]
+#' 
+#' @examples
+#' Ni <- seq(0, 300, 10)
+#' Am <- seq(0, 1000, 20)
+#' my_species <- c(V_ni = 4.5, K_ni = 300, V_am = 5.5, K_am = 150, M_am = 1.5, C_am = 10)
+#' 
+#' # Get uptake for a vector of concentrations
+#' sapply(Am, function(conc) {get_uptake(conc = conc, uptake_shape = "linear", Nform_abbr = "am", spec_params = my_species)})
+#' 
+#' # Uptake shape does not need to be specified if only one set of parameters is provided
+#' sapply(Ni, function(conc) {get_uptake(conc = conc, uptake_shape = NA, Nform_abbr = "ni", spec_params = my_species)})
+#' 
+#' # Create a custom compound to uptake
+#' my_species <- c(V_urea = 1.5, K_urea = 10)
+#' Urea <- seq(0, 25, 0.5)
+#' sapply(Urea, function(conc) {get_uptake(conc = conc, Nform_abbr = "urea", spec_params = my_species)})
 #' 
 get_uptake <- function(conc, uptake_shape = NA, Nform_abbr, spec_params) {
   
