@@ -47,7 +47,6 @@ get_uptake <- function(conc, uptake_shape = NA, Nform_abbr, spec_params) {
   K <- spec_params[paste0("K", "_", Nform_abbr)]
   
   if (is.na(uptake_shape)) {
-    rlang::inform(message = glue::glue("Uptake shape for '{form}' not specified, determining based on parameters provided", form = Nform_abbr))
     if (!is.na(V) & !is.na(K)) {
       up <- MM_uptake(conc = conc, V = V, K = K)
     } else if (!is.na(M) & !is.na(C)) {
