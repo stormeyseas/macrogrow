@@ -12,7 +12,7 @@
 #'
 #' @return the non-dimensionalised internal nutrient quotient
 #' @export
-#' @seealso [macrogrow::Q_rel()]
+#' @seealso [Q_rel()]
 #'
 #' @examples examples
 Q_int <- function(Nf = NULL, Ns = NULL, Q_rel = NULL, spec_params) {

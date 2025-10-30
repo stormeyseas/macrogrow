@@ -1,8 +1,10 @@
 #' Convert biomass to Nf and Ns
 
 #' @description
-#' B = (N_f + N_s)/Q_min
-#' Q_rel = Q_min * (1 + N_s/N_f)
+#' Converts wet or dry biomass to `N_f` and `N_s` via:
+#' \deqn{B = \frac{N_f + N_s}{Q_{min}}}
+#' and where the ratio between `N_f` and `N_s` is calculated via:
+#' \deqn{\frac{Ns}{Nf} = \frac{Q_{int}}{Q_{min}} - 1} 
 #'
 #' @inheritParams Nf_to_biomass
 #' @inheritParams Q_rel 
@@ -22,12 +24,12 @@
 #' starting_biomass <- 250 # mg m-3
 #' 
 #' # Using default Q_rel = 0.5
-#' \dontrun{biomass_to_Nf(biomass = starting_biomass, spec_params = my_species, dry = T)}
+#' biomass_to_Nf(biomass = starting_biomass, spec_params = my_species, dry = T)
 #' 
 #' # Using a specific Q_int
-#' \dontrun{biomass_to_Nf(biomass = starting_biomass, Q_int = 30, spec_params = my_species, dry = T)}
+#' biomass_to_Nf(biomass = starting_biomass, Q_int = 30, spec_params = my_species, dry = T)
 #' 
-#' @seealso [macrogrow::Nf_to_biomass()], [macrogrow::Q_rel()], [macrogrow::Q_int()]
+#' @seealso [Nf_to_biomass()], [Q_rel()], [Q_int()]
 #' 
 biomass_to_Nf <- function(biomass, Q_int = NULL, Q_rel = 0.5, spec_params, dry = T) {
   # If only Q_rel is given, convert to Q_int
@@ -62,12 +64,12 @@ biomass_to_Nf <- function(biomass, Q_int = NULL, Q_rel = 0.5, spec_params, dry =
 #' starting_Ns <- 50 # mg m-3
 #' 
 #' # Using default Q_rel = 0.5
-#' \dontrun{Nf_to_biomass(Nf = starting_Nf, Ns = starting_Ns, spec_params = my_species, dry = T)}
+#' Nf_to_biomass(Nf = starting_Nf, Ns = starting_Ns, spec_params = my_species, dry = T)
 #' 
 #' # Using a specific Q_int
-#' \dontrun{Nf_to_biomass(biomass = starting_biomass, Q_int = 30, spec_params = my_species, dry = T)}
+#' Nf_to_biomass(biomass = starting_biomass, Q_int = 30, spec_params = my_species, dry = T)
 #' 
-#' @seealso [macrogrow::biomass_to_Nf()], [macrogrow::Q_rel()], [macrogrow::Q_int()]
+#' @seealso [biomass_to_Nf()], [Q_rel()], [Q_int()]
 #' 
 Nf_to_biomass <- function(Nf, Ns, Q_int = NULL, Q_rel = 0.5, spec_params, dry = T) {
   # If only Q_rel is given, convert to Q_int

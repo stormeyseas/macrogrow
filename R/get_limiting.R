@@ -1,7 +1,8 @@
 #' Determine limiting factor in growth
 #' 
 #' @description
-#' For each timestep in the growth output matrix, determine the factor most likely to be limiting growth.
+#' `r lifecycle::badge("experimental")`
+#' For each timestep in the growth output matrix, determine the factor(s) most likely to be limiting growth. This function is unfinished and subject to change.
 #'
 #' @param output matrix, direct output of 'grow_macroalgae' function (can be sparse)
 #' @param spec_params a named vector of site-specific parameters - same as input to 'grow_macroalgae' function
@@ -10,18 +11,18 @@
 #' @export 
 #' 
 #' @details
-#' This function gives an idea of what factor(s) limit growth at each timestep. The choices (in order) are:
-#' 1. T_lim
-#' 2. I_lim
-#' 3. S_lim
-#' 4. Q_lim - internal nutrient quotient
-#' 5. Ns_to_Nf - not enough stored nutrients (Ns) were available to be fixed at maximum rate
-#' 6. Nf_loss - more Nf was lost than fixed
-#' 7. conc_nitrate/conc_ammonium/conc_other - there were not enough ambient nutrients to be taken up at the maximum rate
-#' 8. Ns_fixed_not_replaced - the Ns fixed last timestep was not replaced this timestep (Q_rel is declining)
-#' 9. Ns_loss_not_replaced - the Ns lost last timestep was not replaced this timestep (Q_rel is declining)
+#' This function gives an idea of what factor(s) are most likely to be limiting growth at each timestep. The choices are listed in order below. For each limitation, it can be assumed that the factors above it are within "ideal" ranges 
+#' 1. `T_lim`: The macroalgae is limited by temperature
+#' 2. `I_lim`: The macroalgae is limited by light availability
+#' 3. `S_lim`: The macroalgae is limited by salinity
+#' 4. `Q_lim`: The macroalgae does not have enough stored nutrients to fix into biomass at maximum rate allowed by temperature, light and salinity
+#' 5. `Ns_to_Nf`: The macroalgae does not have enough stored nutrients to fix into biomass at maximum rate allowed by temperature, light and salinity
+#' 6. `Nf_loss`: More Nf was lost than was fixed
+#' 7. `conc_nitrate`/`conc_ammonium`/`conc_other`: There were not enough ambient nutrients available to replace fixed Ns
+#' 8. `Ns_fixed_not_replaced`: the Ns fixed last timestep was not replaced this timestep (Q_rel is declining)
+#' 9. `Ns_loss_not_replaced`: the Ns lost last timestep was not replaced this timestep (Q_rel is declining)
 #'
-#' @seealso [macrogrow::grow_macroalgae()]
+#' @seealso [grow_macroalgae()]
 get_limiting <- function(output, spec_params) {
   
   limiting <- rep(NA, nrow(output))

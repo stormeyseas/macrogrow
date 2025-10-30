@@ -1,7 +1,7 @@
 #' Relative water attenuation within canopy
 #' 
-#' #' @description
-#' A short description...
+#' @description
+#' Calculates relative water attenuation within the canopy, based on Plew, D. R. (2011). "Depth-Averaged Drag Coefficient for Modeling Flow through Suspended Canopies". Journal of Hydraulic Engineering, 137(2), 234–247.
 #'
 #' @param U0 incoming incident water velocity (m/s)
 #' @param macro_state vector of named numbers. Must include:
@@ -21,7 +21,7 @@
 #'
 #' @return the relative water attenuation coefficient (u_c)
 #' @export
-#' @seealso [macrogrow::height()], [macrogrow::u_b()], [macrogrow::C_t()]
+#' @seealso [height()], [u_b()], [C_t()]
 #' 
 u_c <- function(U0, macro_state, site_params, spec_params, 
   constants = c(s = 0.0045, gam = 1.13, a2 = 0.2^2, Cb = 0.0025)){
@@ -48,6 +48,9 @@ u_c <- function(U0, macro_state, site_params, spec_params,
 
 #' Relative water attenuation beneath canopy
 #'
+#' @description
+#' Calculates the relative water attenuation beneath the canopy, based on Plew, D. R. (2011). "Depth-Averaged Drag Coefficient for Modeling Flow through Suspended Canopies". Journal of Hydraulic Engineering, 137(2), 234–247. This function is not actually used within the main function `grow_macroalgae()`.
+#' 
 #' @inheritParams u_c
 #'
 #' @return a scalar of relative water attenuation beneath canopy
@@ -63,6 +66,9 @@ u_b <- function(U0, macro_state, SA_WW = 0.5 * (0.0306/2), site_params,
 }
 
 #' Total drag coefficient
+#'
+#' @description
+#' Calculates the total drag coefficient, based on Plew, D. R. (2011). "Depth-Averaged Drag Coefficient for Modeling Flow through Suspended Canopies". Journal of Hydraulic Engineering, 137(2), 234–247. This function is not actually used within the main function `grow_macroalgae()`.
 #'
 #' @inheritParams u_c
 #' 

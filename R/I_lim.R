@@ -41,7 +41,7 @@
 #' })
 #' }
 #' 
-#' @seealso [macrogrow::algae_height()]
+#' @seealso [height()]
 #' 
 I_lim <- function(Nf, I, kW, spec_params, site_params) {
   # Check that required parameters are supplied

@@ -1,4 +1,8 @@
 #' Get the correct uptake rate
+#' 
+#' @description
+#' Gives the substrate uptake rate based on the shape and species-specific parameters supplied. 
+#' If no shape is supplied, attempts to infer the correct shape from supplied parameters. 
 #'
 #' @param conc substrate concentration
 #' @param uptake_shape kinetic shape for substrate uptake. One of "linear" or "Michaelis-Menton" (or "MM"). Defaults to Michaelis-Menton. 
@@ -9,9 +13,6 @@
 #' @param Nform_abbr the abbreviation used in spec_params for the relevant nitrogen form. See details.
 #'
 #' @details
-#' Gives the substrate uptake rate based on the shape and species-specific parameters supplied. 
-#' If no shape is supplied, attempts to infer the correct shape from supplied parameters. 
-#' 
 #' `Nform_abbr` allows the function to link species parameters with concentration. 
 #' E.g. if `Nform_abbr` = "amm" (for ammonium) the function will look for `M_amm` and `C_amm` or `V_amm` and `K_amm` in spec_params and will ignore other uptake parameters which may be included for other substrates. 
 #' 

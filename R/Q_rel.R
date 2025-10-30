@@ -7,7 +7,7 @@
 #'
 #' @return the relative (0-1) internal nutrient quotient
 #' @export
-#' @seealso [macrogrow::Q_int()]
+#' @seealso [Q_int()]
 #'
 Q_rel <- function(Nf = NULL, Ns = NULL, Q_int = NULL, spec_params) {
   if (!is.null(Nf) & !is.null(Ns)) {

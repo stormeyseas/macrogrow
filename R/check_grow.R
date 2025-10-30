@@ -15,7 +15,7 @@
 #' @details
 #' Example csv with all the spec_params & site_params required?
 #'
-#' @seealso [macrogrow::grow_macroalgae()]
+#' @seealso [grow_macroalgae()]
 #' 
 #' @examples "see here" link?
 check_grow <- function(
