@@ -45,8 +45,7 @@ u_c(
 the relative water attenuation coefficient (u_c)
 }
 \description{
-#' @description
-A short description...
+Calculates relative water attenuation within the canopy, based on Plew, D. R. (2011). "Depth-Averaged Drag Coefficient for Modeling Flow through Suspended Canopies". Journal of Hydraulic Engineering, 137(2), 234–247.
 }
 \seealso{
 \code{\link[=height]{height()}}, \code{\link[=u_b]{u_b()}}, \code{\link[=C_t]{C_t()}}

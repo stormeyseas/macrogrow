@@ -58,5 +58,5 @@ df <- purrr::map2_dfr(I, kW, function(Iz, kWz) {
 
 }
 \seealso{
-\code{\link[=algae_height]{algae_height()}}
+\code{\link[=height]{height()}}
 }

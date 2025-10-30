@@ -21,14 +21,29 @@ get_uptake(conc, uptake_shape = NA, Nform_abbr, spec_params)
 }}
 }
 \description{
-Get the correct uptake rate
-}
-\details{
 Gives the substrate uptake rate based on the shape and species-specific parameters supplied.
 If no shape is supplied, attempts to infer the correct shape from supplied parameters.
-
+}
+\details{
 \code{Nform_abbr} allows the function to link species parameters with concentration.
 E.g. if \code{Nform_abbr} = "amm" (for ammonium) the function will look for \code{M_amm} and \code{C_amm} or \code{V_amm} and \code{K_amm} in spec_params and will ignore other uptake parameters which may be included for other substrates.
+}
+\examples{
+Ni <- seq(0, 300, 10)
+Am <- seq(0, 1000, 20)
+my_species <- c(V_ni = 4.5, K_ni = 300, V_am = 5.5, K_am = 150, M_am = 1.5, C_am = 10)
+
+# Get uptake for a vector of concentrations
+sapply(Am, function(conc) {get_uptake(conc = conc, uptake_shape = "linear", Nform_abbr = "am", spec_params = my_species)})
+
+# Uptake shape does not need to be specified if only one set of parameters is provided
+sapply(Ni, function(conc) {get_uptake(conc = conc, uptake_shape = NA, Nform_abbr = "ni", spec_params = my_species)})
+
+# Create a custom compound to uptake
+my_species <- c(V_urea = 1.5, K_urea = 10)
+Urea <- seq(0, 25, 0.5)
+sapply(Urea, function(conc) {get_uptake(conc = conc, Nform_abbr = "urea", spec_params = my_species)})
+
 }
 \seealso{
 \code{\link[=lin_uptake]{lin_uptake()}} \code{\link[=MM_uptake]{MM_uptake()}}

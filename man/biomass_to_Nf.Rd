@@ -26,18 +26,20 @@ biomass_to_Nf(biomass, Q_int = NULL, Q_rel = 0.5, spec_params, dry = T)
 Nf, mg m-3
 }
 \description{
-B = (N_f + N_s)/Q_min
-Q_rel = Q_min * (1 + N_s/N_f)
+Converts wet or dry biomass to \code{N_f} and \code{N_s} via:
+\deqn{B = \frac{N_f + N_s}{Q_{min}}}
+and where the ratio between \code{N_f} and \code{N_s} is calculated via:
+\deqn{\frac{Ns}{Nf} = \frac{Q_{int}}{Q_{min}} - 1}
 }
 \examples{
 my_species <- c(DWWW = 7.5, Q_min = 20, Q_max = 45)
 starting_biomass <- 250 # mg m-3
 
 # Using default Q_rel = 0.5
-\dontrun{biomass_to_Nf(biomass = starting_biomass, spec_params = my_species, dry = T)}
+biomass_to_Nf(biomass = starting_biomass, spec_params = my_species, dry = T)
 
 # Using a specific Q_int
-\dontrun{biomass_to_Nf(biomass = starting_biomass, Q_int = 30, spec_params = my_species, dry = T)}
+biomass_to_Nf(biomass = starting_biomass, Q_int = 30, spec_params = my_species, dry = T)
 
 }
 \seealso{

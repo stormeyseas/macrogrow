@@ -45,5 +45,5 @@ C_t(
 The total drag coefficient C_t
 }
 \description{
-Total drag coefficient
+Calculates the total drag coefficient, based on Plew, D. R. (2011). "Depth-Averaged Drag Coefficient for Modeling Flow through Suspended Canopies". Journal of Hydraulic Engineering, 137(2), 234–247. This function is not actually used within the main function \code{grow_macroalgae()}.
 }

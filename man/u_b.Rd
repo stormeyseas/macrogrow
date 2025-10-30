@@ -40,7 +40,7 @@ u_b(
 a scalar of relative water attenuation beneath canopy
 }
 \description{
-Relative water attenuation beneath canopy
+Calculates the relative water attenuation beneath the canopy, based on Plew, D. R. (2011). "Depth-Averaged Drag Coefficient for Modeling Flow through Suspended Canopies". Journal of Hydraulic Engineering, 137(2), 234–247. This function is not actually used within the main function \code{grow_macroalgae()}.
 }
 \examples{
 examples

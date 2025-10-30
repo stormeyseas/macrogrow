@@ -15,20 +15,21 @@ get_limiting(output, spec_params)
 vector of limiting factors at each timestep
 }
 \description{
-For each timestep in the growth output matrix, determine the factor most likely to be limiting growth.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+For each timestep in the growth output matrix, determine the factor(s) most likely to be limiting growth. This function is unfinished and subject to change.
 }
 \details{
-This function gives an idea of what factor(s) limit growth at each timestep. The choices (in order) are:
+This function gives an idea of what factor(s) are most likely to be limiting growth at each timestep. The choices are listed in order below. For each limitation, it can be assumed that the factors above it are within "ideal" ranges
 \enumerate{
-\item T_lim
-\item I_lim
-\item S_lim
-\item Q_lim - internal nutrient quotient
-\item Ns_to_Nf - not enough stored nutrients (Ns) were available to be fixed at maximum rate
-\item Nf_loss - more Nf was lost than fixed
-\item conc_nitrate/conc_ammonium/conc_other - there were not enough ambient nutrients to be taken up at the maximum rate
-\item Ns_fixed_not_replaced - the Ns fixed last timestep was not replaced this timestep (Q_rel is declining)
-\item Ns_loss_not_replaced - the Ns lost last timestep was not replaced this timestep (Q_rel is declining)
+\item \code{T_lim}: The macroalgae is limited by temperature
+\item \code{I_lim}: The macroalgae is limited by light availability
+\item \code{S_lim}: The macroalgae is limited by salinity
+\item \code{Q_lim}: The macroalgae does not have enough stored nutrients to fix into biomass at maximum rate allowed by temperature, light and salinity
+\item \code{Ns_to_Nf}: The macroalgae does not have enough stored nutrients to fix into biomass at maximum rate allowed by temperature, light and salinity
+\item \code{Nf_loss}: More Nf was lost than was fixed
+\item \code{conc_nitrate}/\code{conc_ammonium}/\code{conc_other}: There were not enough ambient nutrients available to replace fixed Ns
+\item \code{Ns_fixed_not_replaced}: the Ns fixed last timestep was not replaced this timestep (Q_rel is declining)
+\item \code{Ns_loss_not_replaced}: the Ns lost last timestep was not replaced this timestep (Q_rel is declining)
 }
 }
 \seealso{

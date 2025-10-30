@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">macrogrow</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,7 @@
 
 
 <dt id="arg-dry">dry<a class="anchor" aria-label="anchor" href="#arg-dry"></a></dt>
-<dd><p>logical, return dry or wet biomass. If dry = F, spec_params'DWWW' must be provided</p></dd>
+<dd><p>logical, return dry or wet biomass. If dry = F, <code>spec_params['DWWW']</code> must be provided</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -81,14 +81,28 @@
     <p>dry (or wet) biomass, mg m-3</p>
     </div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Not all parameters need to be provided to this function.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code>biomass_to_Nf(), Q_rel(), Q_int()</code></p></div>
+    <div class="dont-index"><p><code><a href="biomass_to_Nf.html">biomass_to_Nf()</a></code>, <code><a href="Q_rel.html">Q_rel()</a></code>, <code><a href="Q_int.html">Q_int()</a></code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">examples</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'examples' not found</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">my_species</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>DWWW <span class="op">=</span> <span class="fl">7.5</span>, Q_min <span class="op">=</span> <span class="fl">20</span>, Q_max <span class="op">=</span> <span class="fl">45</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">starting_Nf</span> <span class="op">&lt;-</span> <span class="fl">150</span> <span class="co"># mg m-3</span></span></span>
+<span class="r-in"><span><span class="va">starting_Ns</span> <span class="op">&lt;-</span> <span class="fl">50</span> <span class="co"># mg m-3</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Using default Q_rel = 0.5</span></span></span>
+<span class="r-in"><span><span class="fu">Nf_to_biomass</span><span class="op">(</span>Nf <span class="op">=</span> <span class="va">starting_Nf</span>, Ns <span class="op">=</span> <span class="va">starting_Ns</span>, spec_params <span class="op">=</span> <span class="va">my_species</span>, dry <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6153.846</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Using a specific Q_int</span></span></span>
+<span class="r-in"><span><span class="fu">Nf_to_biomass</span><span class="op">(</span>biomass <span class="op">=</span> <span class="va">starting_biomass</span>, Q_int <span class="op">=</span> <span class="fl">30</span>, spec_params <span class="op">=</span> <span class="va">my_species</span>, dry <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in Nf_to_biomass(biomass = starting_biomass, Q_int = 30, spec_params = my_species,     dry = T):</span> unused argument (biomass = starting_biomass)</span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -96,7 +110,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Tormey E. Reimer.</p>
+  <p>Developed by Tormey E. Reimer, Scott A. Hadley.</p>
 </div>
 
 <div class="pkgdown-footer-right">

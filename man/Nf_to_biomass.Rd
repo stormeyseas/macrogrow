@@ -35,10 +35,10 @@ starting_Nf <- 150 # mg m-3
 starting_Ns <- 50 # mg m-3
 
 # Using default Q_rel = 0.5
-\dontrun{Nf_to_biomass(Nf = starting_Nf, Ns = starting_Ns, spec_params = my_species, dry = T)}
+Nf_to_biomass(Nf = starting_Nf, Ns = starting_Ns, spec_params = my_species, dry = T)
 
 # Using a specific Q_int
-\dontrun{Nf_to_biomass(biomass = starting_biomass, Q_int = 30, spec_params = my_species, dry = T)}
+Nf_to_biomass(biomass = starting_biomass, Q_int = 30, spec_params = my_species, dry = T)
 
 }
 \seealso{

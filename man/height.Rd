@@ -19,10 +19,11 @@ height(Nf, spec_params)
 a scalar of macroalgae height (m)
 }
 \description{
-Macroalgae height
+Calculates macroalgae height as
+\deqn{h_m = \left(\frac{N_f}{h_a}\right)^{h_b} + h_c}
+where \code{h_m} is limited by a maximum of \code{h_max}.
 }
 \details{
-Calculates macroalgae height as \eqn{h_m = \left(\frac{N_f}{h_a}\right)^{h_b} + h_c} up to a maximum of \code{h_max}.
 Defaults are \eqn{h_a=1000}, \eqn{h_b=1} and \eqn{h_c=0}.
 Algae height therefore defaults to \eqn{N_f \times 10^{-3}} if no parameters are supplied.
 }

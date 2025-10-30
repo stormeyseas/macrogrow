@@ -25,7 +25,7 @@ where \(h_m\) is the macroalgae height."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">macrogrow</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,7 +94,7 @@ where \(h_m\) is the macroalgae height.</p>
 
 
 <dt id="arg-site-params">site_params<a class="anchor" aria-label="anchor" href="#arg-site-params"></a></dt>
-<dd><p>A vector of named numbers. Must include:</p><ul><li><p>\(d_{top}\) the below-surface  depth (m) of the top of the macroalgae culture</p></li>
+<dd><p>A vector of named numbers. Must include:</p><ul><li><p><code>d_top</code>, the below-surface  depth (m) of the top of the macroalgae culture</p></li>
 </ul></dd>
 
 </dl></div>
@@ -109,14 +109,30 @@ where \(h_m\) is the macroalgae height.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">my_species</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>I_o <span class="op">=</span> <span class="fl">200</span>, a_cs <span class="op">=</span> <span class="fl">0.001</span>, h_a <span class="op">=</span> <span class="fl">750</span>, h_b <span class="op">=</span> <span class="fl">0.5</span>, h_c <span class="op">=</span> <span class="fl">0.01</span>, h_max <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">my_site</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>d_top <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">I</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2000</span>, <span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">kW</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">I</span><span class="op">)</span>, <span class="fl">0.05</span>, <span class="fl">0.01</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Use purrr::map2 to calculate light limitation over a range of light and attenuation values, but fixed Nf</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map2_dfr</a></span><span class="op">(</span><span class="va">I</span>, <span class="va">kW</span>, <span class="kw">function</span><span class="op">(</span><span class="va">Iz</span>, <span class="va">kWz</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    I <span class="op">=</span> <span class="va">Iz</span>,</span></span>
+<span class="r-in"><span>    kW <span class="op">=</span> <span class="va">kWz</span>,</span></span>
+<span class="r-in"><span>    lim <span class="op">=</span> <span class="fu">I_lim</span><span class="op">(</span>Nf <span class="op">=</span> <span class="fl">1000</span>, I <span class="op">=</span> <span class="va">Iz</span>, kW <span class="op">=</span> <span class="va">kWz</span>, spec_params <span class="op">=</span> <span class="va">my_species</span>, site_params <span class="op">=</span> <span class="va">my_site</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Tormey E. Reimer.</p>
+  <p>Developed by Tormey E. Reimer, Scott A. Hadley.</p>
 </div>
 
 <div class="pkgdown-footer-right">
