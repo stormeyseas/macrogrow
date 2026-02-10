@@ -43,6 +43,12 @@ reduce the error handling contained within `grow_macroalgae()` and its
 helper functions. As a consequence, `grow_macroalgae()` will likely give
 very unhelpful errors.
 
+## Cite
+
+I'd really appreciate it if you would cite this package if you use it! 
+
+[![DOI](https://zenodo.org/badge/808873016.svg)](https://doi.org/10.5281/zenodo.18587749)
+
 ## References
 
 <div id="refs" class="references csl-bib-body hanging-indent"
