@@ -7,7 +7,6 @@
 #'
 #' @importFrom glue glue
 #' @import rlang cli
-#' @importFrom units set_units drop_units
 #' 
 #' @return printout of potential errors for main function
 #' @export 

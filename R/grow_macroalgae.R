@@ -22,7 +22,6 @@
 #'
 #' @importFrom glue glue
 #' @import rlang
-#' @importFrom units set_units drop_units
 #' 
 #' @return matrix of outputs
 #' @export 
@@ -85,7 +84,7 @@ grow_macroalgae <- function(
     
     # Environmental state (incoming)
     if (use_Uc) {
-      biom <- B_ww.mg[i] |> units::set_units("mg") |> units::set_units("g") |> units::drop_units()
+      biom <- B_ww.mg[i] / 1000 # mg -> g
       u_c[i] <- u_c(
         U0 = velocity[i], # m/s
         macro_state = c(biomass = biom, hm = hm[i]),
@@ -93,7 +92,7 @@ grow_macroalgae <- function(
         spec_params = spec_params,
         constants = other_constants
       )
-      U_0 <- velocity[i] |> units::set_units("m s-1") |> units::set_units("m d-1") |> units::drop_units() # This is now m/d-1
+      U_0 <- velocity[i] * 86400 # m/s -> m/d
       lambda[i]      <- (u_c[i] * U_0)/unname(site_params['farmA'] * site_params['hc']) 
       lambda_0[i]    <- U_0/unname(site_params['farmA'] * site_params['hc']) 
     } else {
