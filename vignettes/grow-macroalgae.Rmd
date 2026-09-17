@@ -11,18 +11,14 @@ This space will be used to detail how to use the main model function, `grow_macr
 
 ```{r setup}
 library(macrogrow)
-library(magrittr)
-library(units)
 library(lubridate)
 library(ggplot2)
 library(cowplot)
 library(dplyr)
 library(tidyr)
 
-remove_unit("gN")
-remove_unit("molN")
-install_unit(name = "gN")
-install_unit(name = "molN", def = "14.067 gN")
+# Molar mass of nitrogen (g mol-1), used for mass <-> molar conversions
+N_molar_mass <- 14.007
 
 dir.create("pngs")
 ```
@@ -38,8 +34,9 @@ Within this package, there are three default datasets:
 ```{r}
 #| label: convert-N
 
-env$nitrate_uM <- env$nitrate %>% set_units("mgN m-3") %>% set_units("umolN L-1") %>% drop_units()
-env$ammonium_uM <- env$ammonium %>% set_units("mgN m-3") %>% set_units("umolN L-1") %>% drop_units()
+# mgN m-3 is numerically equal to ugN L-1; divide by molar mass to get umolN L-1
+env$nitrate_uM <- env$nitrate / N_molar_mass
+env$ammonium_uM <- env$ammonium / N_molar_mass
 ```
 
 ```{r}
@@ -122,7 +119,8 @@ Three values are required for macroalgae initialisation: $N_f$, $N_s$, and $Q_{r
 ```{r}
 #| label: initial-state
 
-init_biomass <- 0.005 %>% set_units("g L-1") %>% set_units("mg m-3") %>% drop_units()
+# 0.005 g L-1 converted to mg m-3 (x 1000 mg/g, x 1000 L/m3)
+init_biomass <- 0.005 * 1000 * 1000
 
 init_NfNs <- biomass_to_Nf(
      biomass = init_biomass, 
@@ -367,15 +365,15 @@ res_1 <- purrr::map(params_adj, function(pa) {
   )
 })
 
-res_2 <- res_1 %>% 
-  bind_rows() %>% 
-  cbind(res) %>% 
+res_2 <- res_1 |> 
+  bind_rows() |> 
+  cbind(res) |> 
   pivot_wider(
     names_from = factor,
     values_from = c(B_dw, total_N)
-  ) %>% 
+  ) |> 
   mutate(sens.total_N = (total_N_1.1-total_N_0.9)/(0.2*total_N_1),
-         sens.B_dw = (B_dw_1.1-B_dw_0.9)/(0.2*B_dw_1)) %>% 
+         sens.B_dw = (B_dw_1.1-B_dw_0.9)/(0.2*B_dw_1)) |> 
   dplyr::select(c(param, contains("sens")))
 
 ggplot(res_2, aes(x = param, y = sens.total_N)) +

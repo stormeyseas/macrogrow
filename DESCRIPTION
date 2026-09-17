@@ -10,14 +10,21 @@ Authors@R: c(
     )
 License: MIT + file LICENSE
 Depends: 
-    R (>= 3.5)
-Imports: rlang,
+    R (>= 4.1)
+Imports: 
+    rlang,
     glue,
-    cli,
-    nleqslv
-Suggests: rmarkdown,
+    cli
+Suggests: 
+    rmarkdown,
     testthat (>= 3.0.0),
-    tidyverse
+    knitr,
+    ggplot2,
+    cowplot,
+    dplyr,
+    tidyr,
+    purrr,
+    lubridate
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
