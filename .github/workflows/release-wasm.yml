@@ -1,0 +1,27 @@
+# Build a WebAssembly (webR) binary of this package and attach it to the
+# GitHub release that triggered the run. Downstream Shinylive apps
+# (e.g. stormeyseas/simple-seaweed) install macrogrow at a release tag and
+# shinylive::export() picks up these assets automatically.
+#
+# Derived from https://github.com/r-wasm/actions/tree/v3/examples
+on:
+  release:
+    # Must republish the release to update assets
+    types: [published]
+
+name: Build and upload wasm R package image
+
+jobs:
+  release-file-system-image:
+    uses: r-wasm/actions/.github/workflows/release-file-system-image.yml@v3
+    with:
+      # Must match the webR version bundled by the shinylive R package
+      # (shinylive 0.5.0 -> shinylive assets 0.10.x -> webR 0.6.0 / R 4.6).
+      # WebAssembly binaries are NOT compatible across webR versions.
+      webr-image: "ghcr.io/r-wasm/webr:v0.6.0"
+      strip: "demo, doc, examples, help, html, include, tests, vignette"
+    permissions:
+      # For publishing artifact files to the release
+      contents: write
+      # To download GitHub Packages within action
+      repository-projects: read
